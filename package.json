@@ -1,0 +1,19 @@
+{
+  "name": "statsbooktool",
+  "version": "0.1.0",
+  "description": "A tool for processing WFTDA Statsbooks",
+  "main": "main.js",
+  "author": "Adam Smasher (Daniel Alt)",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "devtron": "^1.4.0",
+    "electron": "^1.7.12"
+  },
+  "dependencies": {
+    "typeface-raleway": "^0.0.54",
+    "xlsx": "^0.11.19"
+  }
+}

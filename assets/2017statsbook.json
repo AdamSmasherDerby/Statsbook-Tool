@@ -1,0 +1,144 @@
+{
+    "version": "2017",
+    "venue": {
+        "name": [1, "B3"],
+        "city": [1, "H3"],
+        "state": [1, "J3"]
+    },
+    "date": [1,"B7"],
+    "time": [1,"H7"],
+    "tournament": [1,"B5"],
+    "host-league": [1, "H5"],
+    "teams": {
+        "home": {
+            "league": [1, "B10"],
+            "name": [1, "B11"],
+            "color": [1, "B12"],
+            "firstName": [1, "C14"],
+            "firstNumber": [1, "B14"]
+        },
+        "away": {
+            "league": [1, "H10"],
+            "name": [1, "H11"],
+            "color": [1, "H12"],
+            "firstName": [1, "I14"],
+            "firstNumber": [1, "H14"]
+        },
+        "officials":{
+            "firstName": [1, "A60"],
+            "firstRole": [1, "D60"],
+            "firstLeague": [1, "H60"],
+            "firstCert": [1, "J60"]
+                }
+    },
+    "score": {
+        "maxJams": 38,
+        "p1": {
+            "home": {
+                "firstJamNumber": [2, "A4"],
+                "firstJammerNumber": [2, "B4"],
+                "firstLost": [2, "C4"],
+                "firstLead": [2, "D4"],
+                "firstCall": [2, "E4"],
+                "firstInj": [2, "F4"],
+                "firstTrip": [2, "H4"],
+                "lastTrip": [2, "P4"]
+            },
+            "away": {
+                "firstJamNumber": [2, "T4"],
+                "firstJammerNumber": [2, "U4"],
+                "firstLost": [2, "V4"],
+                "firstLead": [2, "W4"],
+                "firstCall": [2, "X4"],
+                "firstInj": [2, "Y4"],
+                "firstTrip": [2, "Z4"],
+                "lastTrip": [2, "AI4"]                
+            }
+        },
+        "p2": {
+            "home": {
+                "firstJamNumber": [2, "A46"],
+                "firstJammerNumber": [2, "B46"],
+                "firstLost": [2, "C46"],
+                "firstLead": [2, "D46"],
+                "firstCall": [2, "E46"],
+                "firstInj": [2, "F46"],
+                "firstTrip": [2, "H46"],
+                "lastTrip": [2, "P46"]
+            },
+            "away": {
+                "firstJamNumber": [2, "T46"],
+                "firstJammerNumber": [2, "U46"],
+                "firstLost": [2, "V46"],
+                "firstLead": [2, "W46"],
+                "firstCall": [2, "X46"],
+                "firstInj": [2, "Y46"],
+                "firstTrip": [2, "Z46"],
+                "lastTrip": [2, "AI46"]                
+            }
+        }
+    },
+    "penalties": {
+        "numberstep": 2,
+        "p1": {
+            "home": {
+                "firstNumber": [3, "A4"],
+                "firstPenalty": [3, "B4"],
+                "firstJam": [3, "B5"],
+                "firstFO": [3, "K4"],
+                "firstFOJam": [3,"K5"]
+            },
+            "away": {
+                "firstNumber": [3, "P4"],
+                "firstPenalty": [3, "Q4"],
+                "firstJam": [3, "Q5"],
+                "firstFO": [3, "Z4"],
+                "firstFOJam": [3,"Z5"]             
+            }
+        },
+        "p2": {
+            "home": {
+                "firstNumber": [3, "AC4"],
+                "firstPenalty": [3, "AD4"],
+                "firstJam": [3, "AD5"],
+                "firstFO": [3, "AM4"],
+                "firstFOJam": [3,"AM5"]
+            },
+            "away": {
+                "firstNumber": [3, "AR4"],
+                "firstPenalty": [3, "4"],
+                "firstJam": [3, "Q5"],
+                "firstFO": [3, "Z4"],
+                "firstFOJam": [3,"Z5"]             
+            }           
+        }
+    },
+    "lineups": {
+        "maxJams": 38,
+        "boxBoxes": 3,
+        "p1": {
+            "home": {
+                "firstJamNumber": [4, "A4"],
+                "firstNoPivot": [4, "B4"],
+                "firstJammer": [4, "C4"]
+            },
+            "away": {
+                "firstJamNumber": [4, "AA4"],
+                "firstNoPivot": [4, "AB4"],
+                "firstJammer": [4, "AC4"]                
+            }
+        },
+        "p2": {
+            "home": {
+                "firstJamNumber": [4, "A46"],
+                "firstNoPivot": [4, "B46"],
+                "firstJammer": [4, "C46"]
+            },
+            "away": {
+                "firstJamNumber": [4, "AA46"],
+                "firstNoPivot": [4, "AB46"],
+                "firstJammer": [4, "AC46"]                
+            }            
+        }
+    }
+}

@@ -1,0 +1,103 @@
+{
+    "scores":
+    {
+        "npPoints":
+        {
+            "description": "NP Box checked with points on first trip",
+            "events": []
+        },
+        "noPointsNoNP":
+        {
+            "description": "No points (including a zero) on first trip, NP box not checked.",
+            "events": []
+        },
+        "tooManyLead":
+        {
+            "description": "Lead box checked more than once in a single jam",
+            "events": []
+        },
+        "tooManyCall":
+        {
+            "description": "Call box checked more than once in a single jam",
+            "events": []
+        },
+        "injuryOnlyOnce":
+        {
+            "description": "Injury box checked for one team, but not the other.",
+            "events": []
+        },
+        "leadPenaltyNotLost":
+        {
+            "description": "Jammer with lead and penalty without 'lost' checked.",
+            "events": []
+        },
+        "onlyOneStarPass":
+        {
+            "description": "Star pass on only one team of the score sheet.",
+            "events": []
+        }
+
+    },
+    "penalties":
+    {
+        "foUnder7":
+        {
+            "description": "FO entered for a skater with fewer than 7 penalties",
+            "events": []
+        },
+        "sevenWithoutFO":
+        {
+            "description": "Seven or more penalties without a FO entered",
+            "events": []
+        },
+        "expulsionNoPenalty":
+        {
+            "description": "Expulsion entered for a jam with no penalty",
+            "events": []
+        },
+        "penaltyNoLineup":
+        {
+            "description": "Skater with penalty entered not listed on Lineups Tab",
+            "events": []
+        },
+        "penaltyNoEntry":
+        {
+            "description": "Penalty on penalty sheet without box entry on Lineups Tab",
+            "events": []
+        }
+    },
+    "lineups":
+    {
+        "samePlayerTwice":
+        {
+            "description": "Same player entered more than once in the same jam",
+            "events": []
+        },
+        "xNoPenalty":
+        {
+            "description": "X marked for player with no corresponding penalty",
+            "events": []
+        },
+        "slashNoPenalty":
+        {
+            "description": "/ marked for player with no corresponding penalty",
+            "events": []
+        },
+        "sNoPenalty":
+        {
+            "description": "S marked for player with no penalty in current or prior jam.",
+            "events": []
+        },
+        "sSlashNoPenalty":
+        {
+            "description": "$ marked for player with no penalty in current or prior jam",
+            "events": []
+        },
+        "iNotInBox":
+        {
+            "description": "I or | marked for player with no box entry.",
+            "events": []
+        }
+
+    }
+}

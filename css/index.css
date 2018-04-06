@@ -1,0 +1,11 @@
+body {
+    font-family: Raleway, sans-serif;
+}
+
+#drag-file {
+    background-color: blue;
+    color:white;
+    text-align: center;
+    width:300px;
+    height: 100px;
+}
