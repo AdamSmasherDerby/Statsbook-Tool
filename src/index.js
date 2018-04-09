@@ -4,7 +4,9 @@ const ipc = electron.ipcRenderer
 const XLSX = require('xlsx')
 
 let holder = document.getElementById('drag-file');
+let fileSelect = document.getElementById('file-select')
 let fileInfoBox = document.getElementById('file-info-box')
+let outBox = document.getElementById('output-box')
 let rABS = true // read XLSX files as binary strings vs. array buffers
 
 // To do - make template dynamically chosen
@@ -20,9 +22,8 @@ let sbData = {},  // derbyJSON formatted statsbook data
     teamList = ['home','away'],
     sbFilename = ""
 
-let saveButton = document.getElementById('save-derby-json-button')
-
-saveButton.addEventListener( 'click', function() {
+ipc.on('save-derby-json', (event) => {
+    // Saves statsbook data to a JSON file
     
     var data = encode( JSON.stringify(sbData, null, ' ')) ;
 
@@ -38,13 +39,51 @@ saveButton.addEventListener( 'click', function() {
     var event = document.createEvent( 'MouseEvents' );
     event.initMouseEvent( 'click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
     link.dispatchEvent( event );
-});
+})
+
+makeReader = (sbFile) => {
+    let reader = new FileReader()
+    fileInfoBox.innerHTML = 'Filename: ' + sbFile.name +'\n'
+    sbFilename = sbFile.name
+
+    reader.onload = (e) => {
+        readSbData(e)
+    }
+
+    // Actually load the file
+    if (rABS) {
+        reader.readAsBinaryString(sbFile)
+    }
+    else {
+        reader.readAsArrayBuffer(sbfile)
+    }
+}
+
+fileSelect.onchange = (e) => {
+    if (e.target.value == undefined){
+        return false;
+    }
+    e.preventDefault();
+    e.stopPropagation
+
+    if (e.target.files.length > 1){
+        console.log('Multiple Files Detected!')
+        return false;
+    } 
+    
+    let sbFile = e.target.files[0]
+
+    makeReader(sbFile)
+    return false;
+}
 
 holder.ondragover = () => {
+    holder.classList.add("box__ondragover")
     return false;
 };
 
 holder.ondragleave = () => {
+    holder.classList.remove("box__ondragover")
     return false;
 };
 
@@ -53,6 +92,7 @@ holder.ondragend = () => {
 };
 
 holder.ondrop = (e) => {
+    holder.classList.remove("box__ondragover")
     e.preventDefault();
     e.stopPropagation
 
@@ -63,48 +103,39 @@ holder.ondrop = (e) => {
     
     let sbFile = e.dataTransfer.files[0]
 
-    let reader = new FileReader()
-    fileInfoBox.innerHTML = 'Filename: ' + sbFile.name +'\n'
-    sbFilename = sbFile.name
-
-    // Set callback for when you load the file
-    reader.onload = (e) => {
-        let data = e.target.result
-        if (!rABS) data = new Uint8Array(data);
-        var workbook = XLSX.read(data, {type: rABS ? 'binary' :'array'})
-
-        //Read in information from the statsbook
-        sbData = {}        
-        sbErrors = JSON.parse(JSON.stringify(sbErrorTemplate))
-        penalties = {}
-        starPasses = []
-        readIGRF(workbook)
-        for (var i in teamList){
-            readTeam(workbook, teamList[i])
-        }
-        readOfficials(workbook)
-        sbData.periods = {'1': {jams: []}, '2': {jams: []}}
-        readScores(workbook)
-        readPenalties(workbook)
-        readLineups(workbook)
-        errorCheck()
-
-        // Display Error List
-        //fileInfoBox.innerHTML += JSON.stringify(sbData,null,' ') + '\n'
-        fileInfoBox.innerHTML += JSON.stringify(sbErrors,null,' ')
-        document.getElementById("save-derby-json-button").disabled = false;
-
-    }
-
-    // Actually load the file
-    if (rABS) {
-        reader.readAsBinaryString(sbFile)
-    }
-    else {
-        reader.readAsArrayBuffer(sbfile)
-    }
-   
+    makeReader(sbFile)
     return false;
+
+}
+
+readSbData = (e) => {
+    // Read in the statsbook data for a dragover event e
+    let data = e.target.result
+    if (!rABS) data = new Uint8Array(data);
+    var workbook = XLSX.read(data, {type: rABS ? 'binary' :'array'})
+
+    //Read in information from the statsbook
+    sbData = {}        
+    sbErrors = JSON.parse(JSON.stringify(sbErrorTemplate))
+    penalties = {}
+    starPasses = []
+    readIGRF(workbook)
+    for (var i in teamList){
+        readTeam(workbook, teamList[i])
+    }
+    readOfficials(workbook)
+    sbData.periods = {'1': {jams: []}, '2': {jams: []}}
+    readScores(workbook)
+    readPenalties(workbook)
+    readLineups(workbook)
+    errorCheck()
+
+    // Display Error List
+    //fileInfoBox.innerHTML += JSON.stringify(sbData,null,' ') + '\n'
+    //outBox.innerHTML += JSON.stringify(sbErrors,null,' ')
+    outBox.appendChild(sbErrorsToTable())
+
+    ipc.send('enable-save-derby-json')
 }
 
 readIGRF = (workbook) => {
@@ -1075,12 +1106,57 @@ remove = (array, element) => {
     }
 }
 
-function encode( s ) {
+encode = (s) => {
     var out = [];
     for ( var i = 0; i < s.length; i++ ) {
         out[i] = s.charCodeAt(i);
     }
     return new Uint8Array( out );
+}
+
+sbErrorsToTable = () => {
+    errorTypes = ["scores","lineups","penalties"]
+    typeHeaders = ["Scores", "Lineups", "Penalties"]
+    let table = document.createElement("table")
+    table.setAttribute('class','table')
+
+    for(let t in errorTypes){
+        let section = errorTypes[t]
+
+        let secHead = document.createElement("tr")
+        let secCell = document.createElement("th")
+        secCell.appendChild(document.createTextNode(typeHeaders[t]))
+        secHead.appendChild(secCell)
+        secHead.setAttribute('class','thead-dark')
+
+        table.appendChild(secHead)
+
+        for(let e in sbErrors[errorTypes[t]]){
+            let descRow = document.createElement("tr")
+            let descCell = document.createElement("th")
+            descCell.appendChild(document.createTextNode(
+                sbErrors[section][e].description
+            ))
+            descRow.appendChild(descCell)
+            descRow.setAttribute('class','thead-light')
+
+            table.appendChild(descRow)
+
+            for(let v in sbErrors[errorTypes[t]][e].events){
+                let evRow = document.createElement("tr")
+                let evCell = document.createElement("td")
+                evCell.appendChild(document.createTextNode(
+                    sbErrors[section][e].events[v]
+                ))
+                evRow.appendChild(evCell)
+
+                table.appendChild(evRow)
+            }
+
+        }
+    }
+    
+    return table
 }
 
 /*

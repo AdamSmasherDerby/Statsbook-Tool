@@ -6,14 +6,52 @@
   "author": "Adam Smasher (Daniel Alt)",
   "license": "MIT",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
   "devDependencies": {
     "devtron": "^1.4.0",
-    "electron": "^1.7.12"
+    "electron": "^1.7.12",
+    "electron-builder": "^20.8.1"
   },
   "dependencies": {
+    "bootstrap": "4.0.0",
+    "jquery": "^3.3.1",
+    "popper.js": "^1.14.3",
     "typeface-raleway": "^0.0.54",
     "xlsx": "^0.11.19"
+  },
+  "build": {
+    "appId": "statsbooktool",
+    "productName": "Statsbook Tool",
+    "directories": {
+      "buildResources": "build",
+      "output": "dist"
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 240,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "win": {
+      "target": "NSIS",
+      "icon": "build/flamingo.ico"
+    }
   }
 }

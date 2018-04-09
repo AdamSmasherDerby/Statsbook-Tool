@@ -3,9 +3,50 @@ body {
 }
 
 #drag-file {
-    background-color: blue;
-    color:white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #555;
     text-align: center;
     width:300px;
-    height: 100px;
+    height: 200px;
+    border-style: dashed;
+    border-color: #555;
+}
+
+.box__dragndrop {
+    color: #999;
+    display: inline;
+    vertical-align: baseline
+}
+
+.inputfile {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+.inputfile + label {
+    font-size: 1.25em;
+    font-weight: 700;
+    color:#555;
+    display: inline-block;
+    cursor: pointer;
+    vertical-align: baseline;
+}
+
+.inputfile:focus + label,
+.inputfile + label:hover {
+    color:pink;
+}
+
+.inputfile:focus + label {
+    outline: 1px dotted #000;
+}
+
+.box__ondragover {
+    background-color: pink
 }

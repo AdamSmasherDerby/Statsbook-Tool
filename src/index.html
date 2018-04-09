@@ -4,22 +4,44 @@
         <meta charset="UTF-8">
         <title>Statsbook Tool</title>
         <link rel="stylesheet" href="../node_modules/typeface-raleway/index.css">
+        <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="../css/index.css">
     </head>
     <body>
-        <h1>Statsbook Tool</h1>
-        <P>This is a tool for working with WFTDA statsbooks.  It is not 
-            in any way official or endorsed by the WFTDA.</P>
-
-        <div id="drag-file">
-            <P>Drop a file here</P>
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col">
+                <h1><strong>Statsbook Tool</strong></h1>
+                <P>This is a tool for working with WFTDA statsbooks.  It is not 
+                    in any way official or endorsed by the WFTDA.</P>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col">
+                    <div id="drag-file">
+                        <input type="file" name="file" id="file-select" class="inputfile" accept=".xlsx" />
+                        <label for="file-select">Choose a file <span class="box__dragndrop"> or drag it here.</span></label>
+                    </div>
+                </div>
+                <div class="col">
+                    <p>File Info:</p>
+                    <div id="file-info-box">
+                        No File Loaded
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                        <div id="output-box"></div>
+                </div>
+            </div>
         </div>
-        <button id="save-derby-json-button" disabled = "true">Save JSON</button>
-        <p>File Info:</p>
-        <pre id="file-info-box">
-            No File Loaded
-        </pre>
-    </body>
 
+        <script>
+            window.jQuery = window.$ = require('jquery');
+        </script>
+        <script src="../node_modules/popper.js/dist/umd/popper.js"></script>
+        <script src="../node_modules/bootstrap/dist/js/bootstrap.js"></script>
+    </body>
 <script src="index.js"></script>
 </html>

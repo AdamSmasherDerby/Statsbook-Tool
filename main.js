@@ -3,7 +3,9 @@ const path = require('path')
 const url = require('url')
 const ipc = require('electron').ipcMain
 
-function createWindow(){
+let menu
+
+createWindow = () => {
     win = new BrowserWindow({width: 800, height: 600})
 
     win.loadURL(url.format({
@@ -12,16 +14,24 @@ function createWindow(){
         slashes: true
     }))
 
-    win.webContents.openDevTools()
+    if (isDev()){
+        win.webContents.openDevTools()
+    }
 
     win.on('closed', ()=> {
         win=null
     })
 
-    var menu = Menu.buildFromTemplate([
+    menu = Menu.buildFromTemplate([
         {
             label: 'Options',
                 submenu: [
+                {   label: 'Save DerbyJSON',
+                    click: function() {
+                        win.webContents.send('save-derby-json')
+                    },
+                    enabled: false
+                },
                 {
                     label:'Exit',
                     click(){
@@ -45,4 +55,12 @@ app.on('activate',() => {
     if (win == null){
         createWindow()
     }
+})
+
+isDev = () => {
+    return process.mainModule.filename.indexOf('app.asar') === -1;
+  }
+
+ipc.on('enable-save-derby-json', (event) => {
+    menu.items[0].submenu.items[0].enabled = true
 })

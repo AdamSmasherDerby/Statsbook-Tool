@@ -33,3 +33,5 @@ Lineups + Penalties:
 Scores + Penalties
 
 1. Jammers with lead and a penalty, but not marked "lost."
+
+Flamingo icon from http://www.iconsmind.com
