@@ -13,11 +13,13 @@
   "devDependencies": {
     "devtron": "^1.4.0",
     "electron": "^1.7.12",
-    "electron-builder": "^20.8.1"
+    "electron-builder": "^20.8.1",
+    "eslint": "^4.19.1"
   },
   "dependencies": {
     "bootstrap": "4.0.0",
     "jquery": "^3.3.1",
+    "moment": "^2.22.0",
     "popper.js": "^1.14.3",
     "typeface-raleway": "^0.0.54",
     "xlsx": "^0.11.19"

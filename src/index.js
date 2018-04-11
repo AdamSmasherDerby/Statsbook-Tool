@@ -1,49 +1,52 @@
 const electron = require('electron')
-const path = require('path')
 const ipc = electron.ipcRenderer
 const XLSX = require('xlsx')
+const moment = require('moment')
 
-let holder = document.getElementById('drag-file');
+// Page Elements
+let holder = document.getElementById('drag-file')
 let fileSelect = document.getElementById('file-select')
 let fileInfoBox = document.getElementById('file-info-box')
 let outBox = document.getElementById('output-box')
-let rABS = true // read XLSX files as binary strings vs. array buffers
 
-// To do - make template dynamically chosen
+// Template Files
 let sbTemplate = require('../assets/2018statsbook.json')
-let sbErrorTemplate = require('../assets/sberrors.json') // used for tracking error checking data
+let sbErrorTemplate = require('../assets/sberrors.json')
+// TO DO - Make template dynamically choosable
 
-// Good practice - sbData should probably become a class and the 
-// various "read" routines become methods.
+// Globals
 let sbData = {},  // derbyJSON formatted statsbook data
     sbErrors = {},
     penalties = {},
     starPasses = [],
     teamList = ['home','away'],
-    sbFilename = ""
+    sbFilename = '',
+    rABS = true // read XLSX files as binary strings vs. array buffers
+    // Good practice - sbData should probably become a class and the 
+    // various "read" routines become methods.
 
-ipc.on('save-derby-json', (event) => {
+ipc.on('save-derby-json', () => {
     // Saves statsbook data to a JSON file
     
-    var data = encode( JSON.stringify(sbData, null, ' ')) ;
+    var data = encode( JSON.stringify(sbData, null, ' ')) 
 
     var blob = new Blob( [ data ], {
         type: 'application/octet-stream'
-    });
+    })
     
-    url = URL.createObjectURL( blob );
-    var link = document.createElement( 'a' );
-    link.setAttribute( 'href', url );
-    link.setAttribute( 'download', sbFilename.split('.')[0] + '.json');
+    let url = URL.createObjectURL( blob )
+    var link = document.createElement( 'a' )
+    link.setAttribute( 'href', url )
+    link.setAttribute( 'download', sbFilename.split('.')[0] + '.json')
     
-    var event = document.createEvent( 'MouseEvents' );
-    event.initMouseEvent( 'click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
-    link.dispatchEvent( event );
+    let e = document.createEvent( 'MouseEvents' )
+    e.initMouseEvent( 'click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null)
+    link.dispatchEvent( e )
 })
 
-makeReader = (sbFile) => {
+let makeReader = (sbFile) => {
+    // Create reader object and load statsbook file
     let reader = new FileReader()
-    fileInfoBox.innerHTML = 'Filename: ' + sbFile.name +'\n'
     sbFilename = sbFile.name
 
     reader.onload = (e) => {
@@ -55,63 +58,63 @@ makeReader = (sbFile) => {
         reader.readAsBinaryString(sbFile)
     }
     else {
-        reader.readAsArrayBuffer(sbfile)
+        reader.readAsArrayBuffer(sbFile)
     }
 }
 
 fileSelect.onchange = (e) => {
     if (e.target.value == undefined){
-        return false;
+        return false
     }
-    e.preventDefault();
+    e.preventDefault()
     e.stopPropagation
 
     if (e.target.files.length > 1){
-        console.log('Multiple Files Detected!')
-        return false;
+        fileInfoBox.innerHTML = 'Error: Multiple Files Selected.'
+        return false
     } 
     
     let sbFile = e.target.files[0]
 
     makeReader(sbFile)
-    return false;
+    return false
 }
 
 holder.ondragover = () => {
-    holder.classList.add("box__ondragover")
-    return false;
-};
+    holder.classList.add('box__ondragover')
+    return false
+}
 
 holder.ondragleave = () => {
-    holder.classList.remove("box__ondragover")
-    return false;
-};
+    holder.classList.remove('box__ondragover')
+    return false
+}
 
 holder.ondragend = () => {
-    return false;
-};
+    return false
+}
 
 holder.ondrop = (e) => {
-    holder.classList.remove("box__ondragover")
-    e.preventDefault();
+    holder.classList.remove('box__ondragover')
+    e.preventDefault()
     e.stopPropagation
 
     if (e.dataTransfer.files.length > 1){
-        console.log('Multiple Files Detected!')
-        return false;
+        fileInfoBox.innerHTML = 'Error: Multiple Files Selected.'
+        return false
     } 
     
     let sbFile = e.dataTransfer.files[0]
 
     makeReader(sbFile)
-    return false;
+    return false
 
 }
 
-readSbData = (e) => {
-    // Read in the statsbook data for a dragover event e
+let readSbData = (e) => {
+    // Read in the statsbook data for an event e
     let data = e.target.result
-    if (!rABS) data = new Uint8Array(data);
+    if (!rABS) data = new Uint8Array(data)
     var workbook = XLSX.read(data, {type: rABS ? 'binary' :'array'})
 
     //Read in information from the statsbook
@@ -123,6 +126,7 @@ readSbData = (e) => {
     for (var i in teamList){
         readTeam(workbook, teamList[i])
     }
+    updateFileInfo()
     readOfficials(workbook)
     sbData.periods = {'1': {jams: []}, '2': {jams: []}}
     readScores(workbook)
@@ -138,25 +142,25 @@ readSbData = (e) => {
     ipc.send('enable-save-derby-json')
 }
 
-readIGRF = (workbook) => {
+let readIGRF = (workbook) => {
     // read IGRF data into the sbData file
 
-    getJsDateFromExcel = (excelDate) => {
+    let getJsDateFromExcel = (excelDate) => {
         // Helper function to convert Excel date to JS format
-          return new Date((excelDate - (25567 + 1))*86400*1000);
-      }
+        return new Date((excelDate - (25567 + 1))*86400*1000)
+    }
     
-    getJsTimeFromExcel = (excelTime) => {
+    let getJsTimeFromExcel = (excelTime) => {
         // Helper function to convert Excel time to JS format
         let secondsAfterMid = excelTime * 86400
         let hours = Math.floor(secondsAfterMid/3600)
         let remainder = secondsAfterMid % 3600
         let minutes = Math.floor(remainder/60)
         let seconds = remainder % 60
-        return(`${hours.toString().padStart(2,"0")
-                }:${minutes.toString().padStart(2,"0")
-                }:${seconds.toString().padStart(2,"0")}`)
-      }
+        return(`${hours.toString().padStart(2,'0')
+        }:${minutes.toString().padStart(2,'0')
+        }:${seconds.toString().padStart(2,'0')}`)
+    }
 
     sbData.venue = {}
     sbData.venue.name = cellValue(workbook,sbTemplate.venue.name)
@@ -165,15 +169,16 @@ readIGRF = (workbook) => {
     sbData.date = getJsDateFromExcel(cellValue(workbook,sbTemplate.date))
     sbData.time = getJsTimeFromExcel(cellValue(workbook,sbTemplate.time))
     sbData.tournament = cellValue(workbook,sbTemplate.tournament)
-    sbData["host-league"] = cellValue(workbook,sbTemplate["host-league"])
+    sbData['host-league'] = cellValue(workbook,sbTemplate['host-league'])
+
 }
 
-readTeam = (workbook,team) => {
+let readTeam = (workbook,team) => {
     // team should be "home" or "away"
     let name_address = {},
         num_address = {},
-        skaterName = "",
-        skaterNumber = "",
+        skaterName = '',
+        skaterNumber = '',
         skaterData = {}
 
     // Extract general team data
@@ -185,32 +190,31 @@ readTeam = (workbook,team) => {
 
     // Extract skater data
     let [nameSheet, nameRow, nameCol] 
-        = nameRowCol(workbook, sbTemplate.teams[team].firstName);
+        = nameRowCol(workbook, sbTemplate.teams[team].firstName)
     let [numSheet, numberRow, numberCol] 
-        = nameRowCol(workbook, sbTemplate.teams[team].firstNumber);
-    let maxNum = sbTemplate.teams[team].maxNum;
-    sbData.teams[team].persons=[];
+        = nameRowCol(workbook, sbTemplate.teams[team].firstNumber)
+    let maxNum = sbTemplate.teams[team].maxNum
+    sbData.teams[team].persons=[]
 
     for (var i = 0; i<maxNum; i++) {
         // For each skater, read in name and number, add to sbData
         name_address = { c: nameCol, r: nameRow + i}
         num_address = { c: numberCol, r: numberRow + i}
-        skaterName = nameSheet[XLSX.utils.encode_cell(name_address)];
-        skaterNumber = numSheet[XLSX.utils.encode_cell(num_address)];
-        if (skaterNumber == undefined) {continue};
-        skaterData = {name: skaterName.v, number: skaterNumber.v};
-        sbData.teams[team].persons.push(skaterData);
-        penalties[team + ":" + skaterNumber.v] = []
+        skaterName = nameSheet[XLSX.utils.encode_cell(name_address)]
+        skaterNumber = numSheet[XLSX.utils.encode_cell(num_address)]
+        if (skaterNumber == undefined) {continue}
+        skaterData = {name: skaterName.v, number: skaterNumber.v}
+        sbData.teams[team].persons.push(skaterData)
+        penalties[team + ':' + skaterNumber.v] = []
     }
 
 
 }
 
-readOfficials = (workbook) => {
+let readOfficials = (workbook) => {
     // Read in officials' data
 
     let props = ['firstName','firstRole','firstLeague','firstCert'],
-        tab = 'IGRF',
         sheet = getSheet(workbook, sbTemplate.teams.officials.sheetNumber),
         maxNum = sbTemplate.teams.officials.maxNum,
         nameAddress = {},
@@ -240,28 +244,37 @@ readOfficials = (workbook) => {
         certAddress.r = cells.firstCert.r + i
 
         // Require presence of both a name and a role to record a line:
-        let offName = sheet[XLSX.utils.encode_cell(nameAddress)];
-        let offRole = sheet[XLSX.utils.encode_cell(roleAddress)];
-        if (offRole == undefined || offName == undefined) {continue};
+        let offName = sheet[XLSX.utils.encode_cell(nameAddress)]
+        let offRole = sheet[XLSX.utils.encode_cell(roleAddress)]
+        if (offRole == undefined || offName == undefined) {continue}
 
-        let offData = {name: offName.v, roles: [offRole.v]};
+        let offData = {name: offName.v, roles: [offRole.v]}
 
         // Also record league and cert if present
-        let offLeague = sheet[XLSX.utils.encode_cell(leagueAddress)];
+        let offLeague = sheet[XLSX.utils.encode_cell(leagueAddress)]
         if (offLeague != undefined) {
-            offData.league = offLeague.v;
+            offData.league = offLeague.v
         }
-        let offCert = sheet[XLSX.utils.encode_cell(certAddress)];
+        let offCert = sheet[XLSX.utils.encode_cell(certAddress)]
         if (offCert != undefined) {
-            offData.certifications = [{level: offCert.v}];
+            offData.certifications = [{level: offCert.v}]
         }
 
-        sbData.teams.officials.persons.push(offData);
+        sbData.teams.officials.persons.push(offData)
     }
 
 }
 
-readScores = (workbook) => {
+let updateFileInfo = () => {
+    // Update the "File Information Box"
+    // Update File Information Box
+    fileInfoBox.innerHTML = `Filename:  ${sbFilename}<br>`
+    fileInfoBox.innerHTML += `Game Date: ${moment(sbData.date).format('MMMM DD, YYYY')}<br>`
+    fileInfoBox.innerHTML += `Team 1: ${sbData.teams['home'].league} ${sbData.teams['home'].name}<br>`
+    fileInfoBox.innerHTML += `Team 2: ${sbData.teams['away'].name} ${sbData.teams['away'].league}<br>`
+}
+
+let readScores = (workbook) => {
     // Given a workbook, extract the information from the score tab
 
     let cells = {},
@@ -271,16 +284,15 @@ readScores = (workbook) => {
         jammerAddress = {},
         jamNumber = {},
         tripAddress = {},
-        starPass = {},
         lostAddress = {},
         leadAddress = {},
         callAddress = {},
         injAddress = {},
         npAddress = {},
-        skater = {};
+        skater = {}
 
     let props = ['firstJamNumber','firstJammerNumber','firstLost','firstLead',
-        'firstCall','firstInj','firstNp','firstTrip','lastTrip'];
+        'firstCall','firstInj','firstNp','firstTrip','lastTrip']
     let tab = 'score'
     let npRe = /(\d)\+NP/
     let ippRe = /(\d)\+(\d)/
@@ -289,7 +301,7 @@ readScores = (workbook) => {
         // For each period, import data
 
         // Add a period object with a jams array
-        let pstring = period.toString();
+        let pstring = period.toString()
 
         for (var i in teamList){ 
             // For each team
@@ -299,44 +311,44 @@ readScores = (workbook) => {
             let starPass = false
 
             // Get an array of starting points for each type of info
-            cells = initCells(team,pstring, tab, props);
+            cells = initCells(team,pstring, tab, props)
             let maxTrips = cells.lastTrip.c - cells.firstTrip.c
-            jamAddress.c = cells.firstJamNumber.c;
-            jammerAddress.c = cells.firstJammerNumber.c;
-            tripAddress.c = cells.firstTrip.c;
-            lostAddress.c = cells.firstLost.c;
-            leadAddress.c = cells.firstLead.c;
-            callAddress.c = cells.firstCall.c;
-            injAddress.c = cells.firstInj.c;
-            npAddress.c = cells.firstNp.c;            
+            jamAddress.c = cells.firstJamNumber.c
+            jammerAddress.c = cells.firstJammerNumber.c
+            tripAddress.c = cells.firstTrip.c
+            lostAddress.c = cells.firstLost.c
+            leadAddress.c = cells.firstLead.c
+            callAddress.c = cells.firstCall.c
+            injAddress.c = cells.firstInj.c
+            npAddress.c = cells.firstNp.c           
         
             for(let l = 0; l< maxJams; l++){
 
                 // For each line in the scoresheet, import data.
 
                 // increment addresses 
-                jamAddress.r = cells.firstJamNumber.r + l;
-                jammerAddress.r = cells.firstJammerNumber.r + l;
-                tripAddress.r = cells.firstTrip.r + l;
-                lostAddress.r = cells.firstLost.r + l;
-                leadAddress.r = cells.firstLead.r + l;
-                callAddress.r = cells.firstCall.r + l;
-                injAddress.r = cells.firstInj.r + l;
-                npAddress.r = cells.firstNp.r + l;
+                jamAddress.r = cells.firstJamNumber.r + l
+                jammerAddress.r = cells.firstJammerNumber.r + l
+                tripAddress.r = cells.firstTrip.r + l
+                lostAddress.r = cells.firstLost.r + l
+                leadAddress.r = cells.firstLead.r + l
+                callAddress.r = cells.firstCall.r + l
+                injAddress.r = cells.firstInj.r + l
+                npAddress.r = cells.firstNp.r + l
 
                 // determine current jam number
-                jamNumber = sheet[XLSX.utils.encode_cell(jamAddress)];
+                jamNumber = sheet[XLSX.utils.encode_cell(jamAddress)]
                 
                 // if we're out of jams, stop
                 if (jamNumber == undefined){break}
 
                 // handle star passes
-                if (jamNumber.v =="SP" || jamNumber.v == "SP*"){
+                if (jamNumber.v =='SP' || jamNumber.v == 'SP*'){
                     starPass = true
-                    if (jamNumber.v == "SP"){
+                    if (jamNumber.v == 'SP'){
                         sbData.periods[pstring].jams[jam -1].events.push(
                             {
-                                event: "star pass",
+                                event: 'star pass',
                                 skater: skater
                             }                        
                         )
@@ -351,47 +363,47 @@ readScores = (workbook) => {
                 // If there isn't currently an numbered object for this jam, create it
                 // Note that while the "number" field is one indexed, the jams array itself is zero indexed
                 if (!sbData.periods[pstring].jams.find(o => o.number === jam)){
-                    sbData.periods[pstring].jams[jam-1] = {number: jam, events: []};
+                    sbData.periods[pstring].jams[jam-1] = {number: jam, events: []}
                 }
 
                 // Process trips.
                 // Add a "pass" object for each trip, including initial passes 
                 // (note that even incomplete initial passes get "pass" events.)
-                let skaterNum = " ";
-                let initCompleted = "yes"
+                let skaterNum = ' '
+                let initCompleted = 'yes'
                 
                 // Check for no initial pass
                 let np = sheet[XLSX.utils.encode_cell(npAddress)]
-                if (np != undefined && np.v != undefined){initCompleted = "no"}
+                if (np != undefined && np.v != undefined){initCompleted = 'no'}
 
                 if (!starPass){
                     // If this line is not a star pass, read in the skater number
                     // and create an intital pass object
 
                     skaterNum = sheet[XLSX.utils.encode_cell(jammerAddress)].v
-                    skater = team + ":" + skaterNum
+                    skater = team + ':' + skaterNum
                     sbData.periods[period].jams[jam-1].events.push(
                         {
-                            event: "pass",
+                            event: 'pass',
                             number: 1,
-                            score: "",
+                            score: '',
                             skater: skater,
                             team: team,
                             completed: initCompleted
                         }
                     )               
-                } else if (jamNumber.v=="SP") {
+                } else if (jamNumber.v=='SP') {
                     // If THIS team has a star pass, use the skater number from the sheet
 
                     skaterNum = sheet[XLSX.utils.encode_cell(jammerAddress)].v
-                    skater = team + ":" + skaterNum
+                    skater = team + ':' + skaterNum
                 }  // Final case - jam number is SP*.   
-                   //  Do nothing: skater number should remain untouched from prior line)
+                //  Do nothing: skater number should remain untouched from prior line)
 
                 // Check for subsequent trips, and add additional pass objects            
                 //(To do - add check for "completed" logic)
                 for (let trip=2; trip < maxTrips + 2; trip++){
-                    tripAddress.c = cells.firstTrip.c + trip -2;
+                    tripAddress.c = cells.firstTrip.c + trip - 2
                     let tripScore = sheet[XLSX.utils.encode_cell(tripAddress)]
                     if (tripScore == undefined){
                         // ERROR CHECK - no trip score, initial pass completed
@@ -412,16 +424,16 @@ readScores = (workbook) => {
                         // If score is x + NP, extract score and update initial trip
                         points = reResult[1]
                         sbData.periods[period].jams[jam-1].events.find(
-                            x => x.event == "pass" && x.number == 1 && x.skater == skater
-                            ).score = points
+                            x => x.event == 'pass' && x.number == 1 && x.skater == skater
+                        ).score = points
                     } else if (tripScore.f != undefined && (ippResult = ippRe.exec(tripScore.f))){
                         // If score is x + x, extract scores and add points to prior AND current trip
                         sbData.periods[period].jams[jam-1].events.find(
-                            x => x.event == "pass" && x.number == 1 && x.skater == skater
-                            ).score = ippResult[1]
+                            x => x.event == 'pass' && x.number == 1 && x.skater == skater
+                        ).score = ippResult[1]
                         sbData.periods[period].jams[jam-1].events.push(
                             {
-                                event: "pass",
+                                event: 'pass',
                                 number: trip,
                                 score: ippResult[2],
                                 skater: skater,
@@ -432,7 +444,7 @@ readScores = (workbook) => {
                         points = tripScore.v
                         sbData.periods[period].jams[jam-1].events.push(
                             {
-                                event: "pass",
+                                event: 'pass',
                                 number: trip,
                                 score: points,
                                 skater: skater,
@@ -455,7 +467,7 @@ readScores = (workbook) => {
                 if (lost != undefined && lost.v != undefined){
                     sbData.periods[period].jams[jam-1].events.push(
                         {
-                            event: "lost",
+                            event: 'lost',
                             skater: skater
                         }
                     )
@@ -465,7 +477,7 @@ readScores = (workbook) => {
                 if (lead != undefined && lead.v != undefined){
                     sbData.periods[period].jams[jam-1].events.push(
                         {
-                            event: "lead",
+                            event: 'lead',
                             skater: skater
                         }
                     )
@@ -475,7 +487,7 @@ readScores = (workbook) => {
                 if (call != undefined && call.v != undefined){
                     sbData.periods[period].jams[jam-1].events.push(
                         {
-                            event: "call",
+                            event: 'call',
                             skater: skater
                         }
                     )
@@ -485,44 +497,44 @@ readScores = (workbook) => {
                 if (inj != undefined && inj.v != undefined){
                     sbData.periods[period].jams[jam-1].events.push(
                         {
-                            event: "injury",
+                            event: 'injury',
                             skater: skater
                         }
                     )
                 }
             }
             
-       }
+        }
         // End of period - check for cross team errors
 
         for (let j in sbData.periods[period].jams){
             // ERROR CHECK: Lead box checked more than once in the same jam
             let jam = parseInt(j) + 1
             if (sbData.periods[period].jams[j].events.filter(
-                x => x.event == "lead"
-                ).length >= 2){
-                    sbErrors.scores.tooManyLead.events.push(
-                        'Period: ' + period + ', Jam: ' + jam
-                    )
-                }
+                x => x.event == 'lead'
+            ).length >= 2){
+                sbErrors.scores.tooManyLead.events.push(
+                    'Period: ' + period + ', Jam: ' + jam
+                )
+            }
     
             // ERROR CHECK: Call box checked for both jammers in same jam
             if (sbData.periods[period].jams[j].events.filter(
-                x => x.event == "call"
-                ).length >= 2){
-                    sbErrors.scores.tooManyCall.events.push(
-                        'Period: ' + period + ', Jam: ' + jam
-                    )
-                }
+                x => x.event == 'call'
+            ).length >= 2){
+                sbErrors.scores.tooManyCall.events.push(
+                    'Period: ' + period + ', Jam: ' + jam
+                )
+            }
 
             // ERROR CHECK: Injury box checked for only one team in a jam.
             if (sbData.periods[period].jams[j].events.filter(
-                x => x.event == "injury"
-                ).length == 1){
-                    sbErrors.scores.injuryOnlyOnce.events.push(
-                        'Period: ' + period + ', Jam: ' + jam
-                    )
-                }
+                x => x.event == 'injury'
+            ).length == 1){
+                sbErrors.scores.injuryOnlyOnce.events.push(
+                    'Period: ' + period + ', Jam: ' + jam
+                )
+            }
         }
     }
     // All score data read
@@ -537,7 +549,7 @@ readScores = (workbook) => {
     }
 }
 
-readPenalties = (workbook) => {
+let readPenalties = (workbook) => {
     // Given a workbook, extract the data from the "Penalties" tab.
 
     let cells = {},
@@ -567,7 +579,7 @@ readPenalties = (workbook) => {
             let team = teamList[i]
 
             // Maximum number of skaters per team
-            let maxNum = sbTemplate.teams[team].maxNum;
+            let maxNum = sbTemplate.teams[team].maxNum
 
             // Read in starting positions for penalty parameters
             cells = initCells(team, pstring, tab, props)
@@ -589,9 +601,9 @@ readPenalties = (workbook) => {
 
                 let skaterNum = sheet[XLSX.utils.encode_cell(numberAddress)]
 
-                if (skaterNum == undefined || skaterNum.v == ""){continue}
+                if (skaterNum == undefined || skaterNum.v == ''){continue}
 
-                let skater = team + ":" + skaterNum.v
+                let skater = team + ':' + skaterNum.v
 
                 for(let p = 0; p < maxPenalties; p++){
                     // For each penalty space
@@ -614,7 +626,7 @@ readPenalties = (workbook) => {
                     // Add a penalty event to that jam
                     sbData.periods[period].jams[jam - 1].events.push(
                         {
-                            event: "penalty",
+                            event: 'penalty',
                             skater: skater,
                             penalty: code
                         }
@@ -633,9 +645,9 @@ readPenalties = (workbook) => {
                     // ERROR CHECK: Seven or more penalties with NO foulout entered 
                     if (foulouts.indexOf(skater) == -1 
                         && penalties[skater].length > 6 
-                        && period == "2"){
-                            sbErrors.penalties.sevenWithoutFO.events.push(
-                                "Team: " + team + " Skater: " + skaterNum.v
+                        && period == '2'){
+                        sbErrors.penalties.sevenWithoutFO.events.push(
+                            'Team: ' + team + ' Skater: ' + skaterNum.v
                         )
                     }
 
@@ -649,21 +661,21 @@ readPenalties = (workbook) => {
                 if (foCode.v != 'FO'){
                     sbData.periods[period].jams[foJam.v -1].events.push(
                         {
-                            event: "expulsion",
+                            event: 'expulsion',
                             skater: skater,
                             notes: [
-                                {note: "Penalty: " + foCode.v},
-                                {note: "Jam: " + foJam.v}
+                                {note: 'Penalty: ' + foCode.v},
+                                {note: 'Jam: ' + foJam.v}
                             ]
                         }
                     )
 
                     // ERROR CHECK: Expulsion code for a jam with no penalty
                     if (sbData.periods[period].jams[foJam.v - 1].events.filter(
-                        x => x.event == "penalty" && x.skater == skater
+                        x => x.event == 'penalty' && x.skater == skater
                     ).length < 1){
                         sbErrors.penalties.expulsionNoPenalty.events.push(
-                            "Period: " + period + " Jam: " + foJam.v + " Team: " + team + " Skater: " + skaterNum.v
+                            'Period: ' + period + ' Jam: ' + foJam.v + ' Team: ' + team + ' Skater: ' + skaterNum.v
                         )
                     }
 
@@ -676,7 +688,7 @@ readPenalties = (workbook) => {
                 // ERROR CHECK: FO entered with fewer than seven penalties
                 if (foCode.v == 'FO' && penalties[skater].length < 7){
                     sbErrors.penalties.foUnder7.events.push(
-                        "Period: " + period + " Team: " + team + " Skater: " + skaterNum.v 
+                        'Period: ' + period + ' Team: ' + team + ' Skater: ' + skaterNum.v 
                     )
                 }
 
@@ -686,7 +698,7 @@ readPenalties = (workbook) => {
             benchExpCodeAddress.r = cells.benchExpCode.r
             benchExpJamAddress.r = cells.benchExpJam.r
 
-            for (e = 0; e < 2; e++){
+            for (let e = 0; e < 2; e++){
                 benchExpCodeAddress.c = cells.benchExpCode.c + e
                 benchExpJamAddress.c = cells.benchExpJam.c + e
 
@@ -698,10 +710,10 @@ readPenalties = (workbook) => {
                 }
                 sbData.periods[period].jams[benchExpJam.v - 1].events.push(
                     {
-                        event: "expulsion",
+                        event: 'expulsion',
                         notes: [
-                            {note: "Bench Staff Expulsion - " + benchExpCode.v},
-                            {note: "Jam: " + benchExpJam.v}
+                            {note: 'Bench Staff Expulsion - ' + benchExpCode.v},
+                            {note: 'Jam: ' + benchExpJam.v}
                         ]
                     }
                 )
@@ -713,7 +725,7 @@ readPenalties = (workbook) => {
 
 }
 
-readLineups = (workbook) => {
+let readLineups = (workbook) => {
     // Read in the data from the lineups tab.
 
     let cells = {},
@@ -756,9 +768,9 @@ readLineups = (workbook) => {
 
                 let jamText = sheet[XLSX.utils.encode_cell(jamNumberAddress)]
 
-                if (jamText == undefined || jamText.v == "") {continue}
+                if (jamText == undefined || jamText.v == '') {continue}
                 // TODO - maybe change this to not give up if the jam # is blank?
-                if (jamText.v != "SP" && jamText.v != "SP*"){
+                if (jamText.v != 'SP' && jamText.v != 'SP*'){
                     // Unless this is a starpass line, update the jam number
                     jam = jamText.v
                     starPass = false
@@ -769,18 +781,18 @@ readLineups = (workbook) => {
                 // Retrieve penalties from this jam and prior jam for
                 // error checking later
                 let thisJamPenalties = sbData.periods[pstring].jams[jam-1].events.filter(
-                    x => x.event == "penalty"    
+                    x => x.event == 'penalty'
                 )
                 let priorJamPenalties = []
                 if (jam != 1) {
                     priorJamPenalties = sbData.periods[pstring].jams[jam-2].events.filter(
-                        x => x.event == "penalty"
+                        x => x.event == 'penalty'
                     )
                 } else if (period == 2){
                     priorJamPenalties = sbData.periods['1'].jams[
                         sbData.periods['1'].jams.length - 1
                     ].events.filter(
-                        x=> x.event == "penalty"
+                        x=> x.event == 'penalty'
                     )
                 }
 
@@ -795,11 +807,11 @@ readLineups = (workbook) => {
 
                     if (skaterText == undefined){continue}
 
-                    let skater = team + ":" + skaterText.v
+                    let skater = team + ':' + skaterText.v
                     // ERROR CHECK: Same skater entered more than once per jam
                     if (skaterList.indexOf(skater) != -1){
                         sbErrors.lineups.samePlayerTwice.events.push(
-                            "Period: " + period + " Jam: " + jam + " Team: " + team + " Skater: " + skaterText.v
+                            'Period: ' + period + ' Jam: ' + jam + ' Team: ' + team + ' Skater: ' + skaterText.v
                         )
                     }
 
@@ -816,7 +828,7 @@ readLineups = (workbook) => {
                     //"lineup" event for that skater with the position
                         sbData.periods[pstring].jams[jam -1].events.push(
                             {
-                                event: "lineup",
+                                event: 'lineup',
                                 skater: skater,
                                 position: position
                             }
@@ -844,124 +856,125 @@ readLineups = (workbook) => {
                         // 3 - Injury object, verify not already present from score tab
 
                         switch (codeText.v){
-                            case '/':
-                                // Add an "Enter Box" event, and push the skater onto the box list
-                                sbData.periods[pstring].jams[jam-1].events.push(
-                                    {
-                                        event: "enter box",
-                                        skater: skater                                        
-                                    }
-                                )
-                                box.push(skater)
-
-                                // ERROR CHECK: Skater enters the box during the jam
-                                // without a penalty in the current jam.
-                                if(thisJamPenalties.indexOf(
-                                    x => x.skater == skater                                        
-                                    ) == -1){
-                                        sbErrors.lineups.slashNoPenalty.events.push(
-                                            "Period: " + pstring + " Jam: " + jam + " Team: " + team + " Skater: " + skaterText.v
-                                        )
-                                }
-                                break;
-                            case 'X':
-                                if (!box.includes(skater)){
-                                    // If the skater is not in the box, add an "enter box" event
-                                    sbData.periods[pstring].jams[jam-1].events.push(
-                                        {
-                                            event: "enter box",
-                                            skater: skater                                        
-                                        }
-                                    )
-                                    // ERROR CHECK: Skater enters the box during the jam 
-                                    // without a penalty in the current jam.
-                                    if(thisJamPenalties.indexOf(
-                                        x => x.skater == skater                                        
-                                        ) == -1){
-                                            sbErrors.lineups.xNoPenalty.events.push(
-                                                "Period: " + pstring + " Jam: " + jam + " Team: " + team + " Skater: " + skaterText.v
-                                            )
-                                    }
-
-                                }
-                                // Whether or not the skater started in the box, add an "exit box" event
-                                sbData.periods[pstring].jams[jam-1].events.push(
-                                    {
-                                        event: "exit box",
-                                        skater: skater                                        
-                                    }
-                                )
-                                // Remove the skater from the box list.
-                                if (box.includes(skater)){
-                                    remove(box,skater)
-                                }                             
-                                break;
-
-                            case 'S':
-                                // Add a box entry, with a note that the skater sat between jams.
-                                sbData.periods[pstring].jams[jam-1].events.push(
-                                    {
-                                        event: "enter box",
-                                        skater: skater,
-                                        note: 'Sat between jams'                                        
-                                    }
-                                )
-                                // Add skater to the box list.
-                                box.push(skater)
-
-                                // ERROR CHECK: Skater starts in the box without a penalty
-                                // in the prior or current jam.
-                                if(thisJamPenalties.indexOf(x => x.skater == skater) == -1
-                                    && priorJamPenalties.indexOf(x => x.skater == skater)){
-                                        sbErrors.lineups.sNoPenalty.events.push(
-                                            "Period: " + pstring + " Jam: " + jam + " Team: " + team + " Skater: " + skaterText.v
-                                        )
-                                }
-                                break;
-
-                            case '$':
-                                sbData.periods[pstring].jams[jam-1].events.push(
-                                    {
-                                        event: "enter box",
-                                        skater: skater,
-                                        note: 'Sat between jams'                                        
-                                    }
-                                )
-                                sbData.periods[pstring].jams[jam-1].events.push(
-                                    {
-                                        event: "exit box",
-                                        skater: skater                                        
-                                    }
-                                ) 
-                                // ERROR CHECK: Skater starts in the box without a penalty
-                                // in the prior or current jam.
-                                if(thisJamPenalties.indexOf(x => x.skater == skater) == -1
-                                    && priorJamPenalties.indexOf(x => x.skater == skater)){
-                                        sbErrors.lineups.sSlashNoPenalty.events.push(
-                                            "Period: " + pstring + " Jam: " + jam + " Team: " + team + " Skater: " + skaterText.v
-                                        )
-                                }
-                            
-                                break;
-                            case 'I':
-                            case '|':
-                                // no event, but use this branch for checking if needed
-                                if (!box.includes(skater)){
-                                    sbErrors.lineups.iNotInBox.events.push(
-                                        "Period: " + pstring + " Jam: " + jam + " Team: " + team + " Skater: " + skaterText.v
-                                    )
-                                }                                
-                                break;
-                            case '3':
+                        case '/':
+                            // Add an "Enter Box" event, and push the skater onto the box list
                             sbData.periods[pstring].jams[jam-1].events.push(
                                 {
-                                    event: "injury",
+                                    event: 'enter box',
                                     skater: skater                                        
                                 }
                             )
-                            default:
-                                // Handle incorrect lineup codes
-                                break;
+                            box.push(skater)
+
+                            // ERROR CHECK: Skater enters the box during the jam
+                            // without a penalty in the current jam.
+                            if(thisJamPenalties.indexOf(
+                                x => x.skater == skater                                        
+                            ) == -1){
+                                sbErrors.lineups.slashNoPenalty.events.push(
+                                    'Period: ' + pstring + ' Jam: ' + jam + ' Team: ' + team + ' Skater: ' + skaterText.v
+                                )
+                            }
+                            break
+                        case 'X':
+                            if (!box.includes(skater)){
+                                // If the skater is not in the box, add an "enter box" event
+                                sbData.periods[pstring].jams[jam-1].events.push(
+                                    {
+                                        event: 'enter box',
+                                        skater: skater                                        
+                                    }
+                                )
+                                // ERROR CHECK: Skater enters the box during the jam 
+                                // without a penalty in the current jam.
+                                if(thisJamPenalties.indexOf(
+                                    x => x.skater == skater                                        
+                                ) == -1){
+                                    sbErrors.lineups.xNoPenalty.events.push(
+                                        'Period: ' + pstring + ' Jam: ' + jam + ' Team: ' + team + ' Skater: ' + skaterText.v
+                                    )
+                                }
+
+                            }
+                            // Whether or not the skater started in the box, add an "exit box" event
+                            sbData.periods[pstring].jams[jam-1].events.push(
+                                {
+                                    event: 'exit box',
+                                    skater: skater                                        
+                                }
+                            )
+                            // Remove the skater from the box list.
+                            if (box.includes(skater)){
+                                remove(box,skater)
+                            }                             
+                            break
+
+                        case 'S':
+                            // Add a box entry, with a note that the skater sat between jams.
+                            sbData.periods[pstring].jams[jam-1].events.push(
+                                {
+                                    event: 'enter box',
+                                    skater: skater,
+                                    note: 'Sat between jams'                                        
+                                }
+                            )
+                            // Add skater to the box list.
+                            box.push(skater)
+
+                            // ERROR CHECK: Skater starts in the box without a penalty
+                            // in the prior or current jam.
+                            if(thisJamPenalties.indexOf(x => x.skater == skater) == -1
+                                && priorJamPenalties.indexOf(x => x.skater == skater)){
+                                sbErrors.lineups.sNoPenalty.events.push(
+                                    'Period: ' + pstring + ' Jam: ' + jam + ' Team: ' + team + ' Skater: ' + skaterText.v
+                                )
+                            }
+                            break
+
+                        case '$':
+                            sbData.periods[pstring].jams[jam-1].events.push(
+                                {
+                                    event: 'enter box',
+                                    skater: skater,
+                                    note: 'Sat between jams'                                        
+                                }
+                            )
+                            sbData.periods[pstring].jams[jam-1].events.push(
+                                {
+                                    event: 'exit box',
+                                    skater: skater                                        
+                                }
+                            ) 
+                            // ERROR CHECK: Skater starts in the box without a penalty
+                            // in the prior or current jam.
+                            if(thisJamPenalties.indexOf(x => x.skater == skater) == -1
+                                && priorJamPenalties.indexOf(x => x.skater == skater)){
+                                sbErrors.lineups.sSlashNoPenalty.events.push(
+                                    'Period: ' + pstring + ' Jam: ' + jam + ' Team: ' + team + ' Skater: ' + skaterText.v
+                                )
+                            }
+                            
+                            break
+                        case 'I':
+                        case '|':
+                            // no event, but use this branch for checking if needed
+                            if (!box.includes(skater)){
+                                sbErrors.lineups.iNotInBox.events.push(
+                                    'Period: ' + pstring + ' Jam: ' + jam + ' Team: ' + team + ' Skater: ' + skaterText.v
+                                )
+                            }                                
+                            break
+                        case '3':
+                            sbData.periods[pstring].jams[jam-1].events.push(
+                                {
+                                    event: 'injury',
+                                    skater: skater                                        
+                                }
+                            )
+                            break
+                        default:
+                        // Handle incorrect lineup codes
+                            break
                         }
 
                     }
@@ -972,7 +985,7 @@ readLineups = (workbook) => {
                 for (var p in thisJamPenalties){
                     if(skaterList.indexOf(thisJamPenalties[p].skater) == -1){
                         sbErrors.penalties.penaltyNoLineup.events.push(
-                            "Period: " + pstring + " Jam: " + jam + " Skater: " + thisJamPenalties[p].skater
+                            'Period: ' + pstring + ' Jam: ' + jam + ' Skater: ' + thisJamPenalties[p].skater
                         )
                     }
                 }
@@ -983,12 +996,12 @@ readLineups = (workbook) => {
 
 }
 
-errorCheck = () => {
+let errorCheck = () => {
     // Run error checks that occur after all data has been read
 
     let jams = 0,
         events = [],
-        pstring = ""
+        pstring = ''
 
     for (let period = 1; period < 3; period++){
 
@@ -1000,30 +1013,30 @@ errorCheck = () => {
 
             // Get the list of Penalties in this jam
             let thisJamPenalties = events.filter(
-                x => x.event == "penalty"
+                x => x.event == 'penalty'
             )
 
             // Get lead jammer if present (will only catch FIRST if two are marked)
-            let leadJammer = ""
-            let leadEvent = events.filter(x => x.event == "lead")
+            let leadJammer = ''
+            let leadEvent = events.filter(x => x.event == 'lead')
             if (leadEvent != undefined){
                 leadJammer = leadEvent[0].skater
             }
 
             // Get the list of box entires in the current jam and the next one
             let thisJamEntries = events.filter(
-                x => x.event == "enter box"    
+                x => x.event == 'enter box'    
             )
             let nextJamEntries = []
             if (period == 1 && jam==(jams)){
                 // If this is the last jam of the 1st period, get period 2, jam 1
                 nextJamEntries = sbData.periods['2'].jams[0].events.filter(
-                    x => x.event == "enter box"
+                    x => x.event == 'enter box'
                 )
             } else if (jam != (jams)){
                 // Otherwise, just grab the next jam (don't forget 0 indexing)
                 nextJamEntries = sbData.periods[pstring].jams[jam].events.filter(
-                    x => x.event == "enter box"
+                    x => x.event == 'enter box'
                 )
             }   // Last jam of the 2nd period gets ignored.
 
@@ -1036,35 +1049,35 @@ errorCheck = () => {
                     x => x.skater == thisJamPenalties[pen].skater
                 ).length == 0){
                     sbErrors.penalties.penaltyNoEntry.events.push(
-                        "Period: " + period + " Jam: " + jam + 
-                        " Skater: " + thisJamPenalties[pen].skater
+                        'Period: ' + period + ' Jam: ' + jam + 
+                        ' Skater: ' + thisJamPenalties[pen].skater
                     )
                 }
             }
 
             //ERROR CHECK: Jammer with lead and penalty, but not lost
-            if (leadJammer != ""
+            if (leadJammer != ''
                 && thisJamPenalties.filter(x => x.skater == leadJammer).length != 0
-                && events.filter(x => x.event == "lost" && x.skater == leadJammer).length == 0
-                ){
-                    sbErrors.scores.leadPenaltyNotLost.events.push(
-                        "Period: " + period + " Jam: " + jam + 
-                        " Skater: " + leadJammer
-                    )
-                }
+                && events.filter(x => x.event == 'lost' && x.skater == leadJammer).length == 0
+            ){
+                sbErrors.scores.leadPenaltyNotLost.events.push(
+                    'Period: ' + period + ' Jam: ' + jam + 
+                    ' Skater: ' + leadJammer
+                )
+            }
 
         }
     }
 
 }
 
-getSheet = (workbook, number) => {
+let getSheet = (workbook, number) => {
     // Given a workbook and a sheet number, return the sheet
     let sheetName = workbook.SheetNames[number]
     return workbook.Sheets[sheetName]
 }
 
-cellValue = (workbook, pair) => {
+let cellValue = (workbook, pair) => {
     // Given a workbook and an array of [sheet #, cell] 
     // return the value
     let sheetName = workbook.SheetNames[pair[0]]
@@ -1073,58 +1086,58 @@ cellValue = (workbook, pair) => {
     return (desired_cell ? desired_cell.v : undefined)
 }
 
-nameRowCol = (workbook,pair) => {
+let nameRowCol = (workbook,pair) => {
     // Given a workbook and an array of [sheet #, cell]
     // return an array of [worksheet object, row #, col #] (zero indexed)
     let sheetName = workbook.SheetNames[pair[0]]
     let worksheet = workbook.Sheets[sheetName]
-    let row = XLSX.utils.decode_cell(pair[1]).r;
-    let col = XLSX.utils.decode_cell(pair[1]).c;
-    return [worksheet, row, col];
+    let row = XLSX.utils.decode_cell(pair[1]).r
+    let col = XLSX.utils.decode_cell(pair[1]).c
+    return [worksheet, row, col]
 }
 
-initCells = (team, period, tab, props) => {
+let initCells = (team, period, tab, props) => {
     // Given a team, period, SB section, and list of properties,
     // return an object of addresses for those properties.
     // Team should be 'home' or 'away'
-    let cells = {};
+    let cells = {}
 
-    for (i in props){
+    for (let i in props){
         cells[props[i]] = XLSX.utils.decode_cell(
-            sbTemplate[tab][period][team][props[i]]);
+            sbTemplate[tab][period][team][props[i]])
     }
 
-    return cells;
+    return cells
 }
 
-remove = (array, element) => {
+let remove = (array, element) => {
     // Lifted from https://blog.mariusschulz.com/
-    const index = array.indexOf(element);
+    const index = array.indexOf(element)
     
     if (index !== -1) {
-        array.splice(index, 1);
+        array.splice(index, 1)
     }
 }
 
-encode = (s) => {
-    var out = [];
+let encode = (s) => {
+    var out = []
     for ( var i = 0; i < s.length; i++ ) {
-        out[i] = s.charCodeAt(i);
+        out[i] = s.charCodeAt(i)
     }
-    return new Uint8Array( out );
+    return new Uint8Array( out )
 }
 
-sbErrorsToTable = () => {
-    errorTypes = ["scores","lineups","penalties"]
-    typeHeaders = ["Scores", "Lineups", "Penalties"]
-    let table = document.createElement("table")
+let sbErrorsToTable = () => {
+    let errorTypes = ['scores','lineups','penalties']
+    let typeHeaders = ['Scores', 'Lineups', 'Penalties']
+    let table = document.createElement('table')
     table.setAttribute('class','table')
 
     for(let t in errorTypes){
         let section = errorTypes[t]
 
-        let secHead = document.createElement("tr")
-        let secCell = document.createElement("th")
+        let secHead = document.createElement('tr')
+        let secCell = document.createElement('th')
         secCell.appendChild(document.createTextNode(typeHeaders[t]))
         secHead.appendChild(secCell)
         secHead.setAttribute('class','thead-dark')
@@ -1132,8 +1145,11 @@ sbErrorsToTable = () => {
         table.appendChild(secHead)
 
         for(let e in sbErrors[errorTypes[t]]){
-            let descRow = document.createElement("tr")
-            let descCell = document.createElement("th")
+            if (sbErrors[errorTypes[t]][e].events.length == 0) {
+                continue
+            }
+            let descRow = document.createElement('tr')
+            let descCell = document.createElement('th')
             descCell.appendChild(document.createTextNode(
                 sbErrors[section][e].description
             ))
@@ -1143,8 +1159,8 @@ sbErrorsToTable = () => {
             table.appendChild(descRow)
 
             for(let v in sbErrors[errorTypes[t]][e].events){
-                let evRow = document.createElement("tr")
-                let evCell = document.createElement("td")
+                let evRow = document.createElement('tr')
+                let evCell = document.createElement('td')
                 evCell.appendChild(document.createTextNode(
                     sbErrors[section][e].events[v]
                 ))

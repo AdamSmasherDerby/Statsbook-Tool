@@ -3,9 +3,10 @@ const path = require('path')
 const url = require('url')
 const ipc = require('electron').ipcMain
 
-let menu
+let menu,
+    win
 
-createWindow = () => {
+let createWindow = () => {
     win = new BrowserWindow({width: 800, height: 600})
 
     win.loadURL(url.format({
@@ -25,7 +26,7 @@ createWindow = () => {
     menu = Menu.buildFromTemplate([
         {
             label: 'Options',
-                submenu: [
+            submenu: [
                 {   label: 'Save DerbyJSON',
                     click: function() {
                         win.webContents.send('save-derby-json')
@@ -36,11 +37,12 @@ createWindow = () => {
                     label:'Exit',
                     click(){
                         app.quit()
-                }}
+                    }
+                }
             ]
         }
     ])
-    Menu.setApplicationMenu(menu);
+    Menu.setApplicationMenu(menu)
 }
 
 app.on('ready', createWindow)
@@ -57,10 +59,10 @@ app.on('activate',() => {
     }
 })
 
-isDev = () => {
-    return process.mainModule.filename.indexOf('app.asar') === -1;
-  }
+let isDev = () => {
+    return process.mainModule.filename.indexOf('app.asar') === -1
+}
 
-ipc.on('enable-save-derby-json', (event) => {
+ipc.on('enable-save-derby-json', () => {
     menu.items[0].submenu.items[0].enabled = true
 })
