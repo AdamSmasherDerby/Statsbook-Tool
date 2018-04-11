@@ -54,6 +54,9 @@
     "win": {
       "target": "NSIS",
       "icon": "build/flamingo.ico"
+    },
+    "nsis": {
+      "license": "LICENSE"
     }
   }
 }
