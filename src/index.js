@@ -732,6 +732,7 @@ let readLineups = (workbook) => {
         jamNumberAddress = {},
         noPivotAddress = {},
         skaterAddress = {},
+        skaterList = [],
         maxJams = sbTemplate.lineups.maxJams,
         boxCodes = sbTemplate.lineups.boxCodes,
         sheet = getSheet(workbook, sbTemplate.lineups.sheetNumber),
@@ -761,7 +762,6 @@ let readLineups = (workbook) => {
             for(let l = 0; l < maxJams; l++){
                 // For each line
 
-                let skaterList = []
                 jamNumberAddress.r = cells.firstJamNumber.r + l
                 noPivotAddress.r = cells.firstNoPivot.r + l
                 skaterAddress.r = cells.firstJammer.r + l
@@ -774,6 +774,7 @@ let readLineups = (workbook) => {
                     // Unless this is a starpass line, update the jam number
                     jam = jamText.v
                     starPass = false
+                    skaterList = []
                 } else {
                     starPass = true
                 }
@@ -781,18 +782,18 @@ let readLineups = (workbook) => {
                 // Retrieve penalties from this jam and prior jam for
                 // error checking later
                 let thisJamPenalties = sbData.periods[pstring].jams[jam-1].events.filter(
-                    x => x.event == 'penalty'
+                    x => (x.event == 'penalty' && x.skater.substr(0,4) == team)
                 )
                 let priorJamPenalties = []
                 if (jam != 1) {
                     priorJamPenalties = sbData.periods[pstring].jams[jam-2].events.filter(
-                        x => x.event == 'penalty'
+                        x => (x.event == 'penalty' && x.skater.substr(0,4) == team)
                     )
                 } else if (period == 2){
                     priorJamPenalties = sbData.periods['1'].jams[
                         sbData.periods['1'].jams.length - 1
                     ].events.filter(
-                        x=> x.event == 'penalty'
+                        x=> (x.event == 'penalty' && x.skater.substr(0,4) == team)
                     )
                 }
 
@@ -809,13 +810,13 @@ let readLineups = (workbook) => {
 
                     let skater = team + ':' + skaterText.v
                     // ERROR CHECK: Same skater entered more than once per jam
-                    if (skaterList.indexOf(skater) != -1){
+                    if (skaterList.indexOf(skater) != -1 && !starPass){
                         sbErrors.lineups.samePlayerTwice.events.push(
                             'Period: ' + period + ' Jam: ' + jam + ' Team: ' + team + ' Skater: ' + skaterText.v
                         )
                     }
 
-                    skaterList.push(skater)
+                    if (!starPass) {skaterList.push(skater)}
 
                     if (s == 1 && noPivot != undefined && noPivot.v != undefined){
                         position = 'blocker'
@@ -868,9 +869,9 @@ let readLineups = (workbook) => {
 
                             // ERROR CHECK: Skater enters the box during the jam
                             // without a penalty in the current jam.
-                            if(thisJamPenalties.indexOf(
+                            if(thisJamPenalties.find(
                                 x => x.skater == skater                                        
-                            ) == -1){
+                            ) == undefined){
                                 sbErrors.lineups.slashNoPenalty.events.push(
                                     'Period: ' + pstring + ' Jam: ' + jam + ' Team: ' + team + ' Skater: ' + skaterText.v
                                 )
@@ -887,9 +888,9 @@ let readLineups = (workbook) => {
                                 )
                                 // ERROR CHECK: Skater enters the box during the jam 
                                 // without a penalty in the current jam.
-                                if(thisJamPenalties.indexOf(
+                                if(thisJamPenalties.find(
                                     x => x.skater == skater                                        
-                                ) == -1){
+                                ) == undefined){
                                     sbErrors.lineups.xNoPenalty.events.push(
                                         'Period: ' + pstring + ' Jam: ' + jam + ' Team: ' + team + ' Skater: ' + skaterText.v
                                     )
@@ -923,8 +924,8 @@ let readLineups = (workbook) => {
 
                             // ERROR CHECK: Skater starts in the box without a penalty
                             // in the prior or current jam.
-                            if(thisJamPenalties.indexOf(x => x.skater == skater) == -1
-                                && priorJamPenalties.indexOf(x => x.skater == skater)){
+                            if(thisJamPenalties.find(x => x.skater == skater) == undefined
+                                && priorJamPenalties.find(x => x.skater == skater) == undefined){
                                 sbErrors.lineups.sNoPenalty.events.push(
                                     'Period: ' + pstring + ' Jam: ' + jam + ' Team: ' + team + ' Skater: ' + skaterText.v
                                 )
@@ -947,8 +948,8 @@ let readLineups = (workbook) => {
                             ) 
                             // ERROR CHECK: Skater starts in the box without a penalty
                             // in the prior or current jam.
-                            if(thisJamPenalties.indexOf(x => x.skater == skater) == -1
-                                && priorJamPenalties.indexOf(x => x.skater == skater)){
+                            if(thisJamPenalties.find(x => x.skater == skater) == undefined
+                                && priorJamPenalties.find(x => x.skater == skater) == undefined){
                                 sbErrors.lineups.sSlashNoPenalty.events.push(
                                     'Period: ' + pstring + ' Jam: ' + jam + ' Team: ' + team + ' Skater: ' + skaterText.v
                                 )

@@ -8,7 +8,7 @@
         },
         "noPointsNoNP":
         {
-            "description": "No points (including a zero) on first trip, NP box not checked.",
+            "description": "No points (including a zero) on first trip, NI box not checked.",
             "events": []
         },
         "tooManyLead":
