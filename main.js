@@ -48,7 +48,7 @@ let createWindow = () => {
                     type: 'info',
                     title: 'Statsbook Tool',
                     message: (`Statsbook Tool Version: ${app.getVersion()}\n` +
-                        'by Adam Smasher (Daniel Alt)\n' +
+                        'by: Adam Smasher (Daniel Alt)\n' +
                         'https://github.com/AdamSmasherDerby/Statsbook-Tool/releases/' )
                 })
             }
