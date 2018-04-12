@@ -202,8 +202,8 @@ let readTeam = (workbook,team) => {
         num_address = { c: numberCol, r: numberRow + i}
         skaterName = nameSheet[XLSX.utils.encode_cell(name_address)]
         skaterNumber = numSheet[XLSX.utils.encode_cell(num_address)]
-        if (skaterNumber == undefined) {continue}
-        skaterData = {name: skaterName.v, number: skaterNumber.v}
+        if (skaterNumber == undefined || skaterNumber.v == undefined) {continue}
+        skaterData = {name: (skaterName.v || ''), number: skaterNumber.v}
         sbData.teams[team].persons.push(skaterData)
         penalties[team + ':' + skaterNumber.v] = []
     }
