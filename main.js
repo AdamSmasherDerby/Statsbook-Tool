@@ -1,4 +1,4 @@
-const {app, BrowserWindow, Menu} = require('electron')
+const {app, BrowserWindow, Menu, dialog} = require('electron')
 const path = require('path')
 const url = require('url')
 const ipc = require('electron').ipcMain
@@ -40,6 +40,18 @@ let createWindow = () => {
                     }
                 }
             ]
+        },
+        {
+            label: 'About',
+            click: function(){
+                dialog.showMessageBox({
+                    type: 'info',
+                    title: 'Statsbook Tool',
+                    message: (`Statsbook Tool Version: ${app.getVersion()}\n` +
+                        'by Adam Smasher (Daniel Alt)\n' +
+                        'https://github.com/AdamSmasherDerby/Statsbook-Tool/releases/' )
+                })
+            }
         }
     ])
     Menu.setApplicationMenu(menu)
