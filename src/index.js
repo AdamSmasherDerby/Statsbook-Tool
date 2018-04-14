@@ -10,17 +10,20 @@ let fileInfoBox = document.getElementById('file-info-box')
 let outBox = document.getElementById('output-box')
 
 // Template Files
-let sbTemplate = require('../assets/2018statsbook.json')
+let template2018 = require('../assets/2018statsbook.json')
+let template2017 = require('../assets/2017statsbook.json')
 let sbErrorTemplate = require('../assets/sberrors.json')
 // TO DO - Make template dynamically choosable
 
 // Globals
 let sbData = {},  // derbyJSON formatted statsbook data
+    sbTemplate = {},
     sbErrors = {},
     penalties = {},
     starPasses = [],
     teamList = ['home','away'],
     sbFilename = '',
+    sbVersion = '',
     rABS = true // read XLSX files as binary strings vs. array buffers
     // Good practice - sbData should probably become a class and the 
     // various "read" routines become methods.
@@ -122,6 +125,7 @@ let readSbData = (e) => {
     sbErrors = JSON.parse(JSON.stringify(sbErrorTemplate))
     penalties = {}
     starPasses = []
+    getVersion(workbook)
     readIGRF(workbook)
     for (var i in teamList){
         readTeam(workbook, teamList[i])
@@ -135,11 +139,32 @@ let readSbData = (e) => {
     errorCheck()
 
     // Display Error List
-    //fileInfoBox.innerHTML += JSON.stringify(sbData,null,' ') + '\n'
     //outBox.innerHTML += JSON.stringify(sbErrors,null,' ')
+    if(outBox.lastElementChild){
+        outBox.removeChild(outBox.lastElementChild)
+    }
     outBox.appendChild(sbErrorsToTable())
-
     ipc.send('enable-save-derby-json')
+}
+
+let getVersion = (workbook) => {
+    // Determine version of Statsbook file.
+
+    let versionText = cellValue(workbook, [0, 'A3'])
+    let versionRe = /(\d){4}/
+    sbVersion = versionRe.exec(versionText)[0]
+
+    switch (sbVersion){
+    case '2018':
+        sbTemplate = template2018
+        break
+    case '2017':
+        sbTemplate = template2017
+        break
+    default:
+        sbTemplate = {}
+    }
+
 }
 
 let readIGRF = (workbook) => {
@@ -269,6 +294,7 @@ let updateFileInfo = () => {
     // Update the "File Information Box"
     // Update File Information Box
     fileInfoBox.innerHTML = `<strong>Filename:</strong>  ${sbFilename}<br>`
+    fileInfoBox.innerHTML += `<strong>SB Version:</strong> ${sbVersion}<br>`
     fileInfoBox.innerHTML += `<strong>Game Date:</strong> ${moment(sbData.date).format('MMMM DD, YYYY')}<br>`
     fileInfoBox.innerHTML += `<strong>Team 1:</strong> ${sbData.teams['home'].league} ${sbData.teams['home'].name}<br>`
     fileInfoBox.innerHTML += `<strong>Team 2:</strong> ${sbData.teams['away'].name} ${sbData.teams['away'].league}<br>`
@@ -341,7 +367,7 @@ let readScores = (workbook) => {
                 jamNumber = sheet[XLSX.utils.encode_cell(jamAddress)]
                 
                 // if we're out of jams, stop
-                if (jamNumber == undefined){break}
+                if (jamNumber == undefined || jamNumber.v == undefined){break}
 
                 // handle star passes
                 if (jamNumber.v =='SP' || jamNumber.v == 'SP*'){
@@ -402,7 +428,7 @@ let readScores = (workbook) => {
                 //  Do nothing: skater number should remain untouched from prior line)
 
                 // Check for subsequent trips, and add additional pass objects            
-                //(To do - add check for "completed" logic)
+
                 for (let trip=2; trip < maxTrips + 2; trip++){
                     tripAddress.c = cells.firstTrip.c + trip - 2
                     let tripScore = sheet[XLSX.utils.encode_cell(tripAddress)]
