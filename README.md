@@ -1,4 +1,6 @@
-Tool for processing WFTDA statsbook files.  Will read a WFTDA Excel spreadsheet file and produce a list of detected errors.  Will also save the game in DerbyJSON format.
+Statsbook Tool is a utility for processing WFTDA statsbook files.  It will read a WFTDA Excel spreadsheet file and produce a list of detected errors.  It will also save the game in DerbyJSON format, in case that proves useful.
+
+At present it supports the 2017 and 2018 statsbook formats.  Feed it an older statsbook at your own peril.
 
 List of errors currently checked:
 

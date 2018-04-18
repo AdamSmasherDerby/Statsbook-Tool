@@ -97,6 +97,11 @@
         {
             "description": "I or | marked for player with no box entry.",
             "events": []
+        },
+        "seatedNoCode":
+        {
+            "description": "Skater previously seated in box with no code on present line.",
+            "events": []
         }
 
     }

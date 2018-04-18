@@ -297,7 +297,7 @@ let updateFileInfo = () => {
     fileInfoBox.innerHTML += `<strong>SB Version:</strong> ${sbVersion}<br>`
     fileInfoBox.innerHTML += `<strong>Game Date:</strong> ${moment(sbData.date).format('MMMM DD, YYYY')}<br>`
     fileInfoBox.innerHTML += `<strong>Team 1:</strong> ${sbData.teams['home'].league} ${sbData.teams['home'].name}<br>`
-    fileInfoBox.innerHTML += `<strong>Team 2:</strong> ${sbData.teams['away'].name} ${sbData.teams['away'].league}<br>`
+    fileInfoBox.innerHTML += `<strong>Team 2:</strong> ${sbData.teams['away'].league} ${sbData.teams['away'].name}<br>`
     fileInfoBox.innerHTML += `<strong>File Read:</strong> ${moment().format('HH:mm:ss MMM DD, YYYY')}`
 }
 
@@ -802,6 +802,8 @@ let readLineups = (workbook) => {
                     jam = jamText.v
                     starPass = false
                     skaterList = []
+                } else if (jamText.v == 'SP*'){
+                    continue
                 } else {
                     starPass = true
                 }
@@ -864,14 +866,16 @@ let readLineups = (workbook) => {
 
                     }
 
+                    let allCodes = ''
                     // Add box codes if present
-                    for (let c = 0; c < boxCodes; c++){
+                    for (let c = 1; c <= boxCodes; c++){
                         // for each code box
 
                         skaterAddress.c = cells.firstJammer.c + (s * (boxCodes+1)) + c
                         let codeText = sheet[XLSX.utils.encode_cell(skaterAddress)]
 
                         if (codeText == undefined) {continue}
+                        allCodes += codeText.v
 
                         // Possible codes - /, X, S, $, I or |, 3
                         // Possible events - enter box, exit box, injury
@@ -1001,16 +1005,29 @@ let readLineups = (workbook) => {
                             )
                             break
                         default:
-                        // Handle incorrect lineup codes
+                        // Handle incorrect lineup codes?
                             break
                         }
 
                     }
+                    // Done reading all codes
+
+                    // ERROR CHECK: is there a skater still in the box without
+                    // any code on the present line?
+                    if (box.includes(skater) && !allCodes){
+                        sbErrors.lineups.seatedNoCode.events.push(
+                            `Period: ${pstring}, Jam: ${jam}, Team: ${
+                                ucFirst(skater.substr(0,4))
+                            }, Skater: ${skater.slice(5)}`
+                        )
+                        remove(box,skater)
+                    }
+
                 }
                 // Done reading line
 
                 // ERROR CHECK: Skaters with penalties not listed on the lineup tab
-                for (var p in thisJamPenalties){
+                for (let p in thisJamPenalties){
                     if(skaterList.indexOf(thisJamPenalties[p].skater) == -1){
                         sbErrors.penalties.penaltyNoLineup.events.push(
                             `Period: ${pstring}, Jam: ${jam}, Team: ${

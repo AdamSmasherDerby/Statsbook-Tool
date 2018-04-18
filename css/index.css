@@ -50,3 +50,8 @@ body {
 .box__ondragover {
     background-color: pink
 }
+
+.my-ui-text { 
+    -webkit-user-select:none; 
+    user-select:none;
+}

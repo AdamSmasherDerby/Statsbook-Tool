@@ -7,7 +7,12 @@ let menu,
     win
 
 let createWindow = () => {
-    win = new BrowserWindow({width: 800, height: 600})
+    win = new BrowserWindow({
+        title: 'Statsbook Tool',
+        icon: __dirname + '/build/flamingo-white.png',
+        width: 800, 
+        height: 600
+    })
 
     win.loadURL(url.format({
         pathname: path.join(__dirname, 'src/index.html'),
