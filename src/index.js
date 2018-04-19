@@ -150,7 +150,10 @@ let readSbData = (e) => {
 let getVersion = (workbook) => {
     // Determine version of Statsbook file.
 
-    let versionText = cellValue(workbook, [0, 'A3'])
+    let defaultVersion = '2018'
+    let sheet = workbook.Sheets['Read Me']
+    let versionText = (sheet ? sheet['A3'].v : defaultVersion)
+    //let versionText = cellValue(workbook, [0, 'A3'])
     let versionRe = /(\d){4}/
     sbVersion = versionRe.exec(versionText)[0]
 
@@ -172,11 +175,15 @@ let readIGRF = (workbook) => {
 
     let getJsDateFromExcel = (excelDate) => {
         // Helper function to convert Excel date to JS format
+        if(!excelDate){return undefined}
+
         return new Date((excelDate - (25567 + 1))*86400*1000)
     }
     
     let getJsTimeFromExcel = (excelTime) => {
         // Helper function to convert Excel time to JS format
+        if(!excelTime){return undefined}
+
         let secondsAfterMid = excelTime * 86400
         let hours = Math.floor(secondsAfterMid/3600)
         let remainder = secondsAfterMid % 3600
@@ -187,46 +194,57 @@ let readIGRF = (workbook) => {
         }:${seconds.toString().padStart(2,'0')}`)
     }
 
+    let sheet = workbook.Sheets[sbTemplate.mainSheet]
     sbData.venue = {}
-    sbData.venue.name = cellValue(workbook,sbTemplate.venue.name)
+    sbData.venue.name = cellVal(sheet,sbTemplate.venue.name)
+    sbData.venue.city = cellVal(sheet,sbTemplate.venue.city)
+    sbData.venue.state = cellVal(sheet,sbTemplate.venue.state)
+    sbData.date = getJsDateFromExcel(cellVal(sheet,sbTemplate.date))
+    sbData.time = getJsTimeFromExcel(cellVal(sheet,sbTemplate.time))  
+    /*sbData.venue.name = cellValue(workbook,sbTemplate.venue.name)
     sbData.venue.city = cellValue(workbook,sbTemplate.venue.city)
     sbData.venue.state = cellValue(workbook,sbTemplate.venue.state)
     sbData.date = getJsDateFromExcel(cellValue(workbook,sbTemplate.date))
     sbData.time = getJsTimeFromExcel(cellValue(workbook,sbTemplate.time))
     sbData.tournament = cellValue(workbook,sbTemplate.tournament)
     sbData['host-league'] = cellValue(workbook,sbTemplate['host-league'])
-
+    */
 }
 
 let readTeam = (workbook,team) => {
     // team should be "home" or "away"
-    let name_address = {},
-        num_address = {},
+    let name_address = {c:0,r:0},
+        num_address = {c:0,r:0},
+        firstNameAddress = {},
+        firstNumAddress = {},
         skaterName = '',
         skaterNumber = '',
-        skaterData = {}
+        skaterData = {},
+        sheet = workbook.Sheets[sbTemplate.teams[team].sheetName]
 
+        
     // Extract general team data
     if (!sbData.hasOwnProperty('teams')){sbData.teams = {}}
     sbData.teams[team] = {}
-    sbData.teams[team].league = cellValue(workbook,sbTemplate.teams[team].league)
-    sbData.teams[team].name = cellValue(workbook,sbTemplate.teams[team].name)
-    sbData.teams[team].color = cellValue(workbook,sbTemplate.teams[team].color)
-
+    sbData.teams[team].league = cellVal(sheet,sbTemplate.teams[team].league)
+    sbData.teams[team].name = cellVal(sheet,sbTemplate.teams[team].name)
+    sbData.teams[team].color = cellVal(sheet,sbTemplate.teams[team].color)
+ 
     // Extract skater data
-    let [nameSheet, nameRow, nameCol] 
-        = nameRowCol(workbook, sbTemplate.teams[team].firstName)
-    let [numSheet, numberRow, numberCol] 
-        = nameRowCol(workbook, sbTemplate.teams[team].firstNumber)
+    firstNameAddress = XLSX.utils.decode_cell(sbTemplate.teams[team].firstName)
+    firstNumAddress = XLSX.utils.decode_cell(sbTemplate.teams[team].firstNumber)
+    name_address.c = firstNameAddress.c
+    num_address.c = firstNumAddress.c
     let maxNum = sbTemplate.teams[team].maxNum
     sbData.teams[team].persons=[]
 
     for (var i = 0; i<maxNum; i++) {
         // For each skater, read in name and number, add to sbData
-        name_address = { c: nameCol, r: nameRow + i}
-        num_address = { c: numberCol, r: numberRow + i}
-        skaterName = nameSheet[XLSX.utils.encode_cell(name_address)]
-        skaterNumber = numSheet[XLSX.utils.encode_cell(num_address)]
+        name_address.r = firstNameAddress.r + i
+        num_address.r = firstNumAddress.r + i
+
+        skaterName = sheet[XLSX.utils.encode_cell(name_address)]
+        skaterNumber = sheet[XLSX.utils.encode_cell(num_address)]
         if (skaterNumber == undefined || skaterNumber.v == undefined) {continue}
         skaterData = {name: (skaterName.v || ''), number: skaterNumber.v}
         sbData.teams[team].persons.push(skaterData)
@@ -240,7 +258,7 @@ let readOfficials = (workbook) => {
     // Read in officials' data
 
     let props = ['firstName','firstRole','firstLeague','firstCert'],
-        sheet = getSheet(workbook, sbTemplate.teams.officials.sheetNumber),
+        sheet = workbook.Sheets[sbTemplate.teams.officials.sheetName],
         maxNum = sbTemplate.teams.officials.maxNum,
         nameAddress = {},
         roleAddress = {},
@@ -306,7 +324,7 @@ let readScores = (workbook) => {
 
     let cells = {},
         maxJams = sbTemplate.score.maxJams,
-        sheet = getSheet(workbook, sbTemplate.score.sheetNumber),
+        sheet = workbook.Sheets[sbTemplate.score.sheetName],
         jamAddress = {},
         jammerAddress = {},
         jamNumber = {},
@@ -589,8 +607,8 @@ let readPenalties = (workbook) => {
         benchExpJamAddress = {},
         foulouts = [],
         maxPenalties = sbTemplate.penalties.maxPenalties,
-        sheet = getSheet(workbook, sbTemplate.penalties.sheetNumber)
-
+        sheet = workbook.Sheets[sbTemplate.penalties.sheetName]
+       
     for(let period = 1; period < 3; period ++){
         // For each period
 
@@ -762,7 +780,7 @@ let readLineups = (workbook) => {
         skaterList = [],
         maxJams = sbTemplate.lineups.maxJams,
         boxCodes = sbTemplate.lineups.boxCodes,
-        sheet = getSheet(workbook, sbTemplate.lineups.sheetNumber),
+        sheet = workbook.Sheets[sbTemplate.lineups.sheetName],
         positions = {0:'jammer',1:'pivot',2:'blocker',3:'blocker',4:'blocker'}
 
     for (let period = 1; period < 3; period++){
@@ -1120,30 +1138,17 @@ let errorCheck = () => {
 
 }
 
-let getSheet = (workbook, number) => {
-    // Given a workbook and a sheet number, return the sheet
-    let sheetName = workbook.SheetNames[number]
-    return workbook.Sheets[sheetName]
+
+let cellVal = (sheet, address) => {
+    // Given a worksheet and a cell address, return the value
+    // in the cell if present, and undefined if not.
+    if (sheet[address] && sheet[address].v){
+        return sheet[address].v
+    } else {
+        return undefined
+    }
 }
 
-let cellValue = (workbook, pair) => {
-    // Given a workbook and an array of [sheet #, cell] 
-    // return the value
-    let sheetName = workbook.SheetNames[pair[0]]
-    let worksheet = workbook.Sheets[sheetName]
-    let desired_cell = worksheet[pair[1]]
-    return (desired_cell ? desired_cell.v : undefined)
-}
-
-let nameRowCol = (workbook,pair) => {
-    // Given a workbook and an array of [sheet #, cell]
-    // return an array of [worksheet object, row #, col #] (zero indexed)
-    let sheetName = workbook.SheetNames[pair[0]]
-    let worksheet = workbook.Sheets[sheetName]
-    let row = XLSX.utils.decode_cell(pair[1]).r
-    let col = XLSX.utils.decode_cell(pair[1]).c
-    return [worksheet, row, col]
-}
 
 let initCells = (team, period, tab, props) => {
     // Given a team, period, SB section, and list of properties,

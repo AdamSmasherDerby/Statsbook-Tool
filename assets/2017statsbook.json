@@ -1,33 +1,36 @@
 {
     "version": "2017",
+    "mainSheet": "IGRF",
     "venue": {
-        "name": [1, "B3"],
-        "city": [1, "H3"],
-        "state": [1, "J3"]
+        "name": "B3",
+        "city": "H3",
+        "state": "J3"
     },
-    "date": [1,"B7"],
-    "time": [1,"H7"],
-    "tournament": [1,"B5"],
-    "host-league": [1, "H5"],
+    "date": "B7",
+    "time": "H7",
+    "tournament": "B5",
+    "host-league": "H5",
     "teams": {
         "home": {
-            "league": [1, "B10"],
-            "name": [1, "B11"],
-            "color": [1, "B12"],
-            "firstName": [1, "C14"],
-            "firstNumber": [1, "B14"],
+            "sheetName": "IGRF",
+            "league":  "B10",
+            "name":  "B11",
+            "color":  "B12",
+            "firstName":  "C14",
+            "firstNumber":  "B14",
             "maxNum": 20
         },
         "away": {
-            "league": [1, "H10"],
-            "name": [1, "H11"],
-            "color": [1, "H12"],
-            "firstName": [1, "I14"],
-            "firstNumber": [1, "H14"],
+            "sheetName": "IGRF",
+            "league":  "H10",
+            "name":  "H11",
+            "color":  "H12",
+            "firstName":  "I14",
+            "firstNumber":  "H14",
             "maxNum": 20
         },
         "officials":{
-            "sheetNumber": 1,
+            "sheetName": "IGRF",
             "firstName": "A60",
             "firstRole": "D60",
             "firstLeague": "H60",
@@ -36,7 +39,7 @@
                 }
     },
     "score": {
-        "sheetNumber": 2,
+        "sheetName": "Score",
         "maxJams": 38,
         "1": {
             "home": {
@@ -88,7 +91,7 @@
         }
     },
     "penalties": {
-        "sheetNumber": 3,
+        "sheetName": "Penalties",
         "maxPenalties": 9,
         "1": {
             "home": {
@@ -133,7 +136,7 @@
         }
     },
     "lineups": {
-        "sheetNumber": 4,
+        "sheetName": "Lineups",
         "maxJams": 38,
         "boxCodes": 3,
         "1": {

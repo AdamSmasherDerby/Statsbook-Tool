@@ -1,33 +1,36 @@
 {
     "version": "2018",
+    "mainSheet": "IGRF",
     "venue": {
-        "name": [1, "B3"],
-        "city": [1, "I3"],
-        "state": [1, "K3"]
+        "name": "B3",
+        "city": "I3",
+        "state": "K3"
     },
-    "date": [1,"B7"],
-    "time": [1,"I7"],
-    "tournament": [1,"B5"],
-    "host-league": [1, "I5"],
+    "date": "B7",
+    "time": "I7",
+    "tournament": "B5",
+    "host-league": "I5",
     "teams": {
         "home": {
-            "league": [1, "B10"],
-            "name": [1, "B11"],
-            "color": [1, "B12"],
-            "firstName": [1, "C14"],
-            "firstNumber": [1, "B14"],
+            "sheetName": "IGRF",
+            "league": "B10",
+            "name": "B11",
+            "color": "B12",
+            "firstName": "C14",
+            "firstNumber": "B14",
             "maxNum": 20
         },
         "away": {
-            "league": [1, "I10"],
-            "name": [1, "I11"],
-            "color": [1, "I12"],
-            "firstName": [1, "J14"],
-            "firstNumber": [1, "I14"],
+            "sheetName": "IGRF",
+            "league": "I10",
+            "name": "I11",
+            "color": "I12",
+            "firstName": "J14",
+            "firstNumber": "I14",
             "maxNum": 20
         },
         "officials":{
-            "sheetNumber": 1,
+            "sheetName": "IGRF",
             "firstName": "C60",
             "firstRole": "A60",
             "firstLeague": "H60",
@@ -36,7 +39,7 @@
                 }
     },
     "score": {
-        "sheetNumber": 2,
+        "sheetName": "Score",
         "maxJams": 38,
         "1": {
             "home": {
@@ -88,7 +91,7 @@
         }
     },
     "penalties": {
-        "sheetNumber": 3,
+        "sheetName": "Penalties",
         "maxPenalties": 9,
         "1": {
             "home": {
@@ -133,7 +136,7 @@
         }
     },
     "lineups": {
-        "sheetNumber": 4,
+        "sheetName": "Lineups",
         "maxJams": 38,
         "boxCodes": 3,
         "1": {
