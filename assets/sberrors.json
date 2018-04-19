@@ -64,6 +64,11 @@
         {
             "description": "Penalty on penalty sheet without box entry on Lineups Tab",
             "events": []
+        },
+        "penaltyBadJam":
+        {
+            "description": "Penalty entered for a jam greater than the highest jam on the Score Tab",
+            "events": []
         }
     },
     "lineups":

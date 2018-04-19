@@ -668,6 +668,14 @@ let readPenalties = (workbook) => {
                     let code = codeText.v,
                         jam = jamText.v
 
+                    if(jam > sbData.periods[period].jams.length){
+                        // Error Check - jam number out of range
+                        sbErrors.penalties.penaltyBadJam.events.push(
+                            `Team: ${ucFirst(team)}, Skater: ${skaterNum.v}, Period: ${period}, Recorded Jam: ${jam}`
+                        )
+                        continue
+                    }
+
                     // Add a penalty event to that jam
                     sbData.periods[period].jams[jam - 1].events.push(
                         {
@@ -1285,6 +1293,7 @@ Lineups + Penalties:
 
 Scores + Penalties
 1. Jammers with lead and a penalty, but not marked "lost."*
+2. Penalties with jam numbers marked that are not on the score sheet.
 
 List of error checks I'm not going to BOTHER implementing, because 
 the statsbook now has conditional formatting to flag them

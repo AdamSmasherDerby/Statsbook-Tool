@@ -36,5 +36,6 @@ Lineups + Penalties:
 Scores + Penalties
 
 1. Jammers with lead and a penalty, but not marked "lost."
+2. Penalties recorded in jam numbers that are not present on the score sheet.
 
 Flamingo icon from http://www.iconsmind.com
