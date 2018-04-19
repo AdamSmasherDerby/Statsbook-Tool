@@ -3,7 +3,7 @@
   "version": "0.1.4",
   "description": "A tool for processing WFTDA Statsbooks",
   "main": "main.js",
-  "author": "Adam Smasher (Daniel Alt)",
+  "author": "Adam Smasher (Daniel Alt) <dan@fnerk.com>",
   "license": "MIT",
   "scripts": {
     "start": "electron .",
