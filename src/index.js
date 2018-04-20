@@ -24,9 +24,9 @@ let sbData = {},  // derbyJSON formatted statsbook data
     teamList = ['home','away'],
     sbFilename = '',
     sbVersion = '',
-    rABS = true // read XLSX files as binary strings vs. array buffers
-    // Good practice - sbData should probably become a class and the 
-    // various "read" routines become methods.
+    rABS = true, // read XLSX files as binary strings vs. array buffers
+    warningData = {}
+
 
 ipc.on('save-derby-json', () => {
     // Saves statsbook data to a JSON file
@@ -120,11 +120,17 @@ let readSbData = (e) => {
     if (!rABS) data = new Uint8Array(data)
     var workbook = XLSX.read(data, {type: rABS ? 'binary' :'array'})
 
-    //Read in information from the statsbook
+    // Reinitialize globals
     sbData = {}        
     sbErrors = JSON.parse(JSON.stringify(sbErrorTemplate))
     penalties = {}
     starPasses = []
+    warningData = {
+        badStarts: [],
+        noEntries: []
+    }
+
+    // Read Statsbook
     getVersion(workbook)
     readIGRF(workbook)
     for (var i in teamList){
@@ -137,9 +143,9 @@ let readSbData = (e) => {
     readPenalties(workbook)
     readLineups(workbook)
     errorCheck()
+    warningCheck()
 
     // Display Error List
-    //outBox.innerHTML += JSON.stringify(sbErrors,null,' ')
     if(outBox.lastElementChild){
         outBox.removeChild(outBox.lastElementChild)
     }
@@ -201,14 +207,7 @@ let readIGRF = (workbook) => {
     sbData.venue.state = cellVal(sheet,sbTemplate.venue.state)
     sbData.date = getJsDateFromExcel(cellVal(sheet,sbTemplate.date))
     sbData.time = getJsTimeFromExcel(cellVal(sheet,sbTemplate.time))  
-    /*sbData.venue.name = cellValue(workbook,sbTemplate.venue.name)
-    sbData.venue.city = cellValue(workbook,sbTemplate.venue.city)
-    sbData.venue.state = cellValue(workbook,sbTemplate.venue.state)
-    sbData.date = getJsDateFromExcel(cellValue(workbook,sbTemplate.date))
-    sbData.time = getJsTimeFromExcel(cellValue(workbook,sbTemplate.time))
-    sbData.tournament = cellValue(workbook,sbTemplate.tournament)
-    sbData['host-league'] = cellValue(workbook,sbTemplate['host-league'])
-    */
+
 }
 
 let readTeam = (workbook,team) => {
@@ -709,8 +708,7 @@ let readPenalties = (workbook) => {
                 
                 // If there is a FO or expulsion, add an event
                 // Note that derbyJSON doesn't actually record foul-outs,
-                // so just record the expulsion and put code here later
-                // for FO sanity checking
+                // so only expulsions are recorded.
                 if (foCode.v != 'FO'){
                     sbData.periods[period].jams[foJam.v -1].events.push(
                         {
@@ -986,6 +984,12 @@ let readLineups = (workbook) => {
                                 sbErrors.lineups.sNoPenalty.events.push(
                                     `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
                                 )
+                                warningData.badStarts.push({
+                                    skater: skater,
+                                    team: team,
+                                    period: period,
+                                    jam: jam
+                                })
                             }
                             break
 
@@ -1010,6 +1014,12 @@ let readLineups = (workbook) => {
                                 sbErrors.lineups.sSlashNoPenalty.events.push(
                                     `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
                                 )
+                                warningData.badStarts.push({
+                                    skater: skater,
+                                    team: team,
+                                    period: period,
+                                    jam: jam
+                                })
                             }
                             
                             break
@@ -1126,6 +1136,12 @@ let errorCheck = () => {
                             ucFirst(thisJamPenalties[pen].skater.substr(0,4))
                         }, Skater: ${thisJamPenalties[pen].skater.slice(5)}`
                     )
+                    warningData.noEntries.push({
+                        skater: thisJamPenalties[pen].skater,
+                        team: thisJamPenalties[pen].skater.substr(0,4),
+                        period: period,
+                        jam: jam
+                    })
                 }
             }
 
@@ -1140,60 +1156,47 @@ let errorCheck = () => {
                     }, Jammer: ${leadJammer.slice(5)}`
                 )
             }
-
         }
     }
-
 }
 
+let warningCheck = () => {
+    // Run checks for things that should throw warnings but not errors.
 
-let cellVal = (sheet, address) => {
-    // Given a worksheet and a cell address, return the value
-    // in the cell if present, and undefined if not.
-    if (sheet[address] && sheet[address].v){
-        return sheet[address].v
-    } else {
-        return undefined
+    // Warning check: Possible substitution.
+
+    // For each skater who has a $ or S without a corresponding penalty,
+    // Check to see if a different skater on the same team has
+    // a penalty without a subsequent box exit.
+    for(let event in warningData.badStarts){
+        let bs = warningData.badStarts[event]
+        if(warningData.noEntries.filter(
+            ne => (ne.team == bs.team &&
+                (
+                    (ne.period == bs.period && ne.jam == (bs.jam-1)) ||
+                    (ne.period == (bs.period -1) && bs.jam == 1)
+                )
+            )).length >= 1){
+            if(bs.jam !=1){
+                sbErrors.warnings.possibleSub.events.push(
+                    `Team: ${ucFirst(bs.team)}, Period: ${bs.period
+                    }, Jams: ${bs.jam-1} & ${bs.jam}`
+                )
+            } else {
+                sbErrors.warnings.possibleSub.events.push(
+                    `Team: ${ucFirst(bs.team)}, Period: 1, Jam: ${sbData.periods['1'].jams.length
+                    } & Period: 2, Jam: ${bs.jam}`                
+                )
+            }
+        }
     }
-}
-
-
-let initCells = (team, period, tab, props) => {
-    // Given a team, period, SB section, and list of properties,
-    // return an object of addresses for those properties.
-    // Team should be 'home' or 'away'
-    let cells = {}
-
-    for (let i in props){
-        cells[props[i]] = XLSX.utils.decode_cell(
-            sbTemplate[tab][period][team][props[i]])
-    }
-
-    return cells
-}
-
-let remove = (array, element) => {
-    // Lifted from https://blog.mariusschulz.com/
-    const index = array.indexOf(element)
-    
-    if (index !== -1) {
-        array.splice(index, 1)
-    }
-}
-
-let encode = (s) => {
-    var out = []
-    for ( var i = 0; i < s.length; i++ ) {
-        out[i] = s.charCodeAt(i)
-    }
-    return new Uint8Array( out )
 }
 
 let sbErrorsToTable = () => {
     // Build error report
 
-    let errorTypes = ['scores','lineups','penalties']
-    let typeHeaders = ['Scores', 'Lineups', 'Penalties']
+    let errorTypes = ['scores','lineups','penalties','warnings']
+    let typeHeaders = ['Scores', 'Lineups', 'Penalties','Warnings']
     let table = document.createElement('table')
     table.setAttribute('class','table')
 
@@ -1253,6 +1256,49 @@ let sbErrorsToTable = () => {
 
     return table
 }
+
+let cellVal = (sheet, address) => {
+    // Given a worksheet and a cell address, return the value
+    // in the cell if present, and undefined if not.
+    if (sheet[address] && sheet[address].v){
+        return sheet[address].v
+    } else {
+        return undefined
+    }
+}
+
+
+let initCells = (team, period, tab, props) => {
+    // Given a team, period, SB section, and list of properties,
+    // return an object of addresses for those properties.
+    // Team should be 'home' or 'away'
+    let cells = {}
+
+    for (let i in props){
+        cells[props[i]] = XLSX.utils.decode_cell(
+            sbTemplate[tab][period][team][props[i]])
+    }
+
+    return cells
+}
+
+let remove = (array, element) => {
+    // Lifted from https://blog.mariusschulz.com/
+    const index = array.indexOf(element)
+    
+    if (index !== -1) {
+        array.splice(index, 1)
+    }
+}
+
+let encode = (s) => {
+    var out = []
+    for ( var i = 0; i < s.length; i++ ) {
+        out[i] = s.charCodeAt(i)
+    }
+    return new Uint8Array( out )
+}
+
 
 let ucFirst = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1)
