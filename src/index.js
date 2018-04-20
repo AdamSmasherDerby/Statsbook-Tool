@@ -789,7 +789,8 @@ let readLineups = (workbook) => {
         maxJams = sbTemplate.lineups.maxJams,
         boxCodes = sbTemplate.lineups.boxCodes,
         sheet = workbook.Sheets[sbTemplate.lineups.sheetName],
-        positions = {0:'jammer',1:'pivot',2:'blocker',3:'blocker',4:'blocker'}
+        positions = {0:'jammer',1:'pivot',2:'blocker',3:'blocker',4:'blocker'},
+        box = {home:[], away: []}
 
     for (let period = 1; period < 3; period++){
         // For each period
@@ -805,7 +806,6 @@ let readLineups = (workbook) => {
             let jam = 0
             let starPass = false
             // Array of skaters in the box.
-            let box = []
 
             cells = initCells(team, pstring, tab, props)
             jamNumberAddress.c = cells.firstJamNumber.c
@@ -922,7 +922,7 @@ let readLineups = (workbook) => {
                                     skater: skater                                        
                                 }
                             )
-                            box.push(skater)
+                            box[team].push(skater)
 
                             // ERROR CHECK: Skater enters the box during the jam
                             // without a penalty in the current jam.
@@ -935,7 +935,7 @@ let readLineups = (workbook) => {
                             }
                             break
                         case 'X':
-                            if (!box.includes(skater)){
+                            if (!box[team].includes(skater)){
                                 // If the skater is not in the box, add an "enter box" event
                                 sbData.periods[pstring].jams[jam-1].events.push(
                                     {
@@ -962,8 +962,8 @@ let readLineups = (workbook) => {
                                 }
                             )
                             // Remove the skater from the box list.
-                            if (box.includes(skater)){
-                                remove(box,skater)
+                            if (box[team].includes(skater)){
+                                remove(box[team],skater)
                             }                             
                             break
 
@@ -977,7 +977,7 @@ let readLineups = (workbook) => {
                                 }
                             )
                             // Add skater to the box list.
-                            box.push(skater)
+                            box[team].push(skater)
 
                             // ERROR CHECK: Skater starts in the box without a penalty
                             // in the prior or current jam.
@@ -1016,7 +1016,7 @@ let readLineups = (workbook) => {
                         case 'I':
                         case '|':
                             // no event, but use this branch for checking if needed
-                            if (!box.includes(skater)){
+                            if (!box[team].includes(skater)){
                                 sbErrors.lineups.iNotInBox.events.push(
                                     `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
                                 )
@@ -1040,13 +1040,13 @@ let readLineups = (workbook) => {
 
                     // ERROR CHECK: is there a skater still in the box without
                     // any code on the present line?
-                    if (box.includes(skater) && !allCodes){
+                    if (box[team].includes(skater) && !allCodes){
                         sbErrors.lineups.seatedNoCode.events.push(
                             `Period: ${pstring}, Jam: ${jam}, Team: ${
                                 ucFirst(skater.substr(0,4))
                             }, Skater: ${skater.slice(5)}`
                         )
-                        remove(box,skater)
+                        remove(box[team],skater)
                     }
 
                 }
