@@ -107,6 +107,11 @@
         {
             "description": "Skater previously seated in box with no code on present line.",
             "events": []
+        },
+        "startsWhileThere":
+        {
+            "description": "S or $ entered for skater already in the box.",
+            "events": []
         }
 
     },
@@ -115,6 +120,11 @@
         "possibleSub":
         {
             "description": "Reported errors may actually be substitution.",
+            "events": []
+        },
+        "lastJamNoEntry":
+        {
+            "description": "No box entry listed for skater penalized in final jam.",
             "events": []
         }
     }

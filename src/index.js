@@ -933,6 +933,7 @@ let readLineups = (workbook) => {
                             }
                             break
                         case 'X':
+                        case 'x':
                             if (!box[team].includes(skater)){
                                 // If the skater is not in the box, add an "enter box" event
                                 sbData.periods[pstring].jams[jam-1].events.push(
@@ -974,8 +975,16 @@ let readLineups = (workbook) => {
                                     note: 'Sat between jams'                                        
                                 }
                             )
-                            // Add skater to the box list.
-                            box[team].push(skater)
+
+                            // ERROR CHECK: Skater starts in the box while already in the box.
+                            if (box[team].includes(skater)){
+                                sbErrors.lineups.startsWhileThere.events.push(
+                                    `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
+                                )
+                            } else {
+                                // Add skater to the box list.
+                                box[team].push(skater)
+                            }
 
                             // ERROR CHECK: Skater starts in the box without a penalty
                             // in the prior or current jam.
@@ -1007,6 +1016,14 @@ let readLineups = (workbook) => {
                                     skater: skater                                        
                                 }
                             ) 
+                            // ERROR CHECK: Skater starts in the box while already in the box.
+                            if (box[team].includes(skater)){
+                                sbErrors.lineups.startsWhileThere.events.push(
+                                    `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
+                                )
+                                remove(box[team],skater)
+                            } 
+
                             // ERROR CHECK: Skater starts in the box without a penalty
                             // in the prior or current jam.
                             if(thisJamPenalties.find(x => x.skater == skater) == undefined
@@ -1131,11 +1148,19 @@ let errorCheck = () => {
                 ).length == 0 && nextJamEntries.filter(
                     x => x.skater == thisJamPenalties[pen].skater
                 ).length == 0){
-                    sbErrors.penalties.penaltyNoEntry.events.push(
-                        `Period: ${period}, Jam: ${jam}, Team: ${
-                            ucFirst(thisJamPenalties[pen].skater.substr(0,4))
-                        }, Skater: ${thisJamPenalties[pen].skater.slice(5)}`
-                    )
+                    if(!(jam==jams && period==2)){
+                        sbErrors.penalties.penaltyNoEntry.events.push(
+                            `Period: ${period}, Jam: ${jam}, Team: ${
+                                ucFirst(thisJamPenalties[pen].skater.substr(0,4))
+                            }, Skater: ${thisJamPenalties[pen].skater.slice(5)}`
+                        )
+                    } else {
+                        sbErrors.warnings.lastJamNoEntry.events.push(
+                            `Period: 2, Jam: ${jam}, Team: ${
+                                ucFirst(thisJamPenalties[pen].skater.substr(0,4))
+                            }, Skater: ${thisJamPenalties[pen].skater.slice(5)}`
+                        )
+                    }
                     warningData.noEntries.push({
                         skater: thisJamPenalties[pen].skater,
                         team: thisJamPenalties[pen].skater.substr(0,4),
@@ -1164,9 +1189,8 @@ let warningCheck = () => {
     // Run checks for things that should throw warnings but not errors.
 
     // Warning check: Possible substitution.
-
     // For each skater who has a $ or S without a corresponding penalty,
-    // Check to see if a different skater on the same team has
+    // check to see if a different skater on the same team has
     // a penalty without a subsequent box exit.
     for(let event in warningData.badStarts){
         let bs = warningData.badStarts[event]
