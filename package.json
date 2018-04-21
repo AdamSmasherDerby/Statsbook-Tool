@@ -47,7 +47,7 @@
     },
     "linux": {
       "icon": "build/flamingo-white.png",
-      "target": ["AppImage","deb"]
+      "target": ["AppImage"]
     },
     "win": {
       "target": "NSIS",
