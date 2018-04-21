@@ -3,38 +3,45 @@
     {
         "npPoints":
         {
-            "description": "NP Box checked with points on first trip",
-            "events": []
+            "description": "NI Box checked with points on first trip",
+            "events": [],
+            "long": "The NI box indicates 'no initial trip', indicating that the jammer never completed their initial trip through the pack.  If points are recorded then this box should not be checked. (This error should not be raised for a correctly recorded initial pass lap point.)"
         },
         "noPointsNoNP":
         {
             "description": "No points (including a zero) on first trip, NI box not checked.",
-            "events": []
+            "events": [],
+            "long": "If the jammer completes their initial pass, they should have points recorded for the first scoring trip, even if that number is zero."
         },
         "tooManyLead":
         {
             "description": "Lead box checked more than once in a single jam",
-            "events": []
+            "events": [],
+            "long": "Only one jammer can be declared lead per jam.  This will check teammates during a star pass as well as opponents."
         },
         "tooManyCall":
         {
             "description": "Call box checked more than once in a single jam",
-            "events": []
+            "events": [],
+            "long": "At most one jammer can call the jamm off per jam."
         },
         "injuryOnlyOnce":
         {
             "description": "Injury box checked for one team, but not the other.",
-            "events": []
+            "events": [],
+            "long": "If the jam is called for injury, it should be recorded on both score sheets."
         },
         "leadPenaltyNotLost":
         {
             "description": "Jammer with lead and penalty without 'lost' checked.",
-            "events": []
+            "events": [],
+            "long": "If the lead jammer earns a penalty, they lose lead.  This box should be checked even if they successfully call the jam."
         },
         "onlyOneStarPass":
         {
             "description": "Star pass on only one team of the score sheet.",
-            "events": []
+            "events": [],
+            "long": "If one team passes the star, the scorekeeper for the other team should record SP* on their score sheet."
         }
 
     },
@@ -43,32 +50,38 @@
         "foUnder7":
         {
             "description": "FO entered for a skater with fewer than 7 penalties",
-            "events": []
+            "events": [],
+            "long": "Skaters should not foul out with fewer than 7 penalties in regulation play."
         },
         "sevenWithoutFO":
         {
             "description": "Seven or more penalties without a FO entered",
-            "events": []
+            "events": [],
+            "long": "Once a skater has earned seven penalties, an 'FO' and the jam in which she fouled out should be recorded in their last column on the penalty tracking sheet."
         },
         "expulsionNoPenalty":
         {
             "description": "Expulsion entered for a jam with no penalty",
-            "events": []
+            "events": [],
+            "long": "Expulsions should always be matched to a penalty issued in the same jam with the same code."
         },
         "penaltyNoLineup":
         {
             "description": "Skater with penalty entered not listed on Lineups Tab",
-            "events": []
+            "events": [],
+            "long": "A skater was listed as having a penalty in a jam where they were not listed as skating on the Lineups tab.  In the extremely rare case of a penalty incurred by a skater or bench staff not participating in the jam, ignore this error."
         },
         "penaltyNoEntry":
         {
             "description": "Penalty on penalty sheet without box entry on Lineups Tab",
-            "events": []
+            "events": [],
+            "long": "A skater was listed as having a penalty without a corresponding box entry code on the Lineups tab.  Can occasionally indicate a substitution. (See warnings)"
         },
         "penaltyBadJam":
         {
             "description": "Penalty entered for a jam greater than the highest jam on the Score Tab",
-            "events": []
+            "events": [],
+            "long": "A penalty was entered with a jam number higher than the maximum jam on the score sheet."
         }
     },
     "lineups":
@@ -76,42 +89,50 @@
         "samePlayerTwice":
         {
             "description": "Same player entered more than once in the same jam",
-            "events": []
+            "events": [],
+            "long": "The same skater was entered twice for the same jam.  As all skaters are required to have unique numbers, this indicates either an error or a time travel paradox."
         },
         "xNoPenalty":
         {
             "description": "X marked for player with no corresponding penalty",
-            "events": []
+            "events": [],
+            "long": "A player was notated as entering (or continuing in) the box without a penalty marked for the same or prior jam on the penalty sheet."
         },
         "slashNoPenalty":
         {
             "description": "/ marked for player with no corresponding penalty",
-            "events": []
+            "events": [],
+            "long": "A player was marked as entering the box without a penalty in the same or prior jam on the penalty sheet."
         },
         "sNoPenalty":
         {
             "description": "S marked for player with no penalty in current or prior jam.",
-            "events": []
+            "events": [],
+            "long": "A player was marked as starting in the box without a penalty in the current or prior jam.  Could potentially indicate a substitute. (See warnings)"
         },
         "sSlashNoPenalty":
         {
             "description": "$ marked for player with no penalty in current or prior jam",
-            "events": []
+            "events": [],
+            "long": "A player was marked as starting and finishing in the box without a penalty in the current or prior jam.  Could potentially indicate a substitute. (See warnings)"
         },
         "iNotInBox":
         {
             "description": "I or | marked for player with no box entry.",
-            "events": []
+            "events": [],
+            "long": "A player was marked as continuing in the box without a corresponding box entry in a prior jam."
         },
         "seatedNoCode":
         {
             "description": "Skater previously seated in box with no code on present line.",
-            "events": []
+            "events": [],
+            "long": "A skater, previously seated in the box, does not have an X or I marked to indicate that they continued in the box. Could potentially indicate a substitute. (See warnings)"
         },
         "startsWhileThere":
         {
             "description": "S or $ entered for skater already in the box.",
-            "events": []
+            "events": [],
+            "long": "Skaters who have already been seated in the box should be indicated with I or X.  S and $ are reserved for skaters who report to the box between jams."
         }
 
     },
@@ -120,17 +141,20 @@
         "possibleSub":
         {
             "description": "Reported errors may actually be substitution.",
-            "events": []
+            "events": [],
+            "long": "Checks for several sets of conditions that may indicate that the reported errors are in fact a box substitution.  Since substitutions are not indicated in the statsbook file, check the paperwork for handwritten notes."
         },
         "lastJamNoEntry":
         {
             "description": "No box entry listed for skater penalized in final jam.",
-            "events": []
+            "events": [],
+            "long": "Skaters penalized in the last jam sometimes fail to report to the box, and this is not necessarily an error in the paperwork."
         },
         "SPNoPointsNoNP": 
         {
             "description": "No points and no NP entered - star pass after initial or error?",
-            "events": []
+            "events": [],
+            "long": "If a jammer passes the star in their first scoring trip, then having neither points nor the NI box is correct."
         }
     }
 }

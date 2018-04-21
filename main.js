@@ -4,7 +4,8 @@ const url = require('url')
 const ipc = require('electron').ipcMain
 
 let menu,
-    win
+    win,
+    helpWin
 
 let createWindow = () => {
     win = new BrowserWindow({
@@ -47,19 +48,53 @@ let createWindow = () => {
             ]
         },
         {
-            label: 'About',
-            click: function(){
-                dialog.showMessageBox({
-                    type: 'info',
-                    title: 'Statsbook Tool',
-                    message: (`Statsbook Tool Version: ${app.getVersion()}\n` +
-                        'by: Adam Smasher (Daniel Alt)\n' +
-                        'https://github.com/AdamSmasherDerby/Statsbook-Tool/releases/' )
-                })
-            }
+            label: 'Help',
+            submenu: [
+                {
+                    label: 'Error Descriptions',
+                    click: function(){
+                        openHelp()
+                    }
+                },
+                {   label: 'About',
+                    click: function(){
+                        dialog.showMessageBox({
+                            type: 'info',
+                            title: 'Statsbook Tool',
+                            message: (`Statsbook Tool Version: ${app.getVersion()}\n` +
+                                'by: Adam Smasher (Daniel Alt)\n' +
+                                'https://github.com/AdamSmasherDerby/Statsbook-Tool/releases/' 
+                            )
+                        })
+                    }
+                }
+            ]    
         }
     ])
     Menu.setApplicationMenu(menu)
+}
+
+let openHelp = () => {
+    helpWin = new BrowserWindow({
+        parent: win,
+        title: 'Error Descriptions',
+        icon: __dirname + '/build/flamingo-white.png',
+        width: 800,
+        height: 600,
+        x: win.getPosition()[0] + 20,
+        y: win.getPosition()[1] + 20
+    })
+
+    helpWin.loadURL(url.format({
+        pathname: path.join(__dirname, 'src/help.html'),
+        protocol: 'file',
+        slashes: true
+    }))
+
+    helpWin.on('closed', () => {
+        helpWin = null
+    })
+    
 }
 
 app.on('ready', createWindow)
