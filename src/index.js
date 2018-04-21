@@ -445,16 +445,23 @@ let readScores = (workbook) => {
                 //  Do nothing: skater number should remain untouched from prior line)
 
                 // Check for subsequent trips, and add additional pass objects            
-
                 for (let trip=2; trip < maxTrips + 2; trip++){
                     tripAddress.c = cells.firstTrip.c + trip - 2
                     let tripScore = sheet[XLSX.utils.encode_cell(tripAddress)]
                     if (tripScore == undefined){
                         // ERROR CHECK - no trip score, initial pass completed
                         if (initCompleted == 'yes' && trip == 2 && !starPass){
-                            sbErrors.scores.noPointsNoNP.events.push(
-                                `Team: ${ucFirst(team)}, Period: ${period}, Jam: ${jam}, Jammer: ${skaterNum} `
-                            )
+                            let nextJamNumber = sheet[XLSX.utils.encode_cell({
+                                r: jamAddress.r + 1, c: jamAddress.c})]
+                            if(nextJamNumber != undefined && nextJamNumber.v=='SP'){
+                                sbErrors.warnings.SPNoPointsNoNP.events.push(
+                                    `Team: ${ucFirst(team)}, Period: ${period}, Jam: ${jam}, Jammer: ${skaterNum}`
+                                )
+                            } else {
+                                sbErrors.scores.noPointsNoNP.events.push(
+                                    `Team: ${ucFirst(team)}, Period: ${period}, Jam: ${jam}, Jammer: ${skaterNum}`
+                                )
+                            }
                         }    
                         continue
                     }

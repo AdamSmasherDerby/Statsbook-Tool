@@ -126,6 +126,11 @@
         {
             "description": "No box entry listed for skater penalized in final jam.",
             "events": []
+        },
+        "SPNoPointsNoNP": 
+        {
+            "description": "No points and no NP entered - star pass after initial or error?",
+            "events": []
         }
     }
 }
