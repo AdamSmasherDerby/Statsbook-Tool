@@ -8,12 +8,12 @@ let holder = document.getElementById('drag-file')
 let fileSelect = document.getElementById('file-select')
 let fileInfoBox = document.getElementById('file-info-box')
 let outBox = document.getElementById('output-box')
+let refreshButton = {}
 
 // Template Files
 let template2018 = require('../assets/2018statsbook.json')
 let template2017 = require('../assets/2017statsbook.json')
 let sbErrorTemplate = require('../assets/sberrors.json')
-// TO DO - Make template dynamically choosable
 
 // Globals
 let sbData = {},  // derbyJSON formatted statsbook data
@@ -25,47 +25,12 @@ let sbData = {},  // derbyJSON formatted statsbook data
     sbFilename = '',
     sbVersion = '',
     rABS = true, // read XLSX files as binary strings vs. array buffers
-    warningData = {}
+    warningData = {},
+    sbFile = new File([''],'')
 
-
-ipc.on('save-derby-json', () => {
-    // Saves statsbook data to a JSON file
-    
-    var data = encode( JSON.stringify(sbData, null, ' ')) 
-
-    var blob = new Blob( [ data ], {
-        type: 'application/octet-stream'
-    })
-    
-    let url = URL.createObjectURL( blob )
-    var link = document.createElement( 'a' )
-    link.setAttribute( 'href', url )
-    link.setAttribute( 'download', sbFilename.split('.')[0] + '.json')
-    
-    let e = document.createEvent( 'MouseEvents' )
-    e.initMouseEvent( 'click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null)
-    link.dispatchEvent( e )
-})
-
-let makeReader = (sbFile) => {
-    // Create reader object and load statsbook file
-    let reader = new FileReader()
-    sbFilename = sbFile.name
-
-    reader.onload = (e) => {
-        readSbData(e)
-    }
-
-    // Actually load the file
-    if (rABS) {
-        reader.readAsBinaryString(sbFile)
-    }
-    else {
-        reader.readAsArrayBuffer(sbFile)
-    }
-}
 
 fileSelect.onchange = (e) => {
+    // Fires if a file is selected by clicking "select file."
     if (e.target.value == undefined){
         return false
     }
@@ -77,27 +42,14 @@ fileSelect.onchange = (e) => {
         return false
     } 
     
-    let sbFile = e.target.files[0]
+    sbFile = e.target.files[0]
 
     makeReader(sbFile)
     return false
 }
 
-holder.ondragover = () => {
-    holder.classList.add('box__ondragover')
-    return false
-}
-
-holder.ondragleave = () => {
-    holder.classList.remove('box__ondragover')
-    return false
-}
-
-holder.ondragend = () => {
-    return false
-}
-
 holder.ondrop = (e) => {
+    // Fires if a file is dropped into the box
     holder.classList.remove('box__ondragover')
     e.preventDefault()
     e.stopPropagation
@@ -107,16 +59,32 @@ holder.ondrop = (e) => {
         return false
     } 
     
-    let sbFile = e.dataTransfer.files[0]
+    sbFile = e.dataTransfer.files[0]
 
     makeReader(sbFile)
     return false
-
 }
 
-let readSbData = (e) => {
+let makeReader = (sbFile) => {
+    // Create reader object and load statsbook file
+    let reader = new FileReader()
+    sbFilename = sbFile.name
+
+    reader.onload = (e) => {
+        readSbData(e.target.result)
+    }
+
+    // Actually load the file
+    if (rABS) {
+        reader.readAsBinaryString(sbFile)
+    }
+    else {
+        reader.readAsArrayBuffer(sbFile)
+    }
+}
+
+let readSbData = (data) => {
     // Read in the statsbook data for an event e
-    let data = e.target.result
     if (!rABS) data = new Uint8Array(data)
     var workbook = XLSX.read(data, {type: rABS ? 'binary' :'array'})
 
@@ -150,7 +118,31 @@ let readSbData = (e) => {
         outBox.removeChild(outBox.lastElementChild)
     }
     outBox.appendChild(sbErrorsToTable())
+
+    // Update UI
     ipc.send('enable-save-derby-json')
+    createRefreshButton()
+}
+
+let updateFileInfo = () => {
+    // Update the "File Information Box"
+    // Update File Information Box
+    fileInfoBox.innerHTML = `<strong>Filename:</strong>  ${sbFilename}<br>`
+    fileInfoBox.innerHTML += `<strong>SB Version:</strong> ${sbVersion}<br>`
+    fileInfoBox.innerHTML += `<strong>Game Date:</strong> ${moment(sbData.date).format('MMMM DD, YYYY')}<br>`
+    fileInfoBox.innerHTML += `<strong>Team 1:</strong> ${sbData.teams['home'].league} ${sbData.teams['home'].name}<br>`
+    fileInfoBox.innerHTML += `<strong>Team 2:</strong> ${sbData.teams['away'].league} ${sbData.teams['away'].name}<br>`
+    fileInfoBox.innerHTML += `<strong>File Read:</strong> ${moment().format('HH:mm:ss MMM DD, YYYY')} `
+}
+
+let createRefreshButton = () => {
+
+    fileInfoBox.innerHTML += '<button id="refresh" type="button" class="btn btn-sm">Refresh</button>'
+    refreshButton = document.getElementById('refresh')
+
+    refreshButton.onclick = () => {
+        makeReader(sbFile)
+    }
 }
 
 let getVersion = (workbook) => {
@@ -305,17 +297,6 @@ let readOfficials = (workbook) => {
         sbData.teams.officials.persons.push(offData)
     }
 
-}
-
-let updateFileInfo = () => {
-    // Update the "File Information Box"
-    // Update File Information Box
-    fileInfoBox.innerHTML = `<strong>Filename:</strong>  ${sbFilename}<br>`
-    fileInfoBox.innerHTML += `<strong>SB Version:</strong> ${sbVersion}<br>`
-    fileInfoBox.innerHTML += `<strong>Game Date:</strong> ${moment(sbData.date).format('MMMM DD, YYYY')}<br>`
-    fileInfoBox.innerHTML += `<strong>Team 1:</strong> ${sbData.teams['home'].league} ${sbData.teams['home'].name}<br>`
-    fileInfoBox.innerHTML += `<strong>Team 2:</strong> ${sbData.teams['away'].league} ${sbData.teams['away'].name}<br>`
-    fileInfoBox.innerHTML += `<strong>File Read:</strong> ${moment().format('HH:mm:ss MMM DD, YYYY')}`
 }
 
 let readScores = (workbook) => {
@@ -1315,6 +1296,7 @@ let initCells = (team, period, tab, props) => {
 
 let remove = (array, element) => {
     // Lifted from https://blog.mariusschulz.com/
+    // Removes an element from an arry
     const index = array.indexOf(element)
     
     if (index !== -1) {
@@ -1332,8 +1314,44 @@ let encode = (s) => {
 
 
 let ucFirst = (string) => {
+    // Capitalize first character of a string
     return string.charAt(0).toUpperCase() + string.slice(1)
 }
+
+
+// Change appearance of input box on file dragover
+holder.ondragover = () => {
+    holder.classList.add('box__ondragover')
+    return false
+}
+
+holder.ondragleave = () => {
+    holder.classList.remove('box__ondragover')
+    return false
+}
+
+holder.ondragend = () => {
+    return false
+}
+
+ipc.on('save-derby-json', () => {
+    // Saves statsbook data to a JSON file
+    
+    var data = encode( JSON.stringify(sbData, null, ' ')) 
+
+    var blob = new Blob( [ data ], {
+        type: 'application/octet-stream'
+    })
+    
+    let url = URL.createObjectURL( blob )
+    var link = document.createElement( 'a' )
+    link.setAttribute( 'href', url )
+    link.setAttribute( 'download', sbFilename.split('.')[0] + '.json')
+    
+    let e = document.createEvent( 'MouseEvents' )
+    e.initMouseEvent( 'click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null)
+    link.dispatchEvent( e )
+})
 
 /*
 List of error checks to be implemented from IGRF Tool.

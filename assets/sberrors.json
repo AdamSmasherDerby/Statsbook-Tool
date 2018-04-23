@@ -152,7 +152,7 @@
         },
         "SPNoPointsNoNP": 
         {
-            "description": "No points and no NP entered - star pass after initial or error?",
+            "description": "No points and no NI entered - star pass after initial or error?",
             "events": [],
             "long": "If a jammer passes the star in their first scoring trip, then having neither points nor the NI box is correct."
         }

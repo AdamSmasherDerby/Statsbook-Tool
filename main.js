@@ -31,7 +31,7 @@ let createWindow = () => {
 
     menu = Menu.buildFromTemplate([
         {
-            label: 'Options',
+            label: 'File',
             submenu: [
                 {   label: 'Save DerbyJSON',
                     click: function() {
