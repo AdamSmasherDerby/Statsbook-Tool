@@ -21,12 +21,12 @@ let sbData = {},  // derbyJSON formatted statsbook data
     sbErrors = {},
     penalties = {},
     starPasses = [],
-    teamList = ['home','away'],
     sbFilename = '',
     sbVersion = '',
     rABS = true, // read XLSX files as binary strings vs. array buffers
     warningData = {},
     sbFile = new File([''],'')
+const teamList = ['home','away']
 
 
 fileSelect.onchange = (e) => {
@@ -95,7 +95,8 @@ let readSbData = (data) => {
     starPasses = []
     warningData = {
         badStarts: [],
-        noEntries: []
+        noEntries: [],
+        badContinues: []
     }
 
     // Read Statsbook
@@ -938,6 +939,12 @@ let readLineups = (workbook) => {
                                     sbErrors.lineups.xNoPenalty.events.push(
                                         `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
                                     )
+                                    warningData.badContinues.push({
+                                        skater: skater,
+                                        team: team,
+                                        period: period,
+                                        jam: jam
+                                    })
                                 }
 
                             }
@@ -1035,6 +1042,12 @@ let readLineups = (workbook) => {
                                 sbErrors.lineups.iNotInBox.events.push(
                                     `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
                                 )
+                                warningData.badContinues.push({
+                                    skater: skater,
+                                    team: team,
+                                    period: period,
+                                    jam: jam
+                                })
                             }                                
                             break
                         case '3':
@@ -1202,6 +1215,34 @@ let warningCheck = () => {
             }
         }
     }
+
+    // Warning check: Possible substitution.
+    // For each skater who has a I, |, X or x without a corresponding penalty,
+    // check to see if a different skater on the same team has
+    // a penalty without a subsequent box exit.
+    for(let event in warningData.badContinues){
+        let bc = warningData.badContinues[event]
+        if(warningData.noEntries.filter(
+            ne => (ne.team == bc.team &&
+                (
+                    (ne.period == bc.period && ne.jam == (bc.jam-1)) ||
+                    (ne.period == (bc.period -1) && bc.jam == 1)
+                )
+            )).length >= 1){
+            if(bc.jam !=1){
+                sbErrors.warnings.possibleSub.events.push(
+                    `Team: ${ucFirst(bc.team)}, Period: ${bc.period
+                    }, Jams: ${bc.jam-1} & ${bc.jam}`
+                )
+            } else {
+                sbErrors.warnings.possibleSub.events.push(
+                    `Team: ${ucFirst(bc.team)}, Period: 1, Jam: ${sbData.periods['1'].jams.length
+                    } & Period: 2, Jam: ${bc.jam}`                
+                )
+            }
+        }
+    }
+
 }
 
 let sbErrorsToTable = () => {
