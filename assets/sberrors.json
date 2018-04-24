@@ -23,7 +23,7 @@
         {
             "description": "Call box checked more than once in a single jam",
             "events": [],
-            "long": "At most one jammer can call the jamm off per jam."
+            "long": "At most one jammer can call the jam off per jam."
         },
         "injuryOnlyOnce":
         {
@@ -142,7 +142,7 @@
         {
             "description": "Reported errors may actually be substitution.",
             "events": [],
-            "long": "Checks for several sets of conditions that may indicate that the reported errors are in fact a box substitution.  Since substitutions are not indicated in the statsbook file, check the paperwork for handwritten notes."
+            "long": "Checks for several sets of conditions that may indicate that the reported errors are in fact a box substitution.  Since substitutions are not indicated in the StatsBook file, check the paperwork for handwritten notes."
         },
         "lastJamNoEntry":
         {

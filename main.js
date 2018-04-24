@@ -1,11 +1,12 @@
-const {app, BrowserWindow, Menu, dialog} = require('electron')
+const {app, BrowserWindow, Menu} = require('electron')
 const path = require('path')
 const url = require('url')
 const ipc = require('electron').ipcMain
 
 let menu,
     win,
-    helpWin
+    helpWin,
+    aboutWin
 
 let createWindow = () => {
     win = new BrowserWindow({
@@ -56,22 +57,54 @@ let createWindow = () => {
                         openHelp()
                     }
                 },
-                {   label: 'About',
+                {
+                    label: 'About',
                     click: function(){
-                        dialog.showMessageBox({
-                            type: 'info',
-                            title: 'Statsbook Tool',
-                            message: (`Statsbook Tool Version: ${app.getVersion()}\n` +
-                                'by: Adam Smasher (Daniel Alt)\n' +
-                                'https://github.com/AdamSmasherDerby/Statsbook-Tool/releases/' 
-                            )
-                        })
+                        openAbout()
                     }
-                }
+                },
             ]    
         }
     ])
     Menu.setApplicationMenu(menu)
+}
+
+let openAbout = () => {
+    aboutWin = new BrowserWindow({
+        parent: win,
+        title: 'StatsBook Tool',
+        icon: __dirname + '/build/flamingo-white.png',
+        width: 300,
+        height: 300,
+        x: win.getPosition()[0] + 250,
+        y: win.getPosition()[1] + 150
+    })
+
+    /*if (isDev()){
+        aboutWin.webContents.openDevTools()
+    }*/
+
+    aboutWin.setMenu(null)
+
+    aboutWin.loadURL(url.format({
+        pathname: path.join(__dirname, 'src/aboutst.html'),
+        protocol: 'file',
+        slashes: true
+    }))
+
+    aboutWin.webContents.on('new-window', function(e, url) {
+        e.preventDefault()
+        require('electron').shell.openExternal(url)
+    })
+
+    aboutWin.on('closed', () => {
+        aboutWin = null
+    })
+
+    aboutWin.webContents.on('did-finish-load', () => {
+        aboutWin.webContents.send('set-version', app.getVersion())
+    })
+    
 }
 
 let openHelp = () => {
@@ -90,6 +123,8 @@ let openHelp = () => {
         protocol: 'file',
         slashes: true
     }))
+
+    helpWin.setMenu(null)
 
     helpWin.on('closed', () => {
         helpWin = null
