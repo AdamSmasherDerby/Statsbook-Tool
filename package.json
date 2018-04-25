@@ -1,7 +1,7 @@
 {
   "name": "statsbooktool",
-  "version": "0.1.7",
-  "description": "A tool for processing WFTDA Statsbooks",
+  "version": "0.2.0",
+  "description": "A tool for error checkings WFTDA Statsbooks",
   "main": "main.js",
   "author": "Adam Smasher (Daniel Alt) <dan@fnerk.com>",
   "license": "MIT",
@@ -20,6 +20,7 @@
     "bootstrap": "4.0.0",
     "jquery": "^3.3.1",
     "moment": "^2.22.0",
+    "npm": "^6.0.0",
     "popper.js": "^1.14.3",
     "typeface-raleway": "^0.0.54",
     "xlsx": "^0.11.19"
@@ -47,7 +48,9 @@
     },
     "linux": {
       "icon": "build/flamingo-white.png",
-      "target": ["AppImage"]
+      "target": [
+        "AppImage"
+      ]
     },
     "win": {
       "target": "NSIS",
