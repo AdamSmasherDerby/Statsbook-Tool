@@ -1,4 +1,4 @@
-const {app, BrowserWindow, Menu} = require('electron')
+const {app, BrowserWindow, Menu, dialog} = require('electron')
 const path = require('path')
 const url = require('url')
 const ipc = require('electron').ipcMain
@@ -29,6 +29,22 @@ let createWindow = () => {
 
     win.on('closed', ()=> {
         win=null
+    })
+
+    win.webContents.on('crashed', ()=> {
+        dialog.showMessageBox(win, {
+            type: 'error',
+            title: 'Statsbook Tool',
+            message: 'Statsbook Tool has crashed.  This should probably not surprise you.'
+        })
+    })
+
+    win.on('unresponsive', ()=> {
+        dialog.showMessageBox(win, {
+            type: 'error',
+            title: 'Statsbook Tool',
+            message: 'Statsbook Tool has become unresponsive.  You should probably have been more emotionally supportive.'
+        })
     })
 
     menu = Menu.buildFromTemplate([
@@ -153,4 +169,12 @@ let isDev = () => {
 
 ipc.on('enable-save-derby-json', () => {
     menu.items[0].submenu.items[0].enabled = true
+})
+
+process.on('uncaughtException', (err) => {
+    dialog.showMessageBox(win, {
+        type: 'error',
+        title: 'Statsbook Tool',
+        message: `Statsbook Tool has had an uncaught exception.  Does this help? (Note: will probably not help.) ${err}`
+    })       
 })
