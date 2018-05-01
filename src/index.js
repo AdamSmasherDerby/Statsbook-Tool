@@ -96,7 +96,10 @@ let readSbData = (data) => {
     warningData = {
         badStarts: [],
         noEntries: [],
-        badContinues: []
+        badContinues: [],
+        noExits: [],
+        foulouts: [],
+        expulsions: []
     }
 
     // Read Statsbook
@@ -709,6 +712,12 @@ let readPenalties = (workbook) => {
                             ]
                         }
                     )
+                    warningData.expulsions.push(
+                        {skater: skater,
+                        team: team,
+                        period: period,
+                        jam: foJam.v}
+                    )
 
                     // ERROR CHECK: Expulsion code for a jam with no penalty
                     if (sbData.periods[period].jams[foJam.v - 1].events.filter(
@@ -723,6 +732,12 @@ let readPenalties = (workbook) => {
 
                 if (foCode.v == 'FO'){
                     foulouts.push(skater)
+                    warningData.foulouts.push(
+                        {skater: skater,
+                        team: team,
+                        period: period,
+                        jam: foJam.v}
+                    )
                 }
 
                 // ERROR CHECK: FO entered with fewer than seven penalties
@@ -1066,7 +1081,7 @@ let readLineups = (workbook) => {
                     }
                     // Done reading all codes
 
-                    // ERROR CHECK: is there a skater still in the box without
+                    // ERROR CHECK: is this skater still in the box without
                     // any code on the present line?
                     if (box[team].includes(skater) && !allCodes){
                         sbErrors.lineups.seatedNoCode.events.push(
@@ -1074,13 +1089,58 @@ let readLineups = (workbook) => {
                                 ucFirst(skater.substr(0,4))
                             }, Skater: ${skater.slice(5)}`
                         )
+                        warningData.noExits.push({
+                            skater: skater,
+                            team: team,
+                            period: period,
+                            jam: jam
+                        })
                         remove(box[team],skater)
                     }
+                    // Done processing skater
 
                 }
                 // Done reading line
 
-                // ERROR CHECK: Skaters with penalties not listed on the lineup tab
+                // Remove fouled out or expelled skaters from the box
+                let fouledOutSkaters = warningData.foulouts.filter(x => x.period == period && x.jam == jam & x.team == team)
+                if(fouledOutSkaters != undefined) {
+                    for(let s in fouledOutSkaters) {
+                        let skater = fouledOutSkaters[s].skater
+                        if(box[team].includes(skater)){
+                            remove(box[team],skater)
+                        }
+                    }
+                }
+                let expelledSkaters = warningData.expulsions.filter(x => x.period == period && x.jam == jam & x.team == team)
+                if(expelledSkaters != undefined) {
+                    for(let s in expelledSkaters) {
+                        let skater = expelledSkaters[s].skater
+                        if(box[team].includes(skater)){
+                            remove(box[team],skater)
+                        }
+                    }
+                }
+
+                // Error Check: Skater still in the box not listed on lineup tab at all
+                for (let s in box[team]){
+                    let skater = box[team][s]
+                    if(!skaterList.includes(skater)){
+                        sbErrors.lineups.seatedNotLinedUp.events.push(
+                            `Period: ${pstring}, Jam: ${jam}, Team: ${
+                                ucFirst(skater.substr(0,4))
+                            }, Skater: ${skater.slice(5)}`
+                        )
+                        warningData.noExits.push({
+                            skater: skater,
+                            team: team,
+                            period: period,
+                            jam: jam
+                        })
+                    }
+                }
+
+                // ERROR CHECK: Skaters with penalties in this jam not listed on the lineup tab
                 for (let p in thisJamPenalties){
                     if(skaterList.indexOf(thisJamPenalties[p].skater) == -1){
                         sbErrors.penalties.penaltyNoLineup.events.push(
@@ -1220,15 +1280,39 @@ let warningCheck = () => {
     // For each skater who has a I, |, X or x without a corresponding penalty,
     // check to see if a different skater on the same team has
     // a penalty without a subsequent box exit.
+
     for(let event in warningData.badContinues){
+        // For each skater who is on the "continued without entry" list
         let bc = warningData.badContinues[event]
-        if(warningData.noEntries.filter(
+
+        // If there's a corresponding entry on the "never exited the box list", issue a warning
+        if(warningData.noExits.filter(
             ne => (ne.team == bc.team &&
                 (
-                    (ne.period == bc.period && ne.jam == (bc.jam-1)) ||
-                    (ne.period == (bc.period -1) && bc.jam == 1)
+                    (ne.period == bc.period && ne.jam == bc.jam) 
                 )
             )).length >= 1){
+            if(bc.jam !=1){
+                    sbErrors.warnings.possibleSub.events.push(
+                        `Team: ${ucFirst(bc.team)}, Period: ${bc.period
+                        }, Jams: ${bc.jam-1} & ${bc.jam}`
+                    )
+            } else {
+                sbErrors.warnings.possibleSub.events.push(
+                    `Team: ${ucFirst(bc.team)}, Period: 1, Jam: ${sbData.periods['1'].jams.length
+                    } & Period: 2, Jam: ${bc.jam}`                
+                )
+            }
+        }
+
+        // If there's a skater in the prior jam with a foulout, issue a warning as well
+        if(warningData.foulouts.filter(
+            fo => fo.team == bc.team && 
+            (
+                (fo.period == bc.period && fo.jam == bc.jam-1) ||
+                (bc.period == 2 && bc.jam == 1 && fo.jam == sbData.periods['1'].jams.length)
+            )
+        ).length > 0) {
             if(bc.jam !=1){
                 sbErrors.warnings.possibleSub.events.push(
                     `Team: ${ucFirst(bc.team)}, Period: ${bc.period
@@ -1241,6 +1325,28 @@ let warningCheck = () => {
                 )
             }
         }
+
+        // If there's a skater in the prior jam with an expulsion, issue a warning as well
+        if(warningData.expulsions.filter(
+            exp => exp.team == bc.team && 
+            (
+                (exp.period == bc.period && exp.jam == bc.jam-1) ||
+                (bc.period == 2 && bc.jam == 1 && exp.jam == sbData.periods['1'].jams.length)
+            )
+        ).length > 0) {
+            if(bc.jam !=1){
+                sbErrors.warnings.possibleSub.events.push(
+                    `Team: ${ucFirst(bc.team)}, Period: ${bc.period
+                    }, Jams: ${bc.jam-1} & ${bc.jam}`
+                )
+            } else {
+                sbErrors.warnings.possibleSub.events.push(
+                    `Team: ${ucFirst(bc.team)}, Period: 1, Jam: ${sbData.periods['1'].jams.length
+                    } & Period: 2, Jam: ${bc.jam}`                
+                )
+            }
+        }
+    
     }
 
 }

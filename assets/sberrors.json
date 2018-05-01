@@ -133,6 +133,12 @@
             "description": "S or $ entered for skater already in the box.",
             "events": [],
             "long": "Skaters who have already been seated in the box should be indicated with I or X.  S and $ are reserved for skaters who report to the box between jams."
+        },
+        "seatedNotLinedUp":
+        {
+            "description": "Penalzied skater not on lineup.",
+            "events": [],
+            "long": "A skater who was issued a penalty in a prior jam does not appear in the lineup for this jam.  May also indicate a substitution."
         }
 
     },
