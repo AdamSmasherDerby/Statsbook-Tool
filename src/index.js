@@ -714,9 +714,9 @@ let readPenalties = (workbook) => {
                     )
                     warningData.expulsions.push(
                         {skater: skater,
-                        team: team,
-                        period: period,
-                        jam: foJam.v}
+                            team: team,
+                            period: period,
+                            jam: foJam.v}
                     )
 
                     // ERROR CHECK: Expulsion code for a jam with no penalty
@@ -734,9 +734,9 @@ let readPenalties = (workbook) => {
                     foulouts.push(skater)
                     warningData.foulouts.push(
                         {skater: skater,
-                        team: team,
-                        period: period,
-                        jam: foJam.v}
+                            team: team,
+                            period: period,
+                            jam: foJam.v}
                     )
                 }
 
@@ -1293,10 +1293,10 @@ let warningCheck = () => {
                 )
             )).length >= 1){
             if(bc.jam !=1){
-                    sbErrors.warnings.possibleSub.events.push(
-                        `Team: ${ucFirst(bc.team)}, Period: ${bc.period
-                        }, Jams: ${bc.jam-1} & ${bc.jam}`
-                    )
+                sbErrors.warnings.possibleSub.events.push(
+                    `Team: ${ucFirst(bc.team)}, Period: ${bc.period
+                    }, Jams: ${bc.jam-1} & ${bc.jam}`
+                )
             } else {
                 sbErrors.warnings.possibleSub.events.push(
                     `Team: ${ucFirst(bc.team)}, Period: 1, Jam: ${sbData.periods['1'].jams.length
@@ -1522,6 +1522,7 @@ Just Penalties
 Just Lineups
 1. Players listed more than once in the same jam on the lineup tab.*
 2. "I" or "|" in lineups without the player being in the box already.*
+3. A player seated in a prior jam who has no marked exit from the box.*
 
 Lineups + Penalties (Check while reading lineups)
 1. Penalties on skaters not listed on the lineup for that jam.*

@@ -24,6 +24,8 @@ Lineups:
 1. Players listed more than once in the same jam on the lineup tab.
 2. "I" or "|" in lineups without the player being in the box already.
 3. Skater previously seated in the box with no code on present line.
+4. Skater seated in a prior jam with no marked exit from the box.
+5. "$" or "S" entered for a skater already in the box.
 
 Lineups + Penalties:
 
