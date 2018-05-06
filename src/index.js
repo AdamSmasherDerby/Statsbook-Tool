@@ -1164,7 +1164,7 @@ let errorCheck = () => {
         events = [],
         pstring = ''
 
-    for (let period = 1; period < sbData.periods.length; period++){
+    for (let period = 1; period <= Object.keys(sbData.periods).length; period++){
 
         pstring = period.toString()
         jams  = sbData.periods[pstring].jams.length
