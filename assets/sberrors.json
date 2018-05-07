@@ -42,6 +42,12 @@
             "description": "Star pass on only one team of the score sheet.",
             "events": [],
             "long": "If one team passes the star, the scorekeeper for the other team should record SP* on their score sheet."
+        },
+        "badJamNumber":
+        {
+            "description": "Jam number out of sequence",
+            "events": [],
+            "long": "Jams should occur in numerical order without gaps in the numbering."
         }
 
     },

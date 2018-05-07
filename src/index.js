@@ -384,7 +384,16 @@ let readScores = (workbook) => {
                     }
                     starPasses.push({period: period, jam: jam})
                 } else {
-                    // Not a star pass? Update the jam
+                    // Not a star pass? 
+
+                    // Error check - is this jam number out of sequence?
+                    if (parseInt(jamNumber.v) != (jam+1)){
+                        sbErrors.scores.badJamNumber.events.push(
+                            `Team: ${ucFirst(team)}, Period: ${pstring}, Jam: ${parseInt(jamNumber.v)}`
+                        )
+                    }
+
+                    //Update the jam
                     jam = parseInt(jamNumber.v)
                     starPass = false
                 }
@@ -692,7 +701,13 @@ let readPenalties = (workbook) => {
                 let foJam = sheet[XLSX.utils.encode_cell(foJamAddress)]
 
                 if(foCode==undefined || foJam==undefined){
-                    //TODO - handle if only one is missing
+                    
+                    // Error Check: FO or EXP code without jam, or vice versa.
+                    if(foCode != undefined || foJam != undefined){
+                        sbErrors.penalties.codeNoJam.events.push(
+                            `Team: ${ucFirst(team)}, Skater: ${skaterNum.v}, Period: ${period}.`
+                        )
+                    }
 
                     // ERROR CHECK: Seven or more penalties with NO foulout entered 
                     if (foulouts.indexOf(skater) == -1 
@@ -1520,8 +1535,7 @@ ipc.on('save-derby-json', () => {
 })
 
 /*
-List of error checks to be implemented from IGRF Tool.
-(* = Done)
+List of error checks.
 
 Check while reading:
 
@@ -1532,6 +1546,7 @@ Just Scores
 4. "Call" checked for both jammers.*
 5. "Injury" checked on one team but not the other.*
 6. Star pass for only one team.*
+7. Jam Number out of sequence
 
 Just Penalties
 1. "FO" entered for skater with fewer than 7 penalties.*

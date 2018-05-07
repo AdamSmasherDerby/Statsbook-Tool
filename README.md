@@ -12,6 +12,7 @@ Scores:
 4. "Call" checked for both jammers.
 5. "Injury" checked on one team but not the other.
 6. Star pass for only one team.
+7. Jam number out of sequence.
 
 Penalties:
 
