@@ -18,6 +18,7 @@ Penalties:
 1. "FO" entered for skater with fewer than 7 penalties.
 2. Seven or more penalties without "FO" or expulsion code entered.
 3. Expulsion code entered for jam with no penalty.
+4. Penalty code without jam number, or jam number without penalty.
 
 Lineups:
 
@@ -26,6 +27,7 @@ Lineups:
 3. Skater previously seated in the box with no code on present line.
 4. Skater seated in a prior jam with no marked exit from the box.
 5. "$" or "S" entered for a skater already in the box.
+6. "No Pivot" not checked after star pass.
 
 Lineups + Penalties:
 

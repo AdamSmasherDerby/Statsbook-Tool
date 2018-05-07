@@ -82,6 +82,12 @@
             "description": "Penalty entered for a jam greater than the highest jam on the Score Tab",
             "events": [],
             "long": "A penalty was entered with a jam number higher than the maximum jam on the score sheet."
+        },
+        "codeNoJam":
+        {
+            "description": "Penalty code without jam number, or jam number without penalty.",
+            "events": [],
+            "long": "On the penalty sheet, either a penalty code was entered without a jam number, or a jam number was entered without a penalty code."
         }
     },
     "lineups":
@@ -139,6 +145,12 @@
             "description": "Penalzied skater not on lineup.",
             "events": [],
             "long": "A skater who was issued a penalty in a prior jam does not appear in the lineup for this jam.  May also indicate a substitution."
+        },
+        "starPassNoPivot":
+        {
+            "description": "No Pivot box not checked on line with Star Pass",
+            "events": [],
+            "long": "After a star pass, the 'no pivot' box should be checked to indicate that there is no longer a pivot on the team with the pass."
         }
 
     },

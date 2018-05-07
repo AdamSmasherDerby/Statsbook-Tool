@@ -652,8 +652,16 @@ let readPenalties = (workbook) => {
                     let jamText = sheet[XLSX.utils.encode_cell(jamAddress)]
 
                     if(codeText == undefined || jamText == undefined){
-                        //TODO - handle if ONE of these is missing
-                        continue
+                        // Error Check - penalty code without jam # or vice versa
+
+                        if(codeText == undefined && jamText == undefined){
+                            continue
+                        } else {
+                            sbErrors.penalties.codeNoJam.events.push(
+                                `Team: ${ucFirst(team)}, Skater: ${skaterNum.v}, Period: ${period}.`
+                            )
+                            continue
+                        }
                     }
 
                     let code = codeText.v,
@@ -824,13 +832,16 @@ let readLineups = (workbook) => {
                 let jamText = sheet[XLSX.utils.encode_cell(jamNumberAddress)]
 
                 if (jamText == undefined || jamText.v == '') {continue}
+                // If there is no jam number, go on to the next line.
                 // TODO - maybe change this to not give up if the jam # is blank?
+
                 if (jamText.v != 'SP' && jamText.v != 'SP*'){
                     // Unless this is a starpass line, update the jam number
                     jam = jamText.v
                     starPass = false
                     skaterList = []
                 } else if (jamText.v == 'SP*'){
+                    // If this is a star pass for the opposing team only, go on to the next line.
                     continue
                 } else {
                     starPass = true
@@ -862,6 +873,14 @@ let readLineups = (workbook) => {
 
                     let skaterText = sheet[XLSX.utils.encode_cell(skaterAddress)]
                     let noPivot = sheet[XLSX.utils.encode_cell(noPivotAddress)]
+
+                    if (starPass == true && (noPivot == undefined || noPivot.v == undefined) && s == 0){
+                        // Error check: Star Pass line without "No Pivot" box checked.
+
+                        sbErrors.lineups.starPassNoPivot.events.push(
+                            `Period: ${period}, Jam: ${jam}, Team: ${ucFirst(team)}`
+                        )
+                    }
 
                     if (skaterText == undefined){continue}
 
@@ -1518,11 +1537,15 @@ Just Penalties
 1. "FO" entered for skater with fewer than 7 penalties.*
 2. Seven or more penalties without "FO" or expulsion code entered.*
 3. Expulsion code entered for jam with no penalty.*
+4. Penalty code without jam number, of jam number without penalty.
 
 Just Lineups
 1. Players listed more than once in the same jam on the lineup tab.*
 2. "I" or "|" in lineups without the player being in the box already.*
-3. A player seated in a prior jam who has no marked exit from the box.*
+3. Skater previously seated in the box with no code on the present line.
+4. A player seated in a prior jam who has no marked exit from the box.*
+5. "S" or "$" entered for skater already seated in the box.
+6. "No Pivot" box not checked after star pass.
 
 Lineups + Penalties (Check while reading lineups)
 1. Penalties on skaters not listed on the lineup for that jam.*
