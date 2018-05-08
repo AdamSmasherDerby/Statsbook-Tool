@@ -7,7 +7,7 @@
             "events": [],
             "long": "The NI box indicates 'no initial trip', indicating that the jammer never completed their initial trip through the pack.  If points are recorded then this box should not be checked. (This error should not be raised for a correctly recorded initial pass lap point.)"
         },
-        "noPointsNoNP":
+        "noPointsNoNI":
         {
             "description": "No points (including a zero) on first trip, NI box not checked.",
             "events": [],
@@ -48,6 +48,12 @@
             "description": "Jam number out of sequence",
             "events": [],
             "long": "Jams should occur in numerical order without gaps in the numbering."
+        },
+        "spPointsBothJammers":
+        {
+            "description": "Both jammers in a star pass with points in same trip.",
+            "events": [],
+            "long": "In one jam, only one jammer should score points for a trip. If Jammer A has points in trip 2 and passes the star to Jammer B in trip 3, all of the points for trip 3 should be in the trip 3 column for Jammer B."
         }
 
     },
@@ -174,7 +180,7 @@
             "events": [],
             "long": "Skaters penalized in the last jam sometimes fail to report to the box, and this is not necessarily an error in the paperwork."
         },
-        "SPNoPointsNoNP": 
+        "SPNoPointsNoNI": 
         {
             "description": "No points and no NI entered - star pass after initial or error?",
             "events": [],
