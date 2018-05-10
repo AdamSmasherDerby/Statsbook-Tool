@@ -100,7 +100,8 @@ let readSbData = (data) => {
         noExits: [],
         foulouts: [],
         expulsions: [],
-        lost: []
+        lost: [],
+        jamsCalledInjury: []
     }
 
     // Read Statsbook
@@ -590,10 +591,18 @@ let readScores = (workbook) => {
                 // Injury
                 let inj = sheet[XLSX.utils.encode_cell(injAddress)]
                 if (inj != undefined && inj.v != undefined){
-                    sbData.periods[period].jams[jam-1].events.push(
+
+                    // To do - don't record injury event here
+                   /* sbData.periods[period].jams[jam-1].events.push(
                         {
-                            event: 'injury',
-                            skater: skater
+                            event: 'injury'
+                        }
+                    )*/
+                    warningData.jamsCalledInjury.push(
+                        {
+                            team: team,
+                            period: period,
+                            jam: jam
                         }
                     )
                 }
@@ -622,12 +631,21 @@ let readScores = (workbook) => {
                 )
             }
 
+            // Record one injury event for each jam with the box checked.
+            let numInjuries = warningData.jamsCalledInjury.filter(
+                x => x.period == period && x.jam == (parseInt(j) + 1)
+            ).length
+            if (numInjuries >= 1) {
+                sbData.periods[period].jams[j].events.push(
+                    {
+                        event: 'injury'
+                    }
+                )
+            } 
             // ERROR CHECK: Injury box checked for only one team in a jam.
-            if (sbData.periods[period].jams[j].events.filter(
-                x => x.event == 'injury'
-            ).length == 1){
+            if (numInjuries == 1) {
                 sbErrors.scores.injuryOnlyOnce.events.push(
-                    `Period: ${period}, Jam: ${jam}`
+                    `Period: ${period}, Jam:${jam}`
                 )
             }
         }
