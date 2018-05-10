@@ -336,8 +336,10 @@ let readScores = (workbook) => {
         for (var i in teamList){ 
             // For each team
 
+            // Setup variables.  Jam is 0 indexed (1 less than jam nubmer).  Trip is 1 indexed.
             let team = teamList[i]
             let jam = 0
+            let trip = 1
             let starPass = false
 
             // Get an array of starting points for each type of info
@@ -385,8 +387,18 @@ let readScores = (workbook) => {
                     }
                     starPasses.push({period: period, jam: jam})
                 } else {
-                    // Not a star pass? Update the jam
+                    // Not a star pass 
+
+                    // Error check - is this jam number out of sequence?
+                    if (parseInt(jamNumber.v) != (jam+1)){
+                        sbErrors.scores.badJamNumber.events.push(
+                            `Team: ${ucFirst(team)}, Period: ${pstring}, Jam: ${parseInt(jamNumber.v)}`
+                        )
+                    }
+
+                    //Update the jam, reset the trip
                     jam = parseInt(jamNumber.v)
+                    trip = 1
                     starPass = false
                 }
 
@@ -402,7 +414,7 @@ let readScores = (workbook) => {
                 let skaterNum = ' '
                 let initCompleted = 'yes'
                 
-                // Check for no initial pass
+                // Check for no initial pass box checked
                 let np = sheet[XLSX.utils.encode_cell(npAddress)]
                 if (np != undefined && np.v != undefined){initCompleted = 'no'}
 
@@ -427,31 +439,56 @@ let readScores = (workbook) => {
 
                     skaterNum = sheet[XLSX.utils.encode_cell(jammerAddress)].v
                     skater = team + ':' + skaterNum
+
+                    // If this is still the initial trip, add another initial pass object.
+                    if(trip==1){
+                        sbData.periods[period].jams[jam-1].events.push(
+                            {
+                                event: 'pass',
+                                number: 1,
+                                score: '',
+                                skater: skater,
+                                team: team,
+                                completed: initCompleted
+                            }
+                        )
+                    }
+
                 }  // Final case - jam number is SP*.   
                 //  Do nothing: skater number should remain untouched from prior line)
 
                 // Check for subsequent trips, and add additional pass objects            
-                for (let trip=2; trip < maxTrips + 2; trip++){
-                    tripAddress.c = cells.firstTrip.c + trip - 2
+                for (let t=2; t < maxTrips + 2; t++){
+                    tripAddress.c = cells.firstTrip.c + t - 2
                     let tripScore = sheet[XLSX.utils.encode_cell(tripAddress)]
+
                     if (tripScore == undefined){
+
                         // ERROR CHECK - no trip score, initial pass completed
-                        if (initCompleted == 'yes' && trip == 2 && !starPass){
+                        if (initCompleted == 'yes' && t == 2 && !starPass){
                             let nextJamNumber = sheet[XLSX.utils.encode_cell({
                                 r: jamAddress.r + 1, c: jamAddress.c})]
                             if(nextJamNumber != undefined && nextJamNumber.v=='SP'){
-                                sbErrors.warnings.SPNoPointsNoNP.events.push(
+                                sbErrors.warnings.SPNoPointsNoNI.events.push(
                                     `Team: ${ucFirst(team)}, Period: ${period}, Jam: ${jam}, Jammer: ${skaterNum}`
                                 )
                             } else {
-                                sbErrors.scores.noPointsNoNP.events.push(
+                                sbErrors.scores.noPointsNoNI.events.push(
                                     `Team: ${ucFirst(team)}, Period: ${period}, Jam: ${jam}, Jammer: ${skaterNum}`
                                 )
                             }
-                        }    
+                        }
+                        
+                        // Go on to next cell
                         continue
                     }
 
+                    // Error check - points entered for a trip that's already been completed.
+                    if (t <= trip){
+                        sbErrors.scores.spPointsBothJammers.events.push(
+                            `Team: ${ucFirst(team)}, Period: ${period}, Jam: ${jam}`
+                        )
+                    }
                     
                     let reResult = []
                     let ippResult = []
@@ -465,24 +502,27 @@ let readScores = (workbook) => {
                         ).score = points
                     } else if (tripScore.f != undefined && (ippResult = ippRe.exec(tripScore.f))){
                         // If score is x + x, extract scores and add points to prior AND current trip
+                        if (!starPass) {trip++}
                         sbData.periods[period].jams[jam-1].events.find(
                             x => x.event == 'pass' && x.number == 1 && x.skater == skater
                         ).score = ippResult[1]
                         sbData.periods[period].jams[jam-1].events.push(
                             {
                                 event: 'pass',
-                                number: trip,
+                                number: t,
                                 score: ippResult[2],
                                 skater: skater,
                                 team: team
                             }                               
                         )
                     } else {
+                        // Normal scoring trip
+                        if (!starPass) {trip++}
                         points = tripScore.v
                         sbData.periods[period].jams[jam-1].events.push(
                             {
                                 event: 'pass',
-                                number: trip,
+                                number: t,
                                 score: points,
                                 skater: skater,
                                 team: team
@@ -490,7 +530,7 @@ let readScores = (workbook) => {
                         )
                     }
 
-                    // ERROR CHECK: No Pass box checked with points given.
+                    // ERROR CHECK: No Initial box checked with points given.
                     if (initCompleted == 'no' && !reResult){
                         sbErrors.scores.npPoints.events.push(
                             `Team: ${ucFirst(team)}, Period: ${period}, Jam: ${jam}, Jammer: ${skaterNum} `
@@ -661,8 +701,16 @@ let readPenalties = (workbook) => {
                     let jamText = sheet[XLSX.utils.encode_cell(jamAddress)]
 
                     if(codeText == undefined || jamText == undefined){
-                        //TODO - handle if ONE of these is missing
-                        continue
+                        // Error Check - penalty code without jam # or vice versa
+
+                        if(codeText == undefined && jamText == undefined){
+                            continue
+                        } else {
+                            sbErrors.penalties.codeNoJam.events.push(
+                                `Team: ${ucFirst(team)}, Skater: ${skaterNum.v}, Period: ${period}.`
+                            )
+                            continue
+                        }
                     }
 
                     let code = codeText.v,
@@ -693,7 +741,13 @@ let readPenalties = (workbook) => {
                 let foJam = sheet[XLSX.utils.encode_cell(foJamAddress)]
 
                 if(foCode==undefined || foJam==undefined){
-                    //TODO - handle if only one is missing
+                    
+                    // Error Check: FO or EXP code without jam, or vice versa.
+                    if(foCode != undefined || foJam != undefined){
+                        sbErrors.penalties.codeNoJam.events.push(
+                            `Team: ${ucFirst(team)}, Skater: ${skaterNum.v}, Period: ${period}.`
+                        )
+                    }
 
                     // ERROR CHECK: Seven or more penalties with NO foulout entered 
                     if (foulouts.indexOf(skater) == -1 
@@ -833,13 +887,16 @@ let readLineups = (workbook) => {
                 let jamText = sheet[XLSX.utils.encode_cell(jamNumberAddress)]
 
                 if (jamText == undefined || jamText.v == '') {continue}
+                // If there is no jam number, go on to the next line.
                 // TODO - maybe change this to not give up if the jam # is blank?
+
                 if (jamText.v != 'SP' && jamText.v != 'SP*'){
                     // Unless this is a starpass line, update the jam number
                     jam = jamText.v
                     starPass = false
                     skaterList = []
                 } else if (jamText.v == 'SP*'){
+                    // If this is a star pass for the opposing team only, go on to the next line.
                     continue
                 } else {
                     starPass = true
@@ -871,6 +928,14 @@ let readLineups = (workbook) => {
 
                     let skaterText = sheet[XLSX.utils.encode_cell(skaterAddress)]
                     let noPivot = sheet[XLSX.utils.encode_cell(noPivotAddress)]
+
+                    if (starPass == true && (noPivot == undefined || noPivot.v == undefined) && s == 0){
+                        // Error check: Star Pass line without "No Pivot" box checked.
+
+                        sbErrors.lineups.starPassNoPivot.events.push(
+                            `Period: ${period}, Jam: ${jam}, Team: ${ucFirst(team)}`
+                        )
+                    }
 
                     if (skaterText == undefined){continue}
 
@@ -1173,7 +1238,7 @@ let errorCheck = () => {
         events = [],
         pstring = ''
 
-    for (let period = 1; period < sbData.periods.length; period++){
+    for (let period = 1; period <= Object.keys(sbData.periods).length; period++){
 
         pstring = period.toString()
         jams  = sbData.periods[pstring].jams.length
@@ -1523,28 +1588,33 @@ ipc.on('save-derby-json', () => {
 })
 
 /*
-List of error checks to be implemented from IGRF Tool.
-(* = Done)
+List of error checks.
 
 Check while reading:
 
 Just Scores
-1. NP checked with points.*
-2. No points (including a zero) entered, but NP *not* checked.*
+1. NI checked with points.*
+2. No points (including a zero) entered, but NI *not* checked.*
 3. "Lead" checked for both jammers.*
 4. "Call" checked for both jammers.*
 5. "Injury" checked on one team but not the other.*
 6. Star pass for only one team.*
+7. Jam Number out of sequence
+8. Points given to more than one jammer in the same trip during a star pass.
 
 Just Penalties
 1. "FO" entered for skater with fewer than 7 penalties.*
 2. Seven or more penalties without "FO" or expulsion code entered.*
 3. Expulsion code entered for jam with no penalty.*
+4. Penalty code without jam number, of jam number without penalty.
 
 Just Lineups
 1. Players listed more than once in the same jam on the lineup tab.*
 2. "I" or "|" in lineups without the player being in the box already.*
-3. A player seated in a prior jam who has no marked exit from the box.*
+3. Skater previously seated in the box with no code on the present line.
+4. A player seated in a prior jam who has no marked exit from the box.*
+5. "S" or "$" entered for skater already seated in the box.
+6. "No Pivot" box not checked after star pass.
 
 Lineups + Penalties (Check while reading lineups)
 1. Penalties on skaters not listed on the lineup for that jam.*

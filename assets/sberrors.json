@@ -7,7 +7,7 @@
             "events": [],
             "long": "The NI box indicates 'no initial trip', indicating that the jammer never completed their initial trip through the pack.  If points are recorded then this box should not be checked. (This error should not be raised for a correctly recorded initial pass lap point.)"
         },
-        "noPointsNoNP":
+        "noPointsNoNI":
         {
             "description": "No points (including a zero) on first trip, NI box not checked.",
             "events": [],
@@ -42,6 +42,18 @@
             "description": "Star pass on only one team of the score sheet.",
             "events": [],
             "long": "If one team passes the star, the scorekeeper for the other team should record SP* on their score sheet."
+        },
+        "badJamNumber":
+        {
+            "description": "Jam number out of sequence",
+            "events": [],
+            "long": "Jams should occur in numerical order without gaps in the numbering."
+        },
+        "spPointsBothJammers":
+        {
+            "description": "Both jammers in a star pass with points in same trip.",
+            "events": [],
+            "long": "In one jam, only one jammer should score points for a trip. If Jammer A has points in trip 2 and passes the star to Jammer B in trip 3, all of the points for trip 3 should be in the trip 3 column for Jammer B."
         }
 
     },
@@ -82,6 +94,12 @@
             "description": "Penalty entered for a jam greater than the highest jam on the Score Tab",
             "events": [],
             "long": "A penalty was entered with a jam number higher than the maximum jam on the score sheet."
+        },
+        "codeNoJam":
+        {
+            "description": "Penalty code without jam number, or jam number without penalty.",
+            "events": [],
+            "long": "On the penalty sheet, either a penalty code was entered without a jam number, or a jam number was entered without a penalty code."
         }
     },
     "lineups":
@@ -139,6 +157,12 @@
             "description": "Penalzied skater not on lineup.",
             "events": [],
             "long": "A skater who was issued a penalty in a prior jam does not appear in the lineup for this jam.  May also indicate a substitution."
+        },
+        "starPassNoPivot":
+        {
+            "description": "No Pivot box not checked on line with Star Pass",
+            "events": [],
+            "long": "After a star pass, the 'no pivot' box should be checked to indicate that there is no longer a pivot on the team with the pass."
         }
 
     },
@@ -156,7 +180,7 @@
             "events": [],
             "long": "Skaters penalized in the last jam sometimes fail to report to the box, and this is not necessarily an error in the paperwork."
         },
-        "SPNoPointsNoNP": 
+        "SPNoPointsNoNI": 
         {
             "description": "No points and no NI entered - star pass after initial or error?",
             "events": [],
