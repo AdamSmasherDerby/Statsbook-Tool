@@ -203,7 +203,22 @@ let readIGRF = (workbook) => {
     sbData.venue.city = cellVal(sheet,sbTemplate.venue.city)
     sbData.venue.state = cellVal(sheet,sbTemplate.venue.state)
     sbData.date = getJsDateFromExcel(cellVal(sheet,sbTemplate.date))
-    sbData.time = getJsTimeFromExcel(cellVal(sheet,sbTemplate.time))  
+    sbData.time = getJsTimeFromExcel(cellVal(sheet,sbTemplate.time))
+
+    let props = ['sbData.venue.name',
+        'sbData.venue.city',
+        'sbData.venue.state',
+        'sbData.date',
+        'sbData.time']
+    let propNames = ['Venue Name','Venue City','Venue State','Date','Time']
+
+    for (let p in props){
+        if (!eval(props[p])) {
+            sbErrors.warnings.missingData.events.push(
+                `${propNames[p]}`
+            )
+        }
+    }
 
 }
 
@@ -225,6 +240,12 @@ let readTeam = (workbook,team) => {
     sbData.teams[team].league = cellVal(sheet,sbTemplate.teams[team].league)
     sbData.teams[team].name = cellVal(sheet,sbTemplate.teams[team].name)
     sbData.teams[team].color = cellVal(sheet,sbTemplate.teams[team].color)
+
+    if(!sbData.teams[team].color){
+        sbErrors.warnings.missingData.events.push(
+            `Missing color for ${ucFirst(team)} team.`
+        )
+    }
  
     // Extract skater data
     firstNameAddress = XLSX.utils.decode_cell(sbTemplate.teams[team].firstName)

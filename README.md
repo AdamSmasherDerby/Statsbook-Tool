@@ -49,5 +49,6 @@ Warnings:
 2. No box entry listed for skater penalized in last jam.
 3. No points and no initial trip checked for a jammer who passes the star.
 4. Lost lead checked without a penalty in the corresponding jam.
+5. Missing data from IGRF
 
 Flamingo icon from http://www.iconsmind.com

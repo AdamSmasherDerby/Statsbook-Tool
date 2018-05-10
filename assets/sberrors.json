@@ -168,6 +168,12 @@
     },
     "warnings":
     {
+        "missingData":
+        {
+            "description": "IGRF missing the following information:",
+            "events": [],
+            "long": "One or more pieces of general information about the game are missing."
+        },
         "possibleSub":
         {
             "description": "Reported errors may actually be substitution.",
