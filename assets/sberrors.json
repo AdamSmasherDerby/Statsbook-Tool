@@ -54,6 +54,12 @@
             "description": "Both jammers in a star pass with points in same trip.",
             "events": [],
             "long": "In one jam, only one jammer should score points for a trip. If Jammer A has points in trip 2 and passes the star to Jammer B in trip 3, all of the points for trip 3 should be in the trip 3 column for Jammer B."
+        },
+        "blankTrip":
+        {
+            "description": "Skipped column on score sheet.",
+            "events": [],
+            "long": "There shouldn't be any blank spaces in the middle of a jam.  A zero should be entered if a jammer completes a scoring pass without scoring any points."
         }
 
     },

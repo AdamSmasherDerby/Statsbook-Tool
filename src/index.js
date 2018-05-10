@@ -357,6 +357,7 @@ let readScores = (workbook) => {
             for(let l = 0; l< maxJams; l++){
 
                 // For each line in the scoresheet, import data.
+                let blankTrip = false
 
                 // increment addresses 
                 jamAddress.r = cells.firstJamNumber.r + l
@@ -480,12 +481,21 @@ let readScores = (workbook) => {
                         }
                         
                         // Go on to next cell
+                        blankTrip = true
                         continue
                     }
 
                     // Error check - points entered for a trip that's already been completed.
                     if (t <= trip){
                         sbErrors.scores.spPointsBothJammers.events.push(
+                            `Team: ${ucFirst(team)}, Period: ${period}, Jam: ${jam}`
+                        )
+                    }
+
+                    // Error check - skipped column in a non star pass line
+                    if(blankTrip && !starPass){
+                        blankTrip = false
+                        sbErrors.scores.blankTrip.events.push(
                             `Team: ${ucFirst(team)}, Period: ${period}, Jam: ${jam}`
                         )
                     }
@@ -1601,6 +1611,7 @@ Just Scores
 6. Star pass for only one team.*
 7. Jam Number out of sequence
 8. Points given to more than one jammer in the same trip during a star pass.
+9. Skipped column on score sheet.
 
 Just Penalties
 1. "FO" entered for skater with fewer than 7 penalties.*

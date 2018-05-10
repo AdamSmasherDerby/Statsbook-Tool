@@ -14,6 +14,7 @@ Scores:
 6. Star pass for only one team.
 7. Jam number out of sequence.
 8. Points given to more than one jammer in the same trip during a star pass.
+9. Skipped column on score sheet.
 
 Penalties:
 
