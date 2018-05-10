@@ -99,7 +99,8 @@ let readSbData = (data) => {
         badContinues: [],
         noExits: [],
         foulouts: [],
-        expulsions: []
+        expulsions: [],
+        lost: []
     }
 
     // Read Statsbook
@@ -505,6 +506,14 @@ let readScores = (workbook) => {
                         {
                             event: 'lost',
                             skater: skater
+                        }
+                    )
+                    warningData.lost.push(
+                        {
+                            skater: skater,
+                            team: team,
+                            period: period,
+                            jam: jam
                         }
                     )
                 }
@@ -1347,6 +1356,19 @@ let warningCheck = () => {
             }
         }
     
+    }
+
+    // Warning Check - lost lead without a penalty
+    for(let s in warningData.lost){
+        let lost = warningData.lost[s]
+        if(sbData.periods[lost.period].jams[lost.jam - 1].events.filter(
+            event => event.skater == lost.skater && event.event == 'penalty'
+        ).length == 0){
+            sbErrors.warnings.lostNoPenalty.events.push(
+                `Team: ${ucFirst(lost.team)}, Period: ${lost.period
+                }, Jam: ${lost.jam}, Skater: ${lost.skater.slice(5)}`
+            )
+        }
     }
 
 }

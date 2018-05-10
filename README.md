@@ -35,9 +35,15 @@ Lineups + Penalties:
 4. "S" or "$" in lineups without a matching penalty.
 5. Penalty recorded without a "X", "/", "S", or "$". 
 
-Scores + Penalties
+Scores + Penalties:
 
 1. Jammers with lead and a penalty, but not marked "lost."
 2. Penalties recorded in jam numbers that are not present on the score sheet.
+
+Warnings:
+1. Errors that may be correctly entered substitutions.
+2. No box entry listed for skater penalized in last jam.
+3. No points and no initial trip checked for a jammer who passes the star.
+4. Lost lead checked without a penalty in the corresponding jam.
 
 Flamingo icon from http://www.iconsmind.com
