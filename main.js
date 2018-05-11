@@ -2,6 +2,8 @@ const {app, BrowserWindow, Menu, dialog} = require('electron')
 const path = require('path')
 const url = require('url')
 const ipc = require('electron').ipcMain
+const isDev = require('electron-is-dev')
+require('update-electron-app')()
 
 let menu,
     win,
@@ -22,7 +24,7 @@ let createWindow = () => {
         slashes: true
     }))
 
-    if (isDev()){
+    if (isDev){
         win.webContents.openDevTools()
         require('devtron').install()
     }
@@ -97,10 +99,6 @@ let openAbout = () => {
         y: win.getPosition()[1] + 150
     })
 
-    /*if (isDev()){
-        aboutWin.webContents.openDevTools()
-    }*/
-
     aboutWin.setMenu(null)
 
     aboutWin.loadURL(url.format({
@@ -162,10 +160,6 @@ app.on('activate',() => {
         createWindow()
     }
 })
-
-let isDev = () => {
-    return process.mainModule.filename.indexOf('app.asar') === -1
-}
 
 ipc.on('enable-save-derby-json', () => {
     menu.items[0].submenu.items[0].enabled = true
