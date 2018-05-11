@@ -24,7 +24,6 @@
     "npm": "^6.0.0",
     "popper.js": "^1.14.3",
     "typeface-raleway": "^0.0.54",
-    "update-electron-app": "^1.1.2",
     "xlsx": "^0.11.19"
   },
   "build": {

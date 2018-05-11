@@ -421,11 +421,13 @@ let readScores = (workbook) => {
                 let np = sheet[XLSX.utils.encode_cell(npAddress)]
                 if (np != undefined && np.v != undefined){initCompleted = 'no'}
 
+                if(sheet[XLSX.utils.encode_cell(jammerAddress)] != undefined){
+                    skaterNum = sheet[XLSX.utils.encode_cell(jammerAddress)].v
+                }
                 if (!starPass){
                     // If this line is not a star pass, read in the skater number
                     // and create an intital pass object
 
-                    skaterNum = sheet[XLSX.utils.encode_cell(jammerAddress)].v
                     skater = team + ':' + skaterNum
                     sbData.periods[period].jams[jam-1].events.push(
                         {
@@ -440,7 +442,6 @@ let readScores = (workbook) => {
                 } else if (jamNumber.v=='SP') {
                     // If THIS team has a star pass, use the skater number from the sheet
 
-                    skaterNum = sheet[XLSX.utils.encode_cell(jammerAddress)].v
                     skater = team + ':' + skaterNum
 
                     // If this is still the initial trip, add another initial pass object.
@@ -457,8 +458,15 @@ let readScores = (workbook) => {
                         )
                     }
 
-                }  // Final case - jam number is SP*.   
-                //  Do nothing: skater number should remain untouched from prior line)
+                } else {
+                    // Final case - jam number is SP*.  
+                    if(skaterNum != ' '){
+                        sbErrors.scores.spStarWithJammer.events.push(
+                            `Period: ${period}, Team: ${team}, Jam: ${jam}`
+                        )
+                    }
+                } 
+
 
                 // Check for subsequent trips, and add additional pass objects            
                 for (let t=2; t < maxTrips + 2; t++){
@@ -1647,6 +1655,7 @@ Just Scores
 7. Jam Number out of sequence
 8. Points given to more than one jammer in the same trip during a star pass.
 9. Skipped column on score sheet.
+10. SP* with jammer number entered.
 
 Just Penalties
 1. "FO" entered for skater with fewer than 7 penalties.*

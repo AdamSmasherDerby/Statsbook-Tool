@@ -3,7 +3,6 @@ const path = require('path')
 const url = require('url')
 const ipc = require('electron').ipcMain
 const isDev = require('electron-is-dev')
-require('update-electron-app')()
 
 let menu,
     win,

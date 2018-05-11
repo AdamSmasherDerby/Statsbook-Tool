@@ -15,6 +15,7 @@ Scores:
 7. Jam number out of sequence.
 8. Points given to more than one jammer in the same trip during a star pass.
 9. Skipped column on score sheet.
+10. SP* with jammer number entered.
 
 Penalties:
 
@@ -50,5 +51,6 @@ Warnings:
 2. No box entry listed for skater penalized in last jam.
 3. No points and no initial trip checked for a jammer who passes the star.
 4. Lost lead checked without a penalty in the corresponding jam.
+5. Jam called for injury checked without a corresponding "3" on the lineups tab.
 
 Flamingo icon from http://www.iconsmind.com

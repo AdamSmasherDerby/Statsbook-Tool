@@ -60,6 +60,12 @@
             "description": "Skipped column on score sheet.",
             "events": [],
             "long": "There shouldn't be any blank spaces in the middle of a jam.  A zero should be entered if a jammer completes a scoring pass without scoring any points."
+        },
+        "spStarWithJammer":
+        {
+            "description": "Jammer entered after SP*.",
+            "events": [],
+            "long": "After an SP*, indicating a star pass for the opposing team only, the remainder of the line should be blank."
         }
 
     },
