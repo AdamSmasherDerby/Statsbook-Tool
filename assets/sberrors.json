@@ -197,6 +197,12 @@
             "description": "Lost lead checked without a corresponding penalty.",
             "events": [],
             "long": "Most of the time 'lost lead' indicates that a jammer receieved a penalty on their initial trip. However, it is possible that this is not an error."
+        },
+        "injNoThree":
+        {
+            "description": "Jam called for injury without a '3' marked on the lineups tab.",
+            "events": [],
+            "long": "When the jam is called for injury, usually there should be an injured skater marked with a '3' on the lineups tab."
         }
     }
 }

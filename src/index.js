@@ -101,7 +101,8 @@ let readSbData = (data) => {
         foulouts: [],
         expulsions: [],
         lost: [],
-        jamsCalledInjury: []
+        jamsCalledInjury: [],
+        lineupThree: []
     }
 
     // Read Statsbook
@@ -592,12 +593,6 @@ let readScores = (workbook) => {
                 let inj = sheet[XLSX.utils.encode_cell(injAddress)]
                 if (inj != undefined && inj.v != undefined){
 
-                    // To do - don't record injury event here
-                   /* sbData.periods[period].jams[jam-1].events.push(
-                        {
-                            event: 'injury'
-                        }
-                    )*/
                     warningData.jamsCalledInjury.push(
                         {
                             team: team,
@@ -609,7 +604,7 @@ let readScores = (workbook) => {
             }
             
         }
-        // End of period - check for cross team errors
+        // End of period - check for cross team errors and process injuries
 
         for (let j in sbData.periods[period].jams){
             // ERROR CHECK: Lead box checked more than once in the same jam
@@ -642,15 +637,18 @@ let readScores = (workbook) => {
                     }
                 )
             } 
+
             // ERROR CHECK: Injury box checked for only one team in a jam.
             if (numInjuries == 1) {
                 sbErrors.scores.injuryOnlyOnce.events.push(
-                    `Period: ${period}, Jam:${jam}`
+                    `Period: ${period}, Jam: ${jam}`
                 )
             }
         }
     }
     // All score data read
+
+    // Error check: Star pass marked for only one team in a jam.
     for (var sp in starPasses){
         if (starPasses.filter(
             x=> x.period == starPasses[sp].period && x.jam == starPasses[sp].jam
@@ -1168,12 +1166,16 @@ let readLineups = (workbook) => {
                             }                                
                             break
                         case '3':
-                            sbData.periods[pstring].jams[jam-1].events.push(
-                                {
-                                    event: 'injury',
-                                    skater: skater                                        
-                                }
-                            )
+                            // Since '3' does not necessarily mean the jam was called, not enough information
+                            // here to conclusively record a derbyJSON injury event, which specifies that the
+                            // jam was called for injury.   However, save the skater information for error
+                            // checking later.
+                            warningData.lineupThree.push({                               
+                                skater: skater,
+                                team: team,
+                                period: period,
+                                jam: jam
+                            })
                             break
                         default:
                         // Handle incorrect lineup codes?
@@ -1463,6 +1465,21 @@ let warningCheck = () => {
             )
         }
     }
+
+    // Warning Check - jam called for injury without a skater marked with a "3"
+    // Note: filtered for home team to prevent duplicate errors.
+    for (let j in warningData.jamsCalledInjury){
+        let injJam = warningData.jamsCalledInjury[j]
+        if(!warningData.lineupThree.find(x => x.jam == injJam.jam)){
+            sbErrors.warnings.injNoThree.events.push(
+                `Period: ${injJam.period}, Jam: ${injJam.jam}`
+            )
+        }
+    }
+    // Remove duplicates
+    sbErrors.warnings.injNoThree.events = sbErrors.warnings.injNoThree.events.filter(
+        (v, i, a) => a.indexOf(v) === i
+    )
 
 }
 
