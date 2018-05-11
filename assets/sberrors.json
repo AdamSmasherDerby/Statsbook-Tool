@@ -54,6 +54,18 @@
             "description": "Both jammers in a star pass with points in same trip.",
             "events": [],
             "long": "In one jam, only one jammer should score points for a trip. If Jammer A has points in trip 2 and passes the star to Jammer B in trip 3, all of the points for trip 3 should be in the trip 3 column for Jammer B."
+        },
+        "blankTrip":
+        {
+            "description": "Skipped column on score sheet.",
+            "events": [],
+            "long": "There shouldn't be any blank spaces in the middle of a jam.  A zero should be entered if a jammer completes a scoring pass without scoring any points."
+        },
+        "spStarWithJammer":
+        {
+            "description": "Jammer entered after SP*.",
+            "events": [],
+            "long": "After an SP*, indicating a star pass for the opposing team only, the remainder of the line should be blank."
         }
 
     },
@@ -197,6 +209,12 @@
             "description": "Lost lead checked without a corresponding penalty.",
             "events": [],
             "long": "Most of the time 'lost lead' indicates that a jammer receieved a penalty on their initial trip. However, it is possible that this is not an error."
+        },
+        "injNoThree":
+        {
+            "description": "Jam called for injury without a '3' marked on the lineups tab.",
+            "events": [],
+            "long": "When the jam is called for injury, usually there should be an injured skater marked with a '3' on the lineups tab."
         }
     }
 }

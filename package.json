@@ -1,6 +1,6 @@
 {
   "name": "statsbooktool",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "A tool for error checking WFTDA Statsbooks",
   "main": "main.js",
   "author": "Adam Smasher (Daniel Alt) <dan@fnerk.com>",
@@ -12,12 +12,13 @@
   },
   "devDependencies": {
     "devtron": "^1.4.0",
-    "electron": "^1.7.12",
+    "electron": "2.0.0",
     "electron-builder": "^20.8.1",
     "eslint": "^4.19.1"
   },
   "dependencies": {
     "bootstrap": "4.0.0",
+    "electron-is-dev": "^0.3.0",
     "jquery": "^3.3.1",
     "moment": "^2.22.0",
     "npm": "^6.0.0",

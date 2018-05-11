@@ -100,7 +100,9 @@ let readSbData = (data) => {
         noExits: [],
         foulouts: [],
         expulsions: [],
-        lost: []
+        lost: [],
+        jamsCalledInjury: [],
+        lineupThree: []
     }
 
     // Read Statsbook
@@ -378,6 +380,7 @@ let readScores = (workbook) => {
             for(let l = 0; l< maxJams; l++){
 
                 // For each line in the scoresheet, import data.
+                let blankTrip = false
 
                 // increment addresses 
                 jamAddress.r = cells.firstJamNumber.r + l
@@ -439,11 +442,13 @@ let readScores = (workbook) => {
                 let np = sheet[XLSX.utils.encode_cell(npAddress)]
                 if (np != undefined && np.v != undefined){initCompleted = 'no'}
 
+                if(sheet[XLSX.utils.encode_cell(jammerAddress)] != undefined){
+                    skaterNum = sheet[XLSX.utils.encode_cell(jammerAddress)].v
+                }
                 if (!starPass){
                     // If this line is not a star pass, read in the skater number
                     // and create an intital pass object
 
-                    skaterNum = sheet[XLSX.utils.encode_cell(jammerAddress)].v
                     skater = team + ':' + skaterNum
                     sbData.periods[period].jams[jam-1].events.push(
                         {
@@ -458,7 +463,6 @@ let readScores = (workbook) => {
                 } else if (jamNumber.v=='SP') {
                     // If THIS team has a star pass, use the skater number from the sheet
 
-                    skaterNum = sheet[XLSX.utils.encode_cell(jammerAddress)].v
                     skater = team + ':' + skaterNum
 
                     // If this is still the initial trip, add another initial pass object.
@@ -475,8 +479,15 @@ let readScores = (workbook) => {
                         )
                     }
 
-                }  // Final case - jam number is SP*.   
-                //  Do nothing: skater number should remain untouched from prior line)
+                } else {
+                    // Final case - jam number is SP*.  
+                    if(skaterNum != ' '){
+                        sbErrors.scores.spStarWithJammer.events.push(
+                            `Period: ${period}, Team: ${team}, Jam: ${jam}`
+                        )
+                    }
+                } 
+
 
                 // Check for subsequent trips, and add additional pass objects            
                 for (let t=2; t < maxTrips + 2; t++){
@@ -501,12 +512,21 @@ let readScores = (workbook) => {
                         }
                         
                         // Go on to next cell
+                        blankTrip = true
                         continue
                     }
 
                     // Error check - points entered for a trip that's already been completed.
                     if (t <= trip){
                         sbErrors.scores.spPointsBothJammers.events.push(
+                            `Team: ${ucFirst(team)}, Period: ${period}, Jam: ${jam}`
+                        )
+                    }
+
+                    // Error check - skipped column in a non star pass line
+                    if(blankTrip && !starPass){
+                        blankTrip = false
+                        sbErrors.scores.blankTrip.events.push(
                             `Team: ${ucFirst(team)}, Period: ${period}, Jam: ${jam}`
                         )
                     }
@@ -601,17 +621,19 @@ let readScores = (workbook) => {
                 // Injury
                 let inj = sheet[XLSX.utils.encode_cell(injAddress)]
                 if (inj != undefined && inj.v != undefined){
-                    sbData.periods[period].jams[jam-1].events.push(
+
+                    warningData.jamsCalledInjury.push(
                         {
-                            event: 'injury',
-                            skater: skater
+                            team: team,
+                            period: period,
+                            jam: jam
                         }
                     )
                 }
             }
             
         }
-        // End of period - check for cross team errors
+        // End of period - check for cross team errors and process injuries
 
         for (let j in sbData.periods[period].jams){
             // ERROR CHECK: Lead box checked more than once in the same jam
@@ -633,10 +655,20 @@ let readScores = (workbook) => {
                 )
             }
 
+            // Record one injury event for each jam with the box checked.
+            let numInjuries = warningData.jamsCalledInjury.filter(
+                x => x.period == period && x.jam == (parseInt(j) + 1)
+            ).length
+            if (numInjuries >= 1) {
+                sbData.periods[period].jams[j].events.push(
+                    {
+                        event: 'injury'
+                    }
+                )
+            } 
+
             // ERROR CHECK: Injury box checked for only one team in a jam.
-            if (sbData.periods[period].jams[j].events.filter(
-                x => x.event == 'injury'
-            ).length == 1){
+            if (numInjuries == 1) {
                 sbErrors.scores.injuryOnlyOnce.events.push(
                     `Period: ${period}, Jam: ${jam}`
                 )
@@ -644,6 +676,8 @@ let readScores = (workbook) => {
         }
     }
     // All score data read
+
+    // Error check: Star pass marked for only one team in a jam.
     for (var sp in starPasses){
         if (starPasses.filter(
             x=> x.period == starPasses[sp].period && x.jam == starPasses[sp].jam
@@ -1161,12 +1195,16 @@ let readLineups = (workbook) => {
                             }                                
                             break
                         case '3':
-                            sbData.periods[pstring].jams[jam-1].events.push(
-                                {
-                                    event: 'injury',
-                                    skater: skater                                        
-                                }
-                            )
+                            // Since '3' does not necessarily mean the jam was called, not enough information
+                            // here to conclusively record a derbyJSON injury event, which specifies that the
+                            // jam was called for injury.   However, save the skater information for error
+                            // checking later.
+                            warningData.lineupThree.push({                               
+                                skater: skater,
+                                team: team,
+                                period: period,
+                                jam: jam
+                            })
                             break
                         default:
                         // Handle incorrect lineup codes?
@@ -1457,6 +1495,21 @@ let warningCheck = () => {
         }
     }
 
+    // Warning Check - jam called for injury without a skater marked with a "3"
+    // Note: filtered for home team to prevent duplicate errors.
+    for (let j in warningData.jamsCalledInjury){
+        let injJam = warningData.jamsCalledInjury[j]
+        if(!warningData.lineupThree.find(x => x.jam == injJam.jam)){
+            sbErrors.warnings.injNoThree.events.push(
+                `Period: ${injJam.period}, Jam: ${injJam.jam}`
+            )
+        }
+    }
+    // Remove duplicates
+    sbErrors.warnings.injNoThree.events = sbErrors.warnings.injNoThree.events.filter(
+        (v, i, a) => a.indexOf(v) === i
+    )
+
 }
 
 let sbErrorsToTable = () => {
@@ -1622,6 +1675,8 @@ Just Scores
 6. Star pass for only one team.*
 7. Jam Number out of sequence
 8. Points given to more than one jammer in the same trip during a star pass.
+9. Skipped column on score sheet.
+10. SP* with jammer number entered.
 
 Just Penalties
 1. "FO" entered for skater with fewer than 7 penalties.*
