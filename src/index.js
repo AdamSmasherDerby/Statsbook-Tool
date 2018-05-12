@@ -230,6 +230,7 @@ let readTeam = (workbook,team) => {
         num_address = {c:0,r:0},
         firstNameAddress = {},
         firstNumAddress = {},
+        skaterNameObject = {},
         skaterName = '',
         skaterNumber = '',
         skaterData = {},
@@ -262,10 +263,15 @@ let readTeam = (workbook,team) => {
         name_address.r = firstNameAddress.r + i
         num_address.r = firstNumAddress.r + i
 
-        skaterName = sheet[XLSX.utils.encode_cell(name_address)]
         skaterNumber = sheet[XLSX.utils.encode_cell(num_address)]
         if (skaterNumber == undefined || skaterNumber.v == undefined) {continue}
-        skaterData = {name: (skaterName.v || ''), number: skaterNumber.v}
+
+        skaterName = ''
+        skaterNameObject = sheet[XLSX.utils.encode_cell(name_address)]
+        if (skaterNameObject != undefined && skaterNameObject.v != undefined) {
+            skaterName = skaterNameObject.v
+        }
+        skaterData = {name: skaterName, number: skaterNumber.v}
         sbData.teams[team].persons.push(skaterData)
         penalties[team + ':' + skaterNumber.v] = []
     }
@@ -1660,6 +1666,11 @@ ipc.on('save-derby-json', () => {
     e.initMouseEvent( 'click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null)
     link.dispatchEvent( e )
 })
+
+window.onerror = (msg, url, lineNo, columnNo) => {
+    ipc.send('error-thrown', msg, url, lineNo, columnNo)
+    return false
+}
 
 /*
 List of error checks.

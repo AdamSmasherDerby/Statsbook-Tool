@@ -164,10 +164,24 @@ ipc.on('enable-save-derby-json', () => {
     menu.items[0].submenu.items[0].enabled = true
 })
 
+ipc.on('error-thrown', (event, msg, url, lineNo, columnNo) => {
+    dialog.showMessageBox(win, {
+        type: 'error',
+        title: 'Statsbook Tool',
+        message: `Statsbook Tool has encountered an error.
+        Here's some details:
+        Message: ${msg}
+        URL: ${url}
+        Line Number: ${lineNo}
+        Column Number: ${columnNo}
+        Does this help?  It probably doesn't help.`
+    })
+})
+
 process.on('uncaughtException', (err) => {
     dialog.showMessageBox(win, {
         type: 'error',
         title: 'Statsbook Tool',
-        message: `Statsbook Tool has had an uncaught exception.  Does this help? (Note: will probably not help.) ${err}`
+        message: `Statsbook Tool has had an uncaught exception in main.js.  Does this help? (Note: will probably not help.) ${err}`
     })       
 })
