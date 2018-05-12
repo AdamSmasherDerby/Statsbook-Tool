@@ -1,4 +1,6 @@
-Statsbook Tool is a utility for processing WFTDA statsbook files.  It will read a WFTDA Excel spreadsheet file and produce a list of detected errors.  It will also save the game in DerbyJSON format, in case that proves useful. This software is not provided, endorsed, produced, or supported by the WFTDA.  It is not guaranteed to work, to be free of false positives, false negatives, random bugs, or apocalyptic curses.
+Statsbook Tool is a utility for processing WFTDA statsbook files.  It will read a WFTDA Excel spreadsheet file and produce a list of detected errors.  In addition, it can export rosters from the IGRF page of the StatsBook in .xml format for importation to CRG Scoreboard. It can also save the game in DerbyJSON format, in case that proves useful for some reason. 
+
+This software is not provided, endorsed, produced, or supported by the WFTDA.  It is not guaranteed to work, to be free of false positives, false negatives, random bugs, or apocalyptic curses.
 
 At present it supports the 2017 and 2018 statsbook formats.  Feed it an older statsbook at your own peril.
 
@@ -28,6 +30,7 @@ https://github.com/AdamSmasherDerby/Statsbook-Tool/releases
 8. Points given to more than one jammer in the same trip during a star pass.
 9. Skipped column on score sheet.
 10. SP* with jammer number entered.
+11. Points scored with no lead jammer and 'lost' not recorded for the scoring team.
 
 ### Penalties:
 
@@ -67,3 +70,15 @@ https://github.com/AdamSmasherDerby/Statsbook-Tool/releases
 6. Jam called for injury checked without a corresponding "3" on the lineups tab.
 
 Flamingo icon from http://www.iconsmind.com
+
+### Release Notes
+
+* 1.0.0 - May 11, 2018
+    * Initial public release
+* 1.1.0 - May 18, 2018
+    * Export to CRG
+    * Tolerance for lowercase 'sp' and 'x'
+    * Check for negative and zero jam numbers
+    * Check for points scored with no lead jammer and lost not checked.
+* 1.1.1 - May 20, 2018
+    * Bugfix for CRG Export option to handle special characters correctly

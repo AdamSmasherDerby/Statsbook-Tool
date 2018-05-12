@@ -66,6 +66,12 @@
             "description": "Jammer entered after SP*.",
             "events": [],
             "long": "After an SP*, indicating a star pass for the opposing team only, the remainder of the line should be blank."
+        },
+        "pointsNoLeadNoLost":
+        {
+            "description": "Points scored with no lead jammer and without lost for scoring team",
+            "events": [],
+            "long": "For a jammer to reach a scoring trip, it must always be the case that they are lead, their opponent is lead, or they have lost lead."
         }
 
     },
@@ -103,7 +109,7 @@
         },
         "penaltyBadJam":
         {
-            "description": "Penalty entered for a jam greater than the highest jam on the Score Tab",
+            "description": "Penalty entered for an impossible jam (greater than the highest jam on the Score Tab, or prior to jam 1)",
             "events": [],
             "long": "A penalty was entered with a jam number higher than the maximum jam on the score sheet."
         },
