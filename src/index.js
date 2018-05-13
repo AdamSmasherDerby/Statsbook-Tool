@@ -779,7 +779,7 @@ let readPenalties = (workbook) => {
                     let code = codeText.v,
                         jam = jamText.v
 
-                    if(jam > sbData.periods[period].jams.length){
+                    if(jam > sbData.periods[period].jams.length || jam - 1 < 0){
                         // Error Check - jam number out of range
                         sbErrors.penalties.penaltyBadJam.events.push(
                             `Team: ${ucFirst(team)}, Skater: ${skaterNum.v}, Period: ${period}, Recorded Jam: ${jam}`
