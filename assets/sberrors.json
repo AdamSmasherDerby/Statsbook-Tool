@@ -103,7 +103,7 @@
         },
         "penaltyBadJam":
         {
-            "description": "Penalty entered for a jam greater than the highest jam on the Score Tab",
+            "description": "Penalty entered for an impossible jam (greater than the highest jam on the Score Tab, or prior to jam 1)",
             "events": [],
             "long": "A penalty was entered with a jam number higher than the maximum jam on the score sheet."
         },
