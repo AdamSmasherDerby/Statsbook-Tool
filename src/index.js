@@ -129,7 +129,7 @@ let readSbData = (data) => {
     outBox.appendChild(sbErrorsToTable())
 
     // Update UI
-    ipc.send('enable-save-derby-json')
+    ipc.send('enable-menu-items')
     createRefreshButton()
 }
 
