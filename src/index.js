@@ -27,8 +27,8 @@ let sbData = {},  // derbyJSON formatted statsbook data
     warningData = {},
     sbFile = new File([''],'')
 const teamList = ['home','away']
-let anSP = /^sp\*?$/i;
-let mySP = /^sp$/i;
+let anSP = /^sp\*?$/i
+let mySP = /^sp$/i
 
 
 fileSelect.onchange = (e) => {
@@ -974,16 +974,16 @@ let readLineups = (workbook) => {
                 // TODO - maybe change this to not give up if the jam # is blank?
 
                 if (anSP.test(jamText.v)) {
-                  starPass = true;
-                  if (!mySP.test(jamText.v)) {
+                    starPass = true
+                    if (!mySP.test(jamText.v)) {
                     // then it's the other team's; go on to the next line.
-                    continue;
-                  }
+                        continue
+                    }
                 } else {
-                  // Not a starpass line, update the jam number
-                  jam = jamText.v
-                  starPass = false
-                  skaterList = []
+                    // Not a starpass line, update the jam number
+                    jam = jamText.v
+                    starPass = false
+                    skaterList = []
                 }
 
                 // Retrieve penalties from this jam and prior jam for
@@ -1399,8 +1399,8 @@ let errorCheck = () => {
                 && thisJamPenalties.filter(x => x.skater == leadJammer).length != 0
                 && events.filter(x => x.event == 'lost' && x.skater == leadJammer).length == 0
             ){
-              // If a penalty is assessed to a jammer between jams (check
-              // LT paperwork), should they be marked as "lost"?
+                // If a penalty is assessed to a jammer between jams (check
+                // LT paperwork), should they be marked as "lost"?
                 sbErrors.scores.leadPenaltyNotLost.events.push(
                     `Period: ${period}, Jam: ${jam}, Team: ${
                         ucFirst(leadJammer.substr(0,4))
