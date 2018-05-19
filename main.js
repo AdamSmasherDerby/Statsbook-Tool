@@ -168,8 +168,8 @@ app.on('activate',() => {
 
 
 ipc.on('enable-menu-items', () => {
-    menu.items.find(x => x.label == "File").submenu.items.find(x => x.label == 'Save DerbyJSON').enabled = true
-    menu.items.find(x => x.label == "File").submenu.items.find(x => x.label == 'Export Roster to CRG').enabled = true
+    menu.items.find(x => x.label == 'File').submenu.items.find(x => x.label == 'Save DerbyJSON').enabled = true
+    menu.items.find(x => x.label == 'File').submenu.items.find(x => x.label == 'Export Roster to CRG').enabled = true
 })
 
 ipc.on('error-thrown', (event, msg, url, lineNo, columnNo) => {
