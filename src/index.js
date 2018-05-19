@@ -666,11 +666,15 @@ let readScores = (workbook) => {
         // End of period - check for cross team errors and process injuries
 
         for (let j in sbData.periods[period].jams){
-            // ERROR CHECK: Lead box checked more than once in the same jam
+            // For each jam in the period
             let jam = parseInt(j) + 1
-            if (sbData.periods[period].jams[j].events.filter(
+
+            let numLead = sbData.periods[period].jams[j].events.filter(
                 x => x.event == 'lead'
-            ).length >= 2){
+            ).length
+
+            // ERROR CHECK: Lead box checked more than once in the same jam
+            if (numLead >= 2){
                 sbErrors.scores.tooManyLead.events.push(
                     `Period: ${period}, Jam: ${jam}`
                 )
@@ -702,6 +706,25 @@ let readScores = (workbook) => {
                 sbErrors.scores.injuryOnlyOnce.events.push(
                     `Period: ${period}, Jam: ${jam}`
                 )
+            }
+
+            // ERROR Check: Points scored with:
+            // Neither team decleared lead
+            // Scoring team not declared lost
+            if (numLead == 0){
+                for(let t in teamList){
+                    let isLost = sbData.periods[period].jams[j].events.find(
+                        x => x.event == 'lost' && x.skater.substr(0,4) == teamList[t]
+                    )
+                    let scoreTrip = sbData.periods[period].jams[j].events.find(
+                        x => x.event == 'pass' & x.team == teamList[t] & x.number > 1
+                    )
+                    if (scoreTrip != undefined && isLost == undefined){
+                        sbErrors.scores.pointsNoLeadNoLost.events.push(
+                            `Period: ${period}, Jam: ${jam}, Team: ${teamList[t]}`
+                        )
+                    }
+                }
             }
         }
     }
