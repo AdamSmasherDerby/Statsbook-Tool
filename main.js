@@ -52,6 +52,12 @@ let createWindow = () => {
         {
             label: 'File',
             submenu: [
+                {   label: 'Export Roster to CRG',
+                    click: function() {
+                        win.webContents.send('export-crg-roster')
+                    },
+                    enabled: false
+                },
                 {   label: 'Save DerbyJSON',
                     click: function() {
                         win.webContents.send('save-derby-json')
@@ -160,8 +166,10 @@ app.on('activate',() => {
     }
 })
 
-ipc.on('enable-save-derby-json', () => {
-    menu.items[0].submenu.items[0].enabled = true
+
+ipc.on('enable-menu-items', () => {
+    menu.items.find(x => x.label == 'File').submenu.items.find(x => x.label == 'Save DerbyJSON').enabled = true
+    menu.items.find(x => x.label == 'File').submenu.items.find(x => x.label == 'Export Roster to CRG').enabled = true
 })
 
 ipc.on('error-thrown', (event, msg, url, lineNo, columnNo) => {

@@ -2,6 +2,8 @@ const electron = require('electron')
 const ipc = electron.ipcRenderer
 const XLSX = require('xlsx')
 const moment = require('moment')
+const builder = require('xmlbuilder')
+const uuid = require('uuid/v4')
 
 // Page Elements
 let holder = document.getElementById('drag-file')
@@ -129,7 +131,7 @@ let readSbData = (data) => {
     outBox.appendChild(sbErrorsToTable())
 
     // Update UI
-    ipc.send('enable-save-derby-json')
+    ipc.send('enable-menu-items')
     createRefreshButton()
 }
 
@@ -1657,20 +1659,78 @@ holder.ondragend = () => {
 ipc.on('save-derby-json', () => {
     // Saves statsbook data to a JSON file
 
-    var data = encode( JSON.stringify(sbData, null, ' '))
+    let data = encode( JSON.stringify(sbData, null, ' '))
 
-    var blob = new Blob( [ data ], {
+    let blob = new Blob( [ data ], {
         type: 'application/octet-stream'
     })
 
     let url = URL.createObjectURL( blob )
-    var link = document.createElement( 'a' )
+    let link = document.createElement( 'a' )
     link.setAttribute( 'href', url )
     link.setAttribute( 'download', sbFilename.split('.')[0] + '.json')
 
     let e = document.createEvent( 'MouseEvents' )
     e.initMouseEvent( 'click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null)
     link.dispatchEvent( e )
+})
+
+ipc.on('export-crg-roster', () => {
+    // Exports statsbook rosters in CRG Scoreboard XML Format
+
+    let root = builder.create('document', {encoding: 'UTF-8'})
+
+    let teams = root.ele('Teams')
+
+    // Cargo cult boilerpplate - I don't know what this part is for,
+    // but it's in the original, so I'm leaving it in.
+    teams.ele('Reset ')
+    let transfer = teams.ele('Transfer')
+    let to = transfer.ele('To')
+    to.ele('Team1 ')
+    to.ele('Team2 ')
+    let from = transfer.ele('From')
+    from.ele('Team1 ')
+    from.ele('Team2')
+    let merge = teams.ele('Merge')
+    to = merge.ele('To')
+    to.ele('Team1 ')
+    to.ele('Team2 ')
+    from = merge.ele('From')
+    from.ele('Team1 ')
+    from.ele('Team2 ')
+
+    for (let t in teamList){
+        let teamElement = teams.ele('Team', 
+            {'Id': `${sbData.teams[teamList[t]].league} ${sbData.teams[teamList[t]].name}`})
+        teamElement.ele('Name').dat(`${sbData.teams[teamList[t]].league} ${sbData.teams[teamList[t]].name}`)
+        teamElement.ele('Logo ')
+        for (let s in sbData.teams[teamList[t]].persons){
+            let skater = teamElement.ele('Skater',
+                {'Id': uuid()})
+            skater.ele('Name').dat(sbData.teams[teamList[t]].persons[s].name)
+            skater.ele('Number').dat(sbData.teams[teamList[t]].persons[s].number)
+            skater.ele('Flags', {'empty': 'true'}).dat('')
+        }
+    }
+
+
+    let data = encode(root.end({pretty: true}))
+
+    let blob = new Blob( [ data ], {
+        type: 'application/octet-stream'
+    })
+
+    let url = URL.createObjectURL( blob )
+    let link = document.createElement( 'a' )
+    link.setAttribute( 'href', url )
+    link.setAttribute( 'download', sbFilename.split('.')[0] + '.xml')
+
+    let e = document.createEvent( 'MouseEvents' )
+    e.initMouseEvent( 'click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null)
+    link.dispatchEvent( e )
+
+
 })
 
 window.onerror = (msg, url, lineNo, columnNo) => {
