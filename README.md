@@ -80,3 +80,5 @@ Flamingo icon from http://www.iconsmind.com
     * Tolerance for lowercase 'sp' and 'x'
     * Check for negative and zero jam numbers
     * Check for points scored with no lead jammer and lost not checked.
+* 1.1.1 - May 20, 2018
+    * Bugfix for CRG Export option to handle special characters correctly
