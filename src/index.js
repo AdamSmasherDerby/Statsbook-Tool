@@ -1669,15 +1669,6 @@ let remove = (array, element) => {
     }
 }
 
-let encode = (s) => {
-    var out = []
-    for ( var i = 0; i < s.length; i++ ) {
-        out[i] = s.charCodeAt(i)
-    }
-    return new Uint8Array( out )
-}
-
-
 let ucFirst = (string) => {
     // Capitalize first character of a string
     return string.charAt(0).toUpperCase() + string.slice(1)
@@ -1760,9 +1751,7 @@ ipc.on('export-crg-roster', () => {
 
     let data = encode(root.end({pretty: true}))
 
-    let blob = new Blob( [ data ], {
-        type: 'application/octet-stream'
-    })
+    let blob = new Blob( [data], { type: 'text/xml'})
 
     let url = URL.createObjectURL( blob )
     let link = document.createElement( 'a' )
@@ -1775,6 +1764,14 @@ ipc.on('export-crg-roster', () => {
 
 
 })
+
+let encode = (s) => {
+    var out = []
+    for ( var i = 0; i < s.length; i++ ) {
+        out[i] = s.charCodeAt(i)
+    }
+    return new Uint16Array( out )
+}
 
 window.onerror = (msg, url, lineNo, columnNo) => {
     ipc.send('error-thrown', msg, url, lineNo, columnNo)
