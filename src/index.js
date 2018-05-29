@@ -33,13 +33,13 @@ let mySP = /^sp$/i;
 
 fileSelect.onchange = (e) => {
     // Fires if a file is selected by clicking "select file."
-    if (e.target.value == undefined){
+    if (e.target.value == undefined) {
         return false
     }
     e.preventDefault()
     e.stopPropagation
 
-    if (e.target.files.length > 1){
+    if (e.target.files.length > 1) {
         fileInfoBox.innerHTML = 'Error: Multiple Files Selected.'
         return false
     }
@@ -336,7 +336,9 @@ let readOfficials = (workbook) => {
 }
 
 let readScores = (workbook) => {
-    // Given a workbook, extract the information from the score tab
+    // Given a workbook, extract the information from the score tab;
+    // this also validates that the jam numbers are correct because they
+    // are entered first into the score tab then imported elsewhere.
 
     let cells = {},
         maxJams = sbTemplate.score.maxJams,
@@ -370,11 +372,12 @@ let readScores = (workbook) => {
             // Setup variables.  Jam is 0 indexed (1 less than jam nubmer).  Trip is 1 indexed.
             let team = teamList[i]
             let jam = 0
+            let lastJamNumber = undefined;
             let trip = 1
             let starPass = false
 
             // Get an array of starting points for each type of info
-            cells = initCells(team,pstring, tab, props)
+            cells = initCells(team, pstring, tab, props)
             let maxTrips = cells.lastTrip.c - cells.firstTrip.c
             jamAddress.c = cells.firstJamNumber.c
             jammerAddress.c = cells.firstJammerNumber.c
@@ -385,7 +388,7 @@ let readScores = (workbook) => {
             injAddress.c = cells.firstInj.c
             npAddress.c = cells.firstNp.c
 
-            for(let l = 0; l < maxJams; l++){
+            for (let l = 0; l < maxJams; l++) {
 
                 // For each line in the scoresheet, import data.
                 let blankTrip = false
@@ -404,7 +407,23 @@ let readScores = (workbook) => {
                 jamNumber = sheet[XLSX.utils.encode_cell(jamAddress)]
 
                 // if we're out of jams, stop
-                if (jamNumber == undefined || jamNumber.v == undefined){break}
+                if (jamNumber == undefined || jamNumber.v == undefined) {
+                  break;
+                }
+                
+                // if this jam number is bad, throw
+                if (
+                  (!/\d+/.test(jamNumber.v) && !anSP.test(jamNumber.v)) || (
+                    lastJamNumber != undefined &&
+                    !anSP.test(jamNumber.v) &&
+                    jamNumber.v != lastJamNumber + 1
+                  )
+                ) {
+                  throw "ERROR: '"+jamNumber.v+"' is not a valid jam number in period "+l+" for team "+team+"! " +
+                    "(It follows jam " + lastJamNumber + ".) We can't process anything else until you fix this.";
+                } else if (!anSP.test(jamNumber.v)) {
+                  lastJamNumber = jamNumber.v;
+                }
 
                 // handle star passes
                 if (anSP.test(jamNumber.v)) {
@@ -435,8 +454,8 @@ let readScores = (workbook) => {
                 }
 
                 // If there isn't currently an numbered object for this jam, create it
-                // Note that while the "number" field is one indexed, the jams array itself is zero indexed
-                if (!sbData.periods[pstring].jams.find(o => o.number === jam)){
+                // Note that while the "number" field is one-indexed, the jams array itself is zero indexed.
+                if (!sbData.periods[pstring].jams.find(o => o.number === jam)) {
                     sbData.periods[pstring].jams[jam-1] = {number: jam, events: []}
                 }
 
@@ -1337,11 +1356,18 @@ let errorCheck = () => {
                 nextJamEntries = sbData.periods['2'].jams[0].events.filter(
                     x => x.event == 'enter box'
                 )
-            } else if (jam != (jams)){
+            } else if (jam != jams) {
                 // Otherwise, just grab the next jam (don't forget 0 indexing)
-                nextJamEntries = sbData.periods[pstring].jams[jam].events.filter(
-                    x => x.event == 'enter box'
-                )
+                nextJamEvent = sbData.periods[pstring].jams[jam];
+                if (nextJamEvent != undefined) {
+                  nextJamEvent = nextJamEvent.events;
+                  if (nextJamEvent != undefined) {
+                    // TODO: Error here, there's some gunk making us think there's another jam when there isn't.
+                    nextJamEntries = nextJamEvent.filter(
+                      x => x.event == 'enter box'
+                    );
+                  }
+                }
             }   // Last jam of the 2nd period gets ignored.
 
             //ERROR CHECK: Penalty without box entry in this jam
