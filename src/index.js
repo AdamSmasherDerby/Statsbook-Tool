@@ -32,7 +32,6 @@ const teamList = ['home','away']
 let anSP = /^sp\*?$/i
 let mySP = /^sp$/i
 
-
 fileSelect.onchange = (e) => {
     // Fires if a file is selected by clicking "select file."
     if (e.target.value == undefined) {
@@ -1692,7 +1691,6 @@ holder.ondragend = () => {
 
 ipc.on('save-derby-json', () => {
     // Saves statsbook data to a JSON file
-
     let data = encode( JSON.stringify(sbData, null, ' '))
 
     let blob = new Blob( [ data ], {
