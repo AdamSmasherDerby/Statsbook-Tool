@@ -35,13 +35,13 @@ let mySP = /^sp$/i
 
 fileSelect.onchange = (e) => {
     // Fires if a file is selected by clicking "select file."
-    if (e.target.value == undefined) {
+    if (e.target.value == undefined){
         return false
     }
     e.preventDefault()
     e.stopPropagation
 
-    if (e.target.files.length > 1) {
+    if (e.target.files.length > 1){
         fileInfoBox.innerHTML = 'Error: Multiple Files Selected.'
         return false
     }
@@ -338,9 +338,8 @@ let readOfficials = (workbook) => {
 }
 
 let readScores = (workbook) => {
-    // Given a workbook, extract the information from the score tab;
-    // this also validates that the jam numbers are correct because they
-    // are entered first into the score tab then referenced everywhere else.
+    // Given a workbook, extract the information from the score tab,
+    // and record the jam numbers for future use.
 
     let cells = {},
         maxJams = sbTemplate.score.maxJams,
@@ -374,12 +373,12 @@ let readScores = (workbook) => {
             // Setup variables.  Jam is 0 indexed (1 less than jam nubmer).  Trip is 1 indexed.
             let team = teamList[i]
             let jam = 0
-            let lastJamNumber = undefined;
             let trip = 1
             let starPass = false
+            let lastJamNumber = undefined;
 
             // Get an array of starting points for each type of info
-            cells = initCells(team, pstring, tab, props)
+            cells = initCells(team,pstring, tab, props)
             let maxTrips = cells.lastTrip.c - cells.firstTrip.c
             jamAddress.c = cells.firstJamNumber.c
             jammerAddress.c = cells.firstJammerNumber.c
@@ -390,7 +389,8 @@ let readScores = (workbook) => {
             injAddress.c = cells.firstInj.c
             npAddress.c = cells.firstNp.c
 
-            for (let l = 0; l < maxJams; l++) {
+            for(let l = 0; l < maxJams; l++){
+
                 // For each line in the scoresheet, import data.
                 let blankTrip = false
 
@@ -454,10 +454,9 @@ let readScores = (workbook) => {
                     starPass = false
                 }
 
-                // If there isn't currently an numbered object for this jam,
-                // create it Note that while the "number" field is
-                // one-indexed, the jams array itself is zero-indexed.
-                if (!sbData.periods[pstring].jams.find(o => o.number === jam)) {
+                // If there isn't currently an numbered object for this jam, create it
+                // Note that while the "number" field is one indexed, the jams array itself is zero indexed
+                if (!sbData.periods[pstring].jams.find(o => o.number === jam)){
                     sbData.periods[pstring].jams[jam-1] = {number: jam, events: []}
                 }
 
@@ -823,7 +822,7 @@ let readPenalties = (workbook) => {
                     let code = codeText.v,
                         jam = jamText.v
 
-                    if(jam > sbData.periods[period].jams.length) {
+                    if(jam > sbData.periods[period].jams.length || jam - 1 < 0){
                         // Error Check - jam number out of range
                         sbErrors.penalties.penaltyBadJam.events.push(
                             `Team: ${ucFirst(team)}, Skater: ${skaterNum.v}, Period: ${period}, Recorded Jam: ${jam}`
@@ -1381,10 +1380,10 @@ let errorCheck = () => {
                 nextJamEntries = sbData.periods['2'].jams[0].events.filter(
                     x => x.event == 'enter box'
                 )
-            } else if (jam != jams) {
+            } else if (jam != (jams)){
                 // Otherwise, just grab the next jam (don't forget 0 indexing)
                 nextJamEntries = sbData.periods[pstring].jams[jam].events.filter(
-                  x => x.event == 'enter box'
+                    x => x.event == 'enter box'
                 )
             }   // Last jam of the 2nd period gets ignored.
 
