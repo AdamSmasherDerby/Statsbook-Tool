@@ -338,7 +338,7 @@ let readOfficials = (workbook) => {
 let readScores = (workbook) => {
     // Given a workbook, extract the information from the score tab;
     // this also validates that the jam numbers are correct because they
-    // are entered first into the score tab then imported elsewhere.
+    // are entered first into the score tab then referenced everywhere else.
 
     let cells = {},
         maxJams = sbTemplate.score.maxJams,
@@ -453,8 +453,9 @@ let readScores = (workbook) => {
                     starPass = false
                 }
 
-                // If there isn't currently an numbered object for this jam, create it
-                // Note that while the "number" field is one-indexed, the jams array itself is zero indexed.
+                // If there isn't currently an numbered object for this jam,
+                // create it Note that while the "number" field is
+                // one-indexed, the jams array itself is zero-indexed.
                 if (!sbData.periods[pstring].jams.find(o => o.number === jam)) {
                     sbData.periods[pstring].jams[jam-1] = {number: jam, events: []}
                 }
@@ -798,7 +799,7 @@ let readPenalties = (workbook) => {
                     let code = codeText.v,
                         jam = jamText.v
 
-                    if(jam > sbData.periods[period].jams.length || jam - 1 < 0){
+                    if(jam > sbData.periods[period].jams.length) {
                         // Error Check - jam number out of range
                         sbErrors.penalties.penaltyBadJam.events.push(
                             `Team: ${ucFirst(team)}, Skater: ${skaterNum.v}, Period: ${period}, Recorded Jam: ${jam}`
@@ -1358,16 +1359,9 @@ let errorCheck = () => {
                 )
             } else if (jam != jams) {
                 // Otherwise, just grab the next jam (don't forget 0 indexing)
-                nextJamEvent = sbData.periods[pstring].jams[jam];
-                if (nextJamEvent != undefined) {
-                  nextJamEvent = nextJamEvent.events;
-                  if (nextJamEvent != undefined) {
-                    // TODO: Error here, there's some gunk making us think there's another jam when there isn't.
-                    nextJamEntries = nextJamEvent.filter(
-                      x => x.event == 'enter box'
-                    );
-                  }
-                }
+                nextJamEntries = sbData.periods[pstring].jams[jam].events.filter(
+                  x => x.event == 'enter box'
+                )
             }   // Last jam of the 2nd period gets ignored.
 
             //ERROR CHECK: Penalty without box entry in this jam
