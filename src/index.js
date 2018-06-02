@@ -446,6 +446,11 @@ let readScores = (workbook) => {
                         sbErrors.scores.badJamNumber.events.push(
                             `Team: ${ucFirst(team)}, Period: ${pstring}, Jam: ${parseInt(jamNumber.v)}`
                         )
+
+                        // Add jam objects for missing jams.
+                        for(let j = jam + 1; j < parseInt(jamNumber.v); j++){
+                            sbData.periods[pstring].jams[j - 1] = {number: j, events: []}
+                        }
                     }
 
                     //Update the jam, reset the trip
