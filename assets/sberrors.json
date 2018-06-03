@@ -31,12 +31,6 @@
             "events": [],
             "long": "If the jam is called for injury, it should be recorded on both score sheets."
         },
-        "leadPenaltyNotLost":
-        {
-            "description": "Jammer with lead and penalty without 'lost' checked.",
-            "events": [],
-            "long": "If the lead jammer earns a penalty, they lose lead.  This box should be checked even if they successfully call the jam."
-        },
         "onlyOneStarPass":
         {
             "description": "Star pass on only one team of the score sheet.",
@@ -191,6 +185,12 @@
             "description": "IGRF missing the following information:",
             "events": [],
             "long": "One or more pieces of general information about the game are missing."
+        },
+        "leadPenaltyNotLost":
+        {
+            "description": "Jammer with lead and penalty without 'lost' checked.",
+            "events": [],
+            "long": "If the lead jammer earns a penalty, they lose lead.  However, if the penalty is issued after the jam is called, it is correct to leave the 'lost' box unchecked."
         },
         "possibleSub":
         {

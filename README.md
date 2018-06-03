@@ -58,8 +58,7 @@ https://github.com/AdamSmasherDerby/Statsbook-Tool/releases
 
 ### Scores + Penalties:
 
-1. Jammers with lead and a penalty, but not marked "lost."
-2. Penalties recorded in jam numbers that are not present on the score sheet.
+1. Penalties recorded in jam numbers that are not present on the score sheet.
 
 ### Warnings:
 1. Errors that may be correctly entered substitutions.
@@ -68,6 +67,7 @@ https://github.com/AdamSmasherDerby/Statsbook-Tool/releases
 4. Lost lead checked without a penalty in the corresponding jam.
 5. Missing data from IGRF
 6. Jam called for injury checked without a corresponding "3" on the lineups tab.
+7. Jammers with lead and a penalty, but not marked "lost."
 
 Flamingo icon from http://www.iconsmind.com
 

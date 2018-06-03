@@ -1411,7 +1411,7 @@ let errorCheck = () => {
             ){
                 // If a penalty is assessed to a jammer between jams (check
                 // LT paperwork), should they be marked as "lost"?
-                sbErrors.scores.leadPenaltyNotLost.events.push(
+                sbErrors.warnings.leadPenaltyNotLost.events.push(
                     `Period: ${period}, Jam: ${jam}, Team: ${
                         ucFirst(leadJammer.substr(0,4))
                     }, Jammer: ${leadJammer.slice(5)}`
