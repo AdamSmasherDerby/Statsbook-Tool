@@ -83,3 +83,8 @@ Flamingo icon from http://www.iconsmind.com
     * Check for points scored with no lead jammer and lost not checked.
 * 1.1.1 - May 20, 2018
     * Bugfix for CRG Export option to handle special characters correctly
+* 1.1.2 - June 3, 2018
+    * Move Lead / Penalty / Not Lost from errors to warnings
+    * Add check for skaters on SP* lines
+    * Doesn't crash on missing jam numbers
+    * Added game clock cells to statsbook template for compatibility with CRG Import Tool.
