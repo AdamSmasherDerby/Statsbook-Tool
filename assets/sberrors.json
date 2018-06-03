@@ -175,6 +175,12 @@
             "description": "No Pivot box not checked on line with Star Pass",
             "events": [],
             "long": "After a star pass, the 'no pivot' box should be checked to indicate that there is no longer a pivot on the team with the pass."
+        },
+        "spStarSkater":
+        {
+            "description": "Skaters entered on SP* line.",
+            "events": [],
+            "long": "On a line beginning with SP* (star pass by opposing team), no further information should be entered in that row on the lineups tab."
         }
 
     },

@@ -984,9 +984,28 @@ let readLineups = (workbook) => {
                 // TODO - maybe change this to not give up if the jam # is blank?
 
                 if (anSP.test(jamText.v)) {
+                // If this is a star pass line (SP or SP*)
                     starPass = true
+
                     if (!mySP.test(jamText.v)) {
-                    // then it's the other team's; go on to the next line.
+                    // If this is an opposing team star pass only,
+                    // Check for skaters that shouldn't be here, then go on.
+                        let spStarSkater = false
+
+                        for (let s=0; s < 5; s++){
+                            skaterAddress.c = cells.firstJammer.c + (s * (boxCodes+1))
+                            let skaterText = sheet[XLSX.utils.encode_cell(skaterAddress)]
+                            if (skaterText != undefined && skaterText.v != undefined){
+                                spStarSkater = true
+                            }
+                        }
+
+                        if (spStarSkater){
+                            sbErrors.lineups.spStarSkater.events.push(
+                                `Period: ${period}, Jam: ${jam}, Team: ${team}`
+                            )
+                        }
+
                         continue
                     }
                 } else {
@@ -1404,13 +1423,11 @@ let errorCheck = () => {
                 }
             }
 
-            //ERROR CHECK: Jammer with lead and penalty, but not lost
+            //Warning check: Jammer with lead and penalty, but not lost
             if (leadJammer != ''
                 && thisJamPenalties.filter(x => x.skater == leadJammer).length != 0
                 && events.filter(x => x.event == 'lost' && x.skater == leadJammer).length == 0
             ){
-                // If a penalty is assessed to a jammer between jams (check
-                // LT paperwork), should they be marked as "lost"?
                 sbErrors.warnings.leadPenaltyNotLost.events.push(
                     `Period: ${period}, Jam: ${jam}, Team: ${
                         ucFirst(leadJammer.substr(0,4))

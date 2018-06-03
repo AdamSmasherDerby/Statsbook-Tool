@@ -47,6 +47,7 @@ https://github.com/AdamSmasherDerby/Statsbook-Tool/releases
 4. Skater seated in a prior jam with no marked exit from the box.
 5. "$" or "S" entered for a skater already in the box.
 6. "No Pivot" not checked after star pass.
+7. Skaters entered on lines beginning with "SP*"
 
 ### Lineups + Penalties:
 
