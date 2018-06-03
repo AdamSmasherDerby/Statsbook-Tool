@@ -13,7 +13,7 @@ https://github.com/AdamSmasherDerby/Statsbook-Tool/releases
 
 *Mac:* Download and run the <code>Statsbook.Tool-x.x.x.dmg</code> file. Drag the flamingo onto the folder. Right or control click the StatsBook Tool program and select "open." Agree to run the software, despite dire warnings of awful consequences. (The awful consequences are that I have not ponied up $100 for a Developer certificate to sign the code.)
 
-*Linux:* Download <code>stastbooktool.AppImage</code>, then type "chmod a+x statsbooktool.AppImage" to make the file executable.
+*Linux:* Download <code>stastbooktool.AppImage</code>, then type "chmod a+x statsbooktool-1.1.2-x86_64.AppImage" to make the file executable.
 
 
 ## List of errors currently checked:
