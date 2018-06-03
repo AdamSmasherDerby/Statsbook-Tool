@@ -163,5 +163,14 @@
                 "firstJammer": "AC46"                
             }            
         }
+    },
+    "clock": {
+        "sheetName": "Game Clock",
+        "1": {
+            "firstJamTime": "B11"
+        },
+        "2": {
+            "firstJamTime": "B62"
+        }
     }
 }
