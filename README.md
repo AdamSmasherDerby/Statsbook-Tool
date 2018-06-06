@@ -88,3 +88,6 @@ Flamingo icon from http://www.iconsmind.com
     * Add check for skaters on SP* lines
     * Doesn't crash on missing jam numbers
     * Added game clock cells to statsbook template for compatibility with CRG Import Tool.
+* 1.1.3 - June 6, 2018
+    * Fixed bug in SP* check.
+    * Clarified that Warnings are not necessarily errors.
