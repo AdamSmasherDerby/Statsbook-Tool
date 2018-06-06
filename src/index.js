@@ -995,7 +995,7 @@ let readLineups = (workbook) => {
                         for (let s=0; s < 5; s++){
                             skaterAddress.c = cells.firstJammer.c + (s * (boxCodes+1))
                             let skaterText = sheet[XLSX.utils.encode_cell(skaterAddress)]
-                            if (skaterText != undefined && skaterText.v != undefined){
+                            if (skaterText != undefined && skaterText.v != false){
                                 spStarSkater = true
                             }
                         }
@@ -1575,7 +1575,7 @@ let sbErrorsToTable = () => {
     // Build error report
 
     let errorTypes = ['scores','lineups','penalties','warnings']
-    let typeHeaders = ['Scores', 'Lineups', 'Penalties','Warnings']
+    let typeHeaders = ['Scores', 'Lineups', 'Penalties','Warnings - These should be checked, but may be OK']
     let table = document.createElement('table')
     table.setAttribute('class','table')
 
