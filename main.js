@@ -66,6 +66,7 @@ let createWindow = () => {
                 },
                 {
                     label:'Exit',
+                    accelerator:  'CmdOrCtrl+Q',
                     click(){
                         app.quit()
                     }
