@@ -91,6 +91,7 @@ Flamingo icon from http://www.iconsmind.com
 * 1.1.3 - June 6, 2018
     * Fixed bug in SP* check.
     * Clarified that Warnings are not necessarily errors.
-* 1.1.4 - ??
+* 1.1.4 - June 12, 2018
     * Added keyboard shortcut for exit.
     * Detects letters entered as jam numbers
+    * Fixed bug in CRG Export introduced in 1.1.1

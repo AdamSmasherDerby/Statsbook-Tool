@@ -1714,7 +1714,7 @@ ipc.on('save-derby-json', () => {
 ipc.on('export-crg-roster', () => {
     // Exports statsbook rosters in CRG Scoreboard XML Format
 
-    let root = builder.create('document', {encoding: 'UTF-8'})
+    let root = builder.create('document', {encoding: 'UTF-16'})
 
     let teams = root.ele('Teams')
 
