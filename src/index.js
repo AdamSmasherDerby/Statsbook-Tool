@@ -32,7 +32,6 @@ const teamList = ['home','away']
 let anSP = /^sp\*?$/i
 let mySP = /^sp$/i
 
-
 fileSelect.onchange = (e) => {
     // Fires if a file is selected by clicking "select file."
     if (e.target.value == undefined){
@@ -129,6 +128,11 @@ let readSbData = (data) => {
         outBox.removeChild(outBox.lastElementChild)
     }
     outBox.appendChild(sbErrorsToTable())
+
+    // Initialize Tooltips
+    $(document).ready(function(){
+        $('[data-toggle="tooltip"]').tooltip() 
+    })
 
     // Update UI
     ipc.send('enable-menu-items')
@@ -1254,6 +1258,7 @@ let readLineups = (workbook) => {
                             }
                             break
                         case '3':
+                        case 3:
                             // Since '3' does not necessarily mean the jam was called, not enough information
                             // here to conclusively record a derbyJSON injury event, which specifies that the
                             // jam was called for injury.   However, save the skater information for error
@@ -1605,6 +1610,8 @@ let sbErrorsToTable = () => {
             descCell.appendChild(document.createTextNode(
                 sbErrors[section][e].description
             ))
+            descCell.setAttribute('data-toggle','tooltip')
+            descCell.setAttribute('title',sbErrors[section][e].long)
             descRow.appendChild(descCell)
             descRow.setAttribute('class','thead-light')
 

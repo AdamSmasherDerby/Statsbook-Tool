@@ -95,3 +95,6 @@ Flamingo icon from http://www.iconsmind.com
     * Added keyboard shortcut for exit.
     * Detects letters entered as jam numbers
     * Fixed bug in CRG Export introduced in 1.1.1
+* 1.1.5 - 
+    * Fixed bug with reading injuries in lineups
+    * Added tooltips to error list
