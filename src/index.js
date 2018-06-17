@@ -1127,6 +1127,12 @@ let readLineups = (workbook) => {
                                 )
                             }
                             break
+                        case 'ᚾ':
+                        // Error Check: Using the rune instead of an X
+                            sbErrors.lineups.runeUsed.events.push(
+                                `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}`
+                            )
+                            //break omitted
                         case 'X':
                         case 'x':
                             if (!box[team].includes(skater)){
@@ -1817,6 +1823,7 @@ Just Lineups
 4. A player seated in a prior jam who has no marked exit from the box.*
 5. "S" or "$" entered for skater already seated in the box.
 6. "No Pivot" box not checked after star pass.
+7. "ᚾ" used in place of "X".
 
 Lineups + Penalties (Check while reading lineups)
 1. Penalties on skaters not listed on the lineup for that jam.*

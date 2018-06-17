@@ -181,6 +181,12 @@
             "description": "Skaters entered on SP* line.",
             "events": [],
             "long": "On a line beginning with SP* (star pass by opposing team), no further information should be entered in that row on the lineups tab."
+        },
+        "runeUsed":
+        {
+            "description": "ᚾ used in statsbook file instead of X.",
+            "events": [],
+            "long": "While the ᚾ character is used during paper entry, the statsbook manual specifies that an 'X' should be entered in the actual Excel file."
         }
 
     },
