@@ -100,3 +100,4 @@ Flamingo icon from http://www.iconsmind.com
     * Fixed bug with reading injuries in lineups
     * Added tooltips to error list
     * Added check for ᚾ in lineups.
+    * Added check for fouled out skater still in box

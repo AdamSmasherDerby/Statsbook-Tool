@@ -187,6 +187,12 @@
             "description": "ᚾ used in statsbook file instead of X.",
             "events": [],
             "long": "While the ᚾ character is used during paper entry, the statsbook manual specifies that an 'X' should be entered in the actual Excel file."
+        },
+        "foInBox":
+        {
+            "description": "Fouled out skater marked as continuing in box in subsequent jam.",
+            "events": [],
+            "long": "After a skater has fouled out, they should not appear in the lineups for subsequent jams."
         }
 
     },

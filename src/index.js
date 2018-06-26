@@ -1250,11 +1250,20 @@ let readLineups = (workbook) => {
                             break
                         case 'I':
                         case '|':
-                            // no event, but use this branch for checking if needed
+                            // no derbyJSON event, but use this branch for error checking
                             if (!box[team].includes(skater)){
-                                sbErrors.lineups.iNotInBox.events.push(
-                                    `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
-                                )
+                                let priorFoulout = warningData.foulouts.filter(x => 
+                                    (x.period == period && x.jam < jam & x.skater == skater) || 
+                                    (x.period < period && x.skater == skater))
+                                if (priorFoulout.length > 0){
+                                    sbErrors.lineups.foInBox.events.push(
+                                        `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
+                                    )
+                                } else {
+                                    sbErrors.lineups.iNotInBox.events.push(
+                                        `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
+                                    )
+                                }
                                 warningData.badContinues.push({
                                     skater: skater,
                                     team: team,
