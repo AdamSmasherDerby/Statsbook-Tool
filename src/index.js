@@ -342,7 +342,8 @@ let readOfficials = (workbook) => {
 }
 
 let readScores = (workbook) => {
-    // Given a workbook, extract the information from the score tab
+    // Given a workbook, extract the information from the score tab,
+    // and record the jam numbers for future use.
 
     let cells = {},
         maxJams = sbTemplate.score.maxJams,
@@ -378,6 +379,7 @@ let readScores = (workbook) => {
             let jam = 0
             let trip = 1
             let starPass = false
+            let lastJamNumber = undefined;
 
             // Get an array of starting points for each type of info
             cells = initCells(team,pstring, tab, props)
@@ -410,7 +412,23 @@ let readScores = (workbook) => {
                 jamNumber = sheet[XLSX.utils.encode_cell(jamAddress)]
 
                 // if we're out of jams, stop
-                if (jamNumber == undefined || jamNumber.v == undefined){break}
+                if (jamNumber == undefined || jamNumber.v == undefined) {
+                  break;
+                }
+                
+                // if this jam number is bad, throw
+                if (
+                  (!/\d+/.test(jamNumber.v) && !anSP.test(jamNumber.v)) || (
+                    lastJamNumber != undefined &&
+                    !anSP.test(jamNumber.v) &&
+                    jamNumber.v != lastJamNumber + 1
+                  )
+                ) {
+                  throw "ERROR: '"+jamNumber.v+"' is not a valid jam number in period "+l+" for team "+team+"! " +
+                    "(It follows jam " + lastJamNumber + ".) We can't process anything else until you fix this.";
+                } else if (!anSP.test(jamNumber.v)) {
+                  lastJamNumber = jamNumber.v;
+                }
 
                 // handle star passes
                 if (anSP.test(jamNumber.v)) {

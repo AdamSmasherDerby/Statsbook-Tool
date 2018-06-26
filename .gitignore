@@ -7,6 +7,7 @@
 .vs/
 .vscode/
 *.log
+*~
 *.pyc
 *.sln
 *.swp
