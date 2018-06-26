@@ -57,6 +57,7 @@ https://github.com/AdamSmasherDerby/Statsbook-Tool/releases
 3. "/" in lineups without a matching penalty.
 4. "S" or "$" in lineups without a matching penalty.
 5. Penalty recorded without a "X", "/", "S", or "$". 
+6. Fouled out skater still in box.
 
 ### Scores + Penalties:
 
