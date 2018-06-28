@@ -31,6 +31,7 @@ https://github.com/AdamSmasherDerby/Statsbook-Tool/releases
 9. Skipped column on score sheet.
 10. SP* with jammer number entered.
 11. Points scored with no lead jammer and 'lost' not recorded for the scoring team.
+12. Jammer not on IGRF.
 
 ### Penalties:
 
@@ -38,6 +39,7 @@ https://github.com/AdamSmasherDerby/Statsbook-Tool/releases
 2. Seven or more penalties without "FO" or expulsion code entered.
 3. Expulsion code entered for jam with no penalty.
 4. Penalty code without jam number, or jam number without penalty.
+5. Skater not on IGRF.
 
 ### Lineups:
 
@@ -49,6 +51,7 @@ https://github.com/AdamSmasherDerby/Statsbook-Tool/releases
 6. "No Pivot" not checked after star pass.
 7. Skaters entered on lines beginning with "SP*".
 8. "ᚾ" entered instead of "X".
+9. Skater not on IGRF.
 
 ### Lineups + Penalties:
 
@@ -102,3 +105,5 @@ Flamingo icon from http://www.iconsmind.com
     * Added tooltips to error list
     * Added check for ᚾ in lineups.
     * Added check for fouled out skater still in box
+* 1.1.6 - 
+    * Added checks for skaters not on IGRF.  (Duplicates conditional formatting from StatsBook.)

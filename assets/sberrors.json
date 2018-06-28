@@ -1,6 +1,12 @@
 {
     "scores":
     {
+        "scoresNotOnIGRF":
+        {
+            "description": "Skater on score sheet is not on IGRF.",
+            "events": [],
+            "long": "A jammer on the score sheet was not listed on the IGRF page.  Should also be higlighted red in the StatsBook."
+        },
         "npPoints":
         {
             "description": "NI Box checked with points on first trip",
@@ -71,6 +77,12 @@
     },
     "penalties":
     {
+        "penaltiesNotOnIGRF":
+        {
+            "description": "Skater on penalties sheet is not on IGRF.",
+            "events": [],
+            "long": "A skater on the penalties sheet was not listed on the IGRF page.  Should also be higlighted red in the StatsBook."
+        },
         "foUnder7":
         {
             "description": "FO entered for a skater with fewer than 7 penalties",
@@ -116,6 +128,12 @@
     },
     "lineups":
     {
+        "lineupsNotOnIGRF":
+        {
+            "description": "Skater on lineups sheet is not on IGRF.",
+            "events": [],
+            "long": "A skater on the lineups sheet was not listed on the IGRF page.  Should also be higlighted red in the StatsBook."
+        },
         "samePlayerTwice":
         {
             "description": "Same player entered more than once in the same jam",

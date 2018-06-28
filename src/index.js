@@ -233,7 +233,7 @@ let readIGRF = (workbook) => {
 }
 
 let readTeam = (workbook,team) => {
-    // team should be "home" or "away"
+// team should be "home" or "away"
     let name_address = {c:0,r:0},
         num_address = {c:0,r:0},
         firstNameAddress = {},
@@ -288,7 +288,7 @@ let readTeam = (workbook,team) => {
 }
 
 let readOfficials = (workbook) => {
-    // Read in officials' data
+// Read in officials' data
 
     let props = ['firstName','firstRole','firstLeague','firstCert'],
         sheet = workbook.Sheets[sbTemplate.teams.officials.sheetName],
@@ -342,7 +342,7 @@ let readOfficials = (workbook) => {
 }
 
 let readScores = (workbook) => {
-    // Given a workbook, extract the information from the score tab
+// Given a workbook, extract the information from the score tab
 
     let cells = {},
         maxJams = sbTemplate.score.maxJams,
@@ -365,13 +365,13 @@ let readScores = (workbook) => {
     let ippRe = /(\d)\+(\d)/
 
     for(let period = 1; period < 3; period ++){
-        // For each period, import data
+    // For each period, import data
 
         // Add a period object with a jams array
         let pstring = period.toString()
 
         for (var i in teamList){
-            // For each team
+        // For each team
 
             // Setup variables.  Jam is 0 indexed (1 less than jam nubmer).  Trip is 1 indexed.
             let team = teamList[i]
@@ -392,8 +392,8 @@ let readScores = (workbook) => {
             npAddress.c = cells.firstNp.c
 
             for(let l = 0; l < maxJams; l++){
+            // For each line in the scoresheet, import data.
 
-                // For each line in the scoresheet, import data.
                 let blankTrip = false
 
                 // increment addresses
@@ -455,18 +455,26 @@ let readScores = (workbook) => {
                 // Add a "pass" object for each trip, including initial passes
                 // (note that even incomplete initial passes get "pass" events.)
                 let skaterNum = ' '
-                let initialCompleted = 'yes'
 
                 // Check for no initial pass box checked
                 let np = sheet[XLSX.utils.encode_cell(npAddress)]
-                if (np != undefined && np.v != undefined){initialCompleted = 'no'}
+                let initialCompleted = (np != undefined && np.v != undefined ? 'no' : 'yes')
 
                 if(sheet[XLSX.utils.encode_cell(jammerAddress)] != undefined){
                     skaterNum = sheet[XLSX.utils.encode_cell(jammerAddress)].v
                 }
+
+                // ERROR CHECK: Skater on score sheet not on the IGRF
+                if (sbData.teams[team].persons.findIndex(x => x.number == skaterNum) == -1){
+                    // This SHOULD be caught by conditional formatting in Excel, but there
+                    // are reports of that breaking sometimes.
+                    sbErrors.scores.scoresNotOnIGRF.events.push(
+                        `Period: ${period}, Jam: ${jam}, Team: ${team}, Skater: ${skaterNum} `
+                    )
+                }
+
                 if (!starPass){
-                    // If this line is not a star pass, read in the skater number
-                    // and create an intital pass object
+                // If this line is not a star pass, create an intital pass object
 
                     skater = team + ':' + skaterNum
                     sbData.periods[period].jams[jam-1].events.push(
@@ -732,7 +740,7 @@ let readScores = (workbook) => {
 }
 
 let readPenalties = (workbook) => {
-    // Given a workbook, extract the data from the "Penalties" tab.
+// Given a workbook, extract the data from the "Penalties" tab.
 
     let cells = {},
         numberAddress = {},
@@ -747,7 +755,7 @@ let readPenalties = (workbook) => {
         sheet = workbook.Sheets[sbTemplate.penalties.sheetName]
 
     for(let period = 1; period < 3; period ++){
-        // For each period
+    // For each period
 
         let pstring = period.toString()
 
@@ -756,7 +764,7 @@ let readPenalties = (workbook) => {
         let tab = 'penalties'
 
         for(let i in teamList){
-            // For each team
+        // For each team
 
             let team = teamList[i]
 
@@ -772,7 +780,7 @@ let readPenalties = (workbook) => {
             foJamAddress.c = cells.firstFOJam.c
 
             for(let s = 0; s < maxNum; s++){
-                // For each player
+            // For each player
 
                 // Advance two rows per skater - TODO make this settable?
                 numberAddress.r = cells.firstNumber.r + (s * 2)
@@ -785,10 +793,19 @@ let readPenalties = (workbook) => {
 
                 if (skaterNum == undefined || skaterNum.v == ''){continue}
 
+                // ERROR CHECK: skater on penalty sheet not on the IGRF
+                if (sbData.teams[team].persons.findIndex(x => x.number == skaterNum.v) == -1){
+                    // This SHOULD be caught by conditional formatting in Excel, but there
+                    // are reports of that breaking sometimes.
+                    sbErrors.penalties.penaltiesNotOnIGRF.events.push(
+                        `Period: ${period}, Team: ${team}, Skater: ${skaterNum.v} `
+                    )
+                }
+
                 let skater = team + ':' + skaterNum.v
 
                 for(let p = 0; p < maxPenalties; p++){
-                    // For each penalty space
+                // For each penalty space
 
                     penaltyAddress.c = cells.firstPenalty.c + p
                     jamAddress.c = cells.firstJam.c + p
@@ -848,6 +865,7 @@ let readPenalties = (workbook) => {
 
                     // ERROR CHECK: Seven or more penalties with NO foulout entered
                     if (foulouts.indexOf(skater) == -1
+                        && penalties[skater] != undefined
                         && penalties[skater].length > 6
                         && period == '2'){
                         sbErrors.penalties.sevenWithoutFO.events.push(
@@ -941,7 +959,7 @@ let readPenalties = (workbook) => {
 }
 
 let readLineups = (workbook) => {
-    // Read in the data from the lineups tab.
+// Read in the data from the lineups tab.
 
     let cells = {},
         jamNumberAddress = {},
@@ -955,7 +973,7 @@ let readLineups = (workbook) => {
         box = {home:[], away: []}
 
     for (let period = 1; period < 3; period++){
-        // For each period
+    // For each period
 
         let pstring = period.toString()
 
@@ -963,7 +981,7 @@ let readLineups = (workbook) => {
         let tab = 'lineups'
 
         for(var i in teamList){
-            // For each team
+        // For each team
             let team = teamList[i]
             let jam = 0
             let starPass = false
@@ -975,7 +993,7 @@ let readLineups = (workbook) => {
             skaterAddress.c = cells.firstJammer.c
 
             for(let l = 0; l < maxJams; l++){
-                // For each line
+            // For each line
 
                 jamNumberAddress.r = cells.firstJamNumber.r + l
                 noPivotAddress.r = cells.firstNoPivot.r + l
@@ -1038,7 +1056,7 @@ let readLineups = (workbook) => {
                 }
 
                 for(let s = 0; s < 5; s++){
-                    // For each skater
+                // For each skater
                     let position = ''
 
                     skaterAddress.c = cells.firstJammer.c + (s * (boxCodes+1))
@@ -1057,6 +1075,17 @@ let readLineups = (workbook) => {
                     if (skaterText == undefined){continue}
 
                     let skater = team + ':' + skaterText.v
+
+                    // ERROR CHECK: Skater on lineups not on IGRF
+                    if (sbData.teams[team].persons.findIndex(x => x.number == skaterText.v) == -1){
+                    // If the skater is not on the IGRF, record an error.
+                        // This SHOULD be caught by conditional formatting in Excel, but there
+                        // are reports of that breaking sometimes.
+                        sbErrors.lineups.lineupsNotOnIGRF.events.push(
+                            `Period: ${period}, Team: ${ucFirst(team)}, Jam: ${jam}, Skater: ${skaterText.v} `
+                        )
+                    }
+
                     // ERROR CHECK: Same skater entered more than once per jam
                     if (skaterList.indexOf(skater) != -1 && !starPass){
                         sbErrors.lineups.samePlayerTwice.events.push(
