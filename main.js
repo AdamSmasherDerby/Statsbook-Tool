@@ -28,6 +28,9 @@ let createWindow = () => {
         require('devtron').install()
     }
 
+    // Prevent files dropped outside of the drop zone from doing anything.
+    win.webContents.on('will-navigate', (event) => event.preventDefault())
+
     win.on('closed', ()=> {
         win=null
     })
