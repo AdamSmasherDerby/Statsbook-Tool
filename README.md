@@ -107,3 +107,5 @@ Flamingo icon from http://www.iconsmind.com
     * Added check for fouled out skater still in box
 * 1.1.6 - 
     * Added checks for skaters not on IGRF.  (Duplicates conditional formatting from StatsBook.)
+    * Updated dependencies
+    * Doesn't crash when checking one period games.

@@ -465,7 +465,8 @@ let readScores = (workbook) => {
                 }
 
                 // ERROR CHECK: Skater on score sheet not on the IGRF
-                if (sbData.teams[team].persons.findIndex(x => x.number == skaterNum) == -1){
+                if (skaterNum != ' ' && 
+                    sbData.teams[team].persons.findIndex(x => x.number == skaterNum) == -1){
                     // This SHOULD be caught by conditional formatting in Excel, but there
                     // are reports of that breaking sometimes.
                     sbErrors.scores.scoresNotOnIGRF.events.push(
@@ -1259,7 +1260,7 @@ let readLineups = (workbook) => {
                                     `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
                                 )
                                 remove(box[team],skater)
-                            }
+                            } 
 
                             // ERROR CHECK: Skater starts in the box without a penalty
                             // in the prior or current jam.
@@ -1432,9 +1433,13 @@ let errorCheck = () => {
             let nextJamEntries = []
             if (period == 1 && jam==(jams)){
                 // If this is the last jam of the 1st period, get period 2, jam 1
-                nextJamEntries = sbData.periods['2'].jams[0].events.filter(
-                    x => x.event == 'enter box'
-                )
+                try {
+                    nextJamEntries = sbData.periods['2'].jams[0].events.filter(
+                        x => x.event == 'enter box'
+                    )
+                } catch (e) {
+                    nextJamEntries = []
+                }
             } else if (jam != (jams)){
                 // Otherwise, just grab the next jam (don't forget 0 indexing)
                 nextJamEntries = sbData.periods[pstring].jams[jam].events.filter(
