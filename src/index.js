@@ -972,22 +972,20 @@ let readLineups = (workbook) => {
         boxCodes = sbTemplate.lineups.boxCodes,
         sheet = workbook.Sheets[sbTemplate.lineups.sheetName],
         positions = {0:'jammer',1:'pivot',2:'blocker',3:'blocker',4:'blocker'},
-        box = {home:[], away: []}
+        box = {home:[], away: []},
+        tab = 'lineups',
+        props = ['firstJamNumber','firstNoPivot','firstJammer']
 
     for (let period = 1; period < 3; period++){
     // For each period
 
         let pstring = period.toString()
 
-        let props = ['firstJamNumber','firstNoPivot','firstJammer']
-        let tab = 'lineups'
-
         for(var i in teamList){
         // For each team
             let team = teamList[i]
             let jam = 0
             let starPass = false
-            // Array of skaters in the box.
 
             cells = initCells(team, pstring, tab, props)
             jamNumberAddress.c = cells.firstJamNumber.c
@@ -1002,6 +1000,7 @@ let readLineups = (workbook) => {
                 skaterAddress.r = cells.firstJammer.r + l
 
                 let jamText = sheet[XLSX.utils.encode_cell(jamNumberAddress)]
+                let noPivot = sheet[XLSX.utils.encode_cell(noPivotAddress)]
 
                 if (jamText == undefined || jamText.v == '') {continue}
                 // If there is no jam number, go on to the next line.
@@ -1032,6 +1031,15 @@ let readLineups = (workbook) => {
 
                         continue
                     }
+
+                    if (noPivot == undefined || noPivot.v == undefined){
+                        // Error check: Star Pass line without "No Pivot" box checked.
+    
+                        sbErrors.lineups.starPassNoPivot.events.push(
+                            `Period: ${period}, Jam: ${jam}, Team: ${ucFirst(team)}`
+                        )
+                    }
+
                 } else {
                     // Not a starpass line, update the jam number
                     jam = jamText.v
@@ -1062,18 +1070,7 @@ let readLineups = (workbook) => {
                     let position = ''
 
                     skaterAddress.c = cells.firstJammer.c + (s * (boxCodes+1))
-
                     let skaterText = sheet[XLSX.utils.encode_cell(skaterAddress)]
-                    let noPivot = sheet[XLSX.utils.encode_cell(noPivotAddress)]
-
-                    if (starPass == true && (noPivot == undefined || noPivot.v == undefined) && s == 0){
-                        // Error check: Star Pass line without "No Pivot" box checked.
-
-                        sbErrors.lineups.starPassNoPivot.events.push(
-                            `Period: ${period}, Jam: ${jam}, Team: ${ucFirst(team)}`
-                        )
-                    }
-
                     if (skaterText == undefined){continue}
 
                     let skater = team + ':' + skaterText.v
