@@ -2,7 +2,7 @@ Statsbook Tool is a utility for processing WFTDA statsbook files.  It will read 
 
 This software is not provided, endorsed, produced, or supported by the WFTDA.  It is not guaranteed to work, to be free of false positives, false negatives, random bugs, or apocalyptic curses.
 
-At present it supports the 2017 and 2018 statsbook formats.  Feed it an older statsbook at your own peril.
+At present it supports the 2017, 2018, and 2019 statsbook formats.  Feed it an older statsbook at your own peril. Note that the 2019 statsbook release also substantially changed how lineups are entered.  The program determines which data entry method you should be using based on the file type - if you're using a 2019 statsbook file, you should be using the 2019 instructions.
 
 Installable binaries are located at:
 https://github.com/AdamSmasherDerby/Statsbook-Tool/releases
@@ -105,7 +105,9 @@ Flamingo icon from http://www.iconsmind.com
     * Added tooltips to error list
     * Added check for ᚾ in lineups.
     * Added check for fouled out skater still in box
-* 1.1.6 - 
+* 1.1.6 - October 27, 2018
     * Added checks for skaters not on IGRF.  (Duplicates conditional formatting from StatsBook.)
     * Updated dependencies
     * Doesn't crash when checking one period games.
+* 1.2.0 - 
+    * Updated for 2019 Statsbook revision

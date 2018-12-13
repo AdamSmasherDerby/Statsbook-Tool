@@ -171,6 +171,7 @@ let getVersion = (workbook) => {
     sbVersion = versionRe.exec(versionText)[0]
 
     switch (sbVersion){
+    case '2019':
     case '2018':
         sbTemplate = template2018
         break
