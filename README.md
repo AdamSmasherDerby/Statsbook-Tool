@@ -43,23 +43,23 @@ https://github.com/AdamSmasherDerby/Statsbook-Tool/releases
 
 ### Lineups:
 
-1. Players listed more than once in the same jam on the lineup tab.
-2. "I" or "|" in lineups without the player being in the box already.
+1. Skater not on IGRF.
+2. Players listed more than once in the same jam on the lineup tab.
 3. Skater previously seated in the box with no code on present line.
 4. Skater seated in a prior jam with no marked exit from the box.
 5. "$" or "S" entered for a skater already in the box.
 6. "No Pivot" not checked after star pass.
 7. Skaters entered on lines beginning with "SP*".
-8. "ᚾ" entered instead of "X".
-9. Skater not on IGRF.
+8. "ᚾ" entered instead of "X". (2018 and earlier)
+9. "I" or "|" in lineups without the player being in the box already. (2018 and earlier)
 
 ### Lineups + Penalties:
 
 1. Penalties on skaters not listed on the lineup for that jam.
-2. "X" in lineups without a matching penalty.
-3. "/" in lineups without a matching penalty.
+2. "+" or "X" in lineups without a matching penalty.
+3. "-" or "/" in lineups without a matching penalty.
 4. "S" or "$" in lineups without a matching penalty.
-5. Penalty recorded without a "X", "/", "S", or "$". 
+5. Penalty recorded without a box entry. 
 6. Fouled out skater still in box.
 
 ### Scores + Penalties:
@@ -109,5 +109,5 @@ Flamingo icon from http://www.iconsmind.com
     * Added checks for skaters not on IGRF.  (Duplicates conditional formatting from StatsBook.)
     * Updated dependencies
     * Doesn't crash when checking one period games.
-* 1.2.0 - 
+* 2.0.0 - December 15, 2018
     * Updated for 2019 Statsbook revision

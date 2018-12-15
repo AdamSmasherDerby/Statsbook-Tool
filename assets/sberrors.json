@@ -146,9 +146,21 @@
             "events": [],
             "long": "A player was notated as entering (or continuing in) the box without a penalty marked for the same or prior jam on the penalty sheet."
         },
+        "plusNoPenalty":
+        {
+            "description": "+ marked for player with no corresponding penalty",
+            "events": [],
+            "long": "A player was notated as entering the box without a penalty marked for the same or prior jam on the penalty sheet."
+        },
         "slashNoPenalty":
         {
             "description": "/ marked for player with no corresponding penalty",
+            "events": [],
+            "long": "A player was marked as entering the box without a penalty in the same or prior jam on the penalty sheet."
+        },
+        "dashNoPenalty":
+        {
+            "description": "- marked for player with no corresponding penalty",
             "events": [],
             "long": "A player was marked as entering the box without a penalty in the same or prior jam on the penalty sheet."
         },
@@ -174,7 +186,7 @@
         {
             "description": "Skater previously seated in box with no code on present line.",
             "events": [],
-            "long": "A skater, previously seated in the box, does not have an X or I marked to indicate that they continued in the box. Could potentially indicate a substitute. (See warnings)"
+            "long": "A skater, previously seated in the box, does not have a continuation marked to indicate that they continued in the box. Could potentially indicate a substitute. (See warnings)"
         },
         "startsWhileThere":
         {
@@ -184,7 +196,7 @@
         },
         "seatedNotLinedUp":
         {
-            "description": "Penalzied skater not on lineup.",
+            "description": "Previously penalzied skater not on lineup.",
             "events": [],
             "long": "A skater who was issued a penalty in a prior jam does not appear in the lineup for this jam.  May also indicate a substitution."
         },
@@ -211,6 +223,12 @@
             "description": "Fouled out skater marked as continuing in box in subsequent jam.",
             "events": [],
             "long": "After a skater has fouled out, they should not appear in the lineups for subsequent jams."
+        },
+        "badLineupCode":
+        {
+            "description": "An unrecognized box code was used. Wrong statsbook version?",
+            "events": [],
+            "long": "This error is thrown if a character is present in the box code colums that shouldn't be there. This checker assumes that 2019 statsbooks are entered according to the 2019 statsbook manual, etc. Check your statsbook file version if you are receiving this error."
         }
 
     },

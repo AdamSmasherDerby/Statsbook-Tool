@@ -1071,7 +1071,10 @@ let readLineups = (workbook) => {
 
                     skaterAddress.c = cells.firstJammer.c + (s * (boxCodes+1))
                     let skaterText = sheet[XLSX.utils.encode_cell(skaterAddress)]
-                    if (skaterText == undefined){continue}
+                    if (skaterText == undefined ||
+                        skaterText == '?' ||
+                        skaterText == 'n/a' ||
+                        skaterText == 'N/A'){continue}
 
                     let skater = team + ':' + skaterText.v
 
@@ -1122,64 +1125,127 @@ let readLineups = (workbook) => {
                         let codeText = sheet[XLSX.utils.encode_cell(skaterAddress)]
 
                         if (codeText == undefined) {continue}
+
                         allCodes += codeText.v
 
-                        // Possible codes - /, X, S, $, I or |, 3
-                        // Possible events - enter box, exit box, injury
-                        // / - Enter box
-                        // X - Test to see if skater is IN box
-                        //      Yes: exit box, No: enter box, exit box
-                        // S - Enter box, note: sat between jams
-                        // $ - Enter box, exit box, note: sat between jams
-                        // I or | - no event, error checking only
-                        // 3 - Injury object, verify not already present from score tab
+                        switch(sbVersion){
+                        case '2017':
+                        case '2018':
+                            // Possible codes - /, X, S, $, I or |, 3
+                            // Possible events - enter box, exit box, injury
+                            // / - Enter box
+                            // X - Test to see if skater is IN box
+                            //      Yes: exit box, No: enter box, exit box
+                            // S - Enter box, note: sat between jams
+                            // $ - Enter box, exit box, note: sat between jams
+                            // I or | - no event, error checking only
+                            // 3 - Injury object, verify not already present from score tab
 
-                        switch (codeText.v){
-                        case '/':
-                            // Add an "Enter Box" event, and push the skater onto the box list
-                            sbData.periods[pstring].jams[jam-1].events.push(
-                                {
-                                    event: 'enter box',
-                                    skater: skater
-                                }
-                            )
-                            box[team].push(skater)
+                            switch (codeText.v){
+                            case '/':
+                                // Add an "Enter Box" event, and push the skater onto the box list
+                                enterBox(pstring, jam, skater)
+                                box[team].push(skater)
 
-                            // ERROR CHECK: Skater enters the box during the jam
-                            // without a penalty in the current jam.
-                            if(thisJamPenalties.find(
-                                x => x.skater == skater
-                            ) == undefined){
-                                sbErrors.lineups.slashNoPenalty.events.push(
-                                    `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
-                                )
-                            }
-                            break
-                        case 'ᚾ':
-                        // Error Check: Using the rune instead of an X
-                            sbErrors.lineups.runeUsed.events.push(
-                                `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}`
-                            )
-                            //break omitted
-                        case 'X':
-                        case 'x':
-                            if (!box[team].includes(skater)){
-                                // If the skater is not in the box, add an "enter box" event
-                                sbData.periods[pstring].jams[jam-1].events.push(
-                                    {
-                                        event: 'enter box',
-                                        skater: skater
-                                    }
-                                )
                                 // ERROR CHECK: Skater enters the box during the jam
                                 // without a penalty in the current jam.
                                 if(thisJamPenalties.find(
                                     x => x.skater == skater
                                 ) == undefined){
-                                    sbErrors.lineups.xNoPenalty.events.push(
+                                    sbErrors.lineups.slashNoPenalty.events.push(
                                         `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
                                     )
-                                    warningData.badContinues.push({
+                                }
+                                break
+                            case 'ᚾ':
+                            // Error Check: Using the rune instead of an X
+                                sbErrors.lineups.runeUsed.events.push(
+                                    `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}`
+                                )
+                                //break omitted
+                            case 'X':
+                            case 'x':
+                                if (!box[team].includes(skater)){
+                                    // If the skater is not in the box, add an "enter box" event
+                                    enterBox(pstring, jam, skater)
+
+                                    // ERROR CHECK: Skater enters the box during the jam
+                                    // without a penalty in the current jam.
+                                    if(thisJamPenalties.find(
+                                        x => x.skater == skater
+                                    ) == undefined){
+                                        sbErrors.lineups.xNoPenalty.events.push(
+                                            `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
+                                        )
+                                        warningData.badContinues.push({
+                                            skater: skater,
+                                            team: team,
+                                            period: period,
+                                            jam: jam
+                                        })
+                                    }
+
+                                }
+                                // Whether or not the skater started in the box, add an "exit box" event
+                                exitBox(pstring, jam, skater)
+
+                                // Remove the skater from the box list.
+                                if (box[team].includes(skater)){
+                                    remove(box[team],skater)
+                                }
+                                break
+
+                            case 'S':
+                            case 's':
+                                // Add a box entry, with a note that the skater sat between jams.
+                                enterBox(pstring, jam, skater, 'Sat Between Jams.')
+
+                                // ERROR CHECK: Skater starts in the box while already in the box.
+                                if (box[team].includes(skater)){
+                                    sbErrors.lineups.startsWhileThere.events.push(
+                                        `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
+                                    )
+                                } else {
+                                    // Add skater to the box list.
+                                    box[team].push(skater)
+                                }
+
+                                // ERROR CHECK: Skater starts in the box without a penalty
+                                // in the prior or current jam.
+                                if(thisJamPenalties.find(x => x.skater == skater) == undefined
+                                    && priorJamPenalties.find(x => x.skater == skater) == undefined){
+                                    sbErrors.lineups.sNoPenalty.events.push(
+                                        `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
+                                    )
+                                    warningData.badStarts.push({
+                                        skater: skater,
+                                        team: team,
+                                        period: period,
+                                        jam: jam
+                                    })
+                                }
+                                break
+
+                            case '$':
+                                enterBox(pstring, jam, skater, 'Sat Between Jams.')
+                                exitBox(pstring, jam, skater)
+
+                                // ERROR CHECK: Skater starts in the box while already in the box.
+                                if (box[team].includes(skater)){
+                                    sbErrors.lineups.startsWhileThere.events.push(
+                                        `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
+                                    )
+                                    remove(box[team],skater)
+                                } 
+
+                                // ERROR CHECK: Skater starts in the box without a penalty
+                                // in the prior or current jam.
+                                if(thisJamPenalties.find(x => x.skater == skater) == undefined
+                                    && priorJamPenalties.find(x => x.skater == skater) == undefined){
+                                    sbErrors.lineups.sSlashNoPenalty.events.push(
+                                        `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
+                                    )
+                                    warningData.badStarts.push({
                                         skater: skater,
                                         team: team,
                                         period: period,
@@ -1187,99 +1253,98 @@ let readLineups = (workbook) => {
                                     })
                                 }
 
-                            }
-                            // Whether or not the skater started in the box, add an "exit box" event
-                            sbData.periods[pstring].jams[jam-1].events.push(
-                                {
-                                    event: 'exit box',
-                                    skater: skater
+                                break
+                            case 'I':
+                            case '|':
+                                // no derbyJSON event, but use this branch for error checking
+                                if (!box[team].includes(skater)){
+                                    let priorFoulout = warningData.foulouts.filter(x => 
+                                        (x.period == period && x.jam < jam & x.skater == skater) || 
+                                        (x.period < period && x.skater == skater))
+                                    if (priorFoulout.length > 0){
+                                        sbErrors.lineups.foInBox.events.push(
+                                            `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
+                                        )
+                                    } else {
+                                        sbErrors.lineups.iNotInBox.events.push(
+                                            `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
+                                        )
+                                    }
+                                    warningData.badContinues.push({
+                                        skater: skater,
+                                        team: team,
+                                        period: period,
+                                        jam: jam
+                                    })
                                 }
-                            )
-                            // Remove the skater from the box list.
-                            if (box[team].includes(skater)){
-                                remove(box[team],skater)
+                                break
+                            case '3':
+                            case 3:
+                                // Since '3' does not necessarily mean the jam was called, not enough information
+                                // here to conclusively record a derbyJSON injury event, which specifies that the
+                                // jam was called for injury.   However, save the skater information for error
+                                // checking later.
+                                warningData.lineupThree.push({
+                                    skater: skater,
+                                    team: team,
+                                    period: period,
+                                    jam: jam
+                                })
+                                break
+                            default:
+                            // Handle invalid lineup codes
+                                sbErrors.lineups.badLineupCode.events.push(
+                                    `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}, Code: ${codeText.v}`
+                                )
+                                break
                             }
                             break
+                        case '2019':
+                            // Possible codes - -, +, S, $, 3
 
-                        case 'S':
-                        case 's':
-                            // Add a box entry, with a note that the skater sat between jams.
-                            sbData.periods[pstring].jams[jam-1].events.push(
-                                {
-                                    event: 'enter box',
-                                    skater: skater,
-                                    note: 'Sat between jams'
-                                }
-                            )
+                            // - - Enter box
+                            // + - Enter and exit box
+                            // S - Sat between jams or continued
+                            // $ - Sat between jams or continued with exit
+                            // 3 - Injury object, verify not already present from score tab
 
-                            // ERROR CHECK: Skater starts in the box while already in the box.
-                            if (box[team].includes(skater)){
-                                sbErrors.lineups.startsWhileThere.events.push(
-                                    `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
-                                )
-                            } else {
-                                // Add skater to the box list.
+                            switch (codeText.v){
+                            case '-':
+                                // Add an "Enter Box" event, and push the skater onto the box list
+                                enterBox(pstring, jam, skater)
                                 box[team].push(skater)
-                            }
 
-                            // ERROR CHECK: Skater starts in the box without a penalty
-                            // in the prior or current jam.
-                            if(thisJamPenalties.find(x => x.skater == skater) == undefined
-                                && priorJamPenalties.find(x => x.skater == skater) == undefined){
-                                sbErrors.lineups.sNoPenalty.events.push(
-                                    `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
-                                )
-                                warningData.badStarts.push({
-                                    skater: skater,
-                                    team: team,
-                                    period: period,
-                                    jam: jam
-                                })
-                            }
-                            break
-
-                        case '$':
-                            sbData.periods[pstring].jams[jam-1].events.push(
-                                {
-                                    event: 'enter box',
-                                    skater: skater,
-                                    note: 'Sat between jams'
+                                // ERROR CHECK: Skater enters the box during the jam
+                                // without a penalty in the current jam.
+                                if(thisJamPenalties.find(
+                                    x => x.skater == skater
+                                ) == undefined){
+                                    sbErrors.lineups.dashNoPenalty.events.push(
+                                        `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
+                                    )
                                 }
-                            )
-                            sbData.periods[pstring].jams[jam-1].events.push(
-                                {
-                                    event: 'exit box',
-                                    skater: skater
+                                break
+                            case '+':
+
+                                enterBox(pstring, jam, skater)
+                                exitBox(pstring, jam, skater)
+
+                                // ERROR CHECK: Skater enters the box during the jam
+                                // without a penalty in the current jam.
+                                if(thisJamPenalties.find(
+                                    x => x.skater == skater
+                                ) == undefined){
+                                    sbErrors.lineups.plusNoPenalty.events.push(
+                                        `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
+                                    )
                                 }
-                            )
-                            // ERROR CHECK: Skater starts in the box while already in the box.
-                            if (box[team].includes(skater)){
-                                sbErrors.lineups.startsWhileThere.events.push(
-                                    `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
-                                )
-                                remove(box[team],skater)
-                            } 
 
-                            // ERROR CHECK: Skater starts in the box without a penalty
-                            // in the prior or current jam.
-                            if(thisJamPenalties.find(x => x.skater == skater) == undefined
-                                && priorJamPenalties.find(x => x.skater == skater) == undefined){
-                                sbErrors.lineups.sSlashNoPenalty.events.push(
-                                    `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
-                                )
-                                warningData.badStarts.push({
-                                    skater: skater,
-                                    team: team,
-                                    period: period,
-                                    jam: jam
-                                })
-                            }
+                                break
 
-                            break
-                        case 'I':
-                        case '|':
-                            // no derbyJSON event, but use this branch for error checking
-                            if (!box[team].includes(skater)){
+                            case 'S':
+                            case 's': {
+
+                                // ERROR CHECK: skater who has fouled out starting in box
                                 let priorFoulout = warningData.foulouts.filter(x => 
                                     (x.period == period && x.jam < jam & x.skater == skater) || 
                                     (x.period < period && x.skater == skater))
@@ -1287,37 +1352,97 @@ let readLineups = (workbook) => {
                                     sbErrors.lineups.foInBox.events.push(
                                         `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
                                     )
-                                } else {
-                                    sbErrors.lineups.iNotInBox.events.push(
+                                }
+
+                                if (!box[team].includes(skater)){
+                                // If the skater is not already in the box:
+                                
+                                    // ERROR CHECK: Skater starts in the box without a penalty
+                                    // in the prior or current jam.
+                                    if(thisJamPenalties.find(x => x.skater == skater) == undefined
+                                        && priorJamPenalties.find(x => x.skater == skater) == undefined){
+                                        sbErrors.lineups.sNoPenalty.events.push(
+                                            `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
+                                        )
+                                        warningData.badStarts.push({
+                                            skater: skater,
+                                            team: team,
+                                            period: period,
+                                            jam: jam
+                                        })
+                                    }
+
+                                    // Add a box entry, and add the skater to the box list
+                                    enterBox(pstring, jam, skater, 'Sat Between Jams.')
+                                    box[team].push(skater)
+                                }
+
+                                break
+                            }
+                            case '$': {
+                                // ERROR CHECK: skater who has fouled out starting in box
+                                let priorFoulout = warningData.foulouts.filter(x => 
+                                    (x.period == period && x.jam < jam & x.skater == skater) || 
+                                    (x.period < period && x.skater == skater))
+                                if (priorFoulout.length > 0){
+                                    sbErrors.lineups.foInBox.events.push(
                                         `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
                                     )
                                 }
-                                warningData.badContinues.push({
+
+                                if (!box[team].includes(skater)){
+                                // If the skater is not already in the box:
+                                
+                                    // ERROR CHECK: Skater starts in the box without a penalty
+                                    // in the prior or current jam.
+                                    if(thisJamPenalties.find(x => x.skater == skater) == undefined
+                                        && priorJamPenalties.find(x => x.skater == skater) == undefined){
+                                        sbErrors.lineups.sNoPenalty.events.push(
+                                            `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
+                                        )
+                                        warningData.badStarts.push({
+                                            skater: skater,
+                                            team: team,
+                                            period: period,
+                                            jam: jam
+                                        })
+                                    }
+
+                                    // Add a box entry, and add the skater to the box list
+                                    enterBox(pstring, jam, skater, 'Sat Between Jams.')
+                                    exitBox(pstring, jam, skater)
+                                } else {
+                                    exitBox(pstring, jam, skater)
+                                    remove(box[team],skater)
+                                }
+
+                                break
+                            }
+                            case '3':
+                            case 3:
+                                // Since '3' does not necessarily mean the jam was called, not enough information
+                                // here to conclusively record a derbyJSON injury event, which specifies that the
+                                // jam was called for injury.   However, save the skater information for error
+                                // checking later.
+                                warningData.lineupThree.push({
                                     skater: skater,
                                     team: team,
                                     period: period,
                                     jam: jam
                                 })
+                                break
+                            default:
+                                // Handle invalid lineup codes
+                                sbErrors.lineups.badLineupCode.events.push(
+                                    `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}, Code: ${codeText.v}`
+                                )
+                                break
                             }
                             break
-                        case '3':
-                        case 3:
-                            // Since '3' does not necessarily mean the jam was called, not enough information
-                            // here to conclusively record a derbyJSON injury event, which specifies that the
-                            // jam was called for injury.   However, save the skater information for error
-                            // checking later.
-                            warningData.lineupThree.push({
-                                skater: skater,
-                                team: team,
-                                period: period,
-                                jam: jam
-                            })
-                            break
                         default:
-                        // Handle incorrect lineup codes?
+                        // Handle unrecognized  statsbook versions?
                             break
                         }
-
                     }
                     // Done reading all codes
 
@@ -1723,6 +1848,31 @@ let remove = (array, element) => {
     if (index !== -1) {
         array.splice(index, 1)
     }
+}
+
+let enterBox = (pstring, jam, skater, note) => {
+// Add an 'enter box' event
+    let event = {
+        event: 'enter box',
+        skater: skater
+    }
+
+    if (note !== undefined){
+        event.note = note
+    }
+
+    sbData.periods[pstring].jams[jam-1].events.push(event)
+
+}
+
+let exitBox = (pstring, jam, skater) => {
+// Add an 'exit box' event
+    sbData.periods[pstring].jams[jam-1].events.push(
+        {
+            event: 'exit box',
+            skater: skater
+        }
+    )
 }
 
 let ucFirst = (string) => {
