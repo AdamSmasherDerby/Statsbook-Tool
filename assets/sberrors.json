@@ -196,7 +196,7 @@
         },
         "seatedNotLinedUp":
         {
-            "description": "Previously penalzied skater not on lineup.",
+            "description": "Previously penalized skater not on lineup.",
             "events": [],
             "long": "A skater who was issued a penalty in a prior jam does not appear in the lineup for this jam.  May also indicate a substitution."
         },
