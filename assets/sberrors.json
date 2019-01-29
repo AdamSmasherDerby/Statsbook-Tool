@@ -275,6 +275,12 @@
             "description": "Jam called for injury without a '3' marked on the lineups tab.",
             "events": [],
             "long": "When the jam is called for injury, usually there should be an injured skater marked with a '3' on the lineups tab."
+        },
+        "emptyLineupNoComment":
+        {
+            "description": "Empty box on lineup sheet without an accompanying comment.",
+            "events": [],
+            "long": "An empty box on the lineup sheet could indicate that fewer than a full lineup took the track that jam, that the information is missing, or it could be a data entry error.  Excel comments are a good way to indicate why a box is empty, but are not mandatory."
         }
     }
 }

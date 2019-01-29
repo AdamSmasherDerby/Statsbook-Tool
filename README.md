@@ -80,34 +80,37 @@ Flamingo icon from http://www.iconsmind.com
 ### Release Notes
 
 * 1.0.0 - May 11, 2018
-    * Initial public release
+    * Initial public release.
 * 1.1.0 - May 18, 2018
-    * Export to CRG
-    * Tolerance for lowercase 'sp' and 'x'
-    * Check for negative and zero jam numbers
+    * Export to CRG.
+    * Tolerance for lowercase 'sp' and 'x'.
+    * Check for negative and zero jam numbers.
     * Check for points scored with no lead jammer and lost not checked.
 * 1.1.1 - May 20, 2018
-    * Bugfix for CRG Export option to handle special characters correctly
+    * Bugfix for CRG Export option to handle special characters correctly.
 * 1.1.2 - June 3, 2018
-    * Move Lead / Penalty / Not Lost from errors to warnings
-    * Add check for skaters on SP* lines
-    * Doesn't crash on missing jam numbers
+    * Move Lead / Penalty / Not Lost from errors to warnings.
+    * Add check for skaters on SP* lines.
+    * Doesn't crash on missing jam numbers.
     * Added game clock cells to statsbook template for compatibility with CRG Import Tool.
 * 1.1.3 - June 6, 2018
     * Fixed bug in SP* check.
     * Clarified that Warnings are not necessarily errors.
 * 1.1.4 - June 12, 2018
     * Added keyboard shortcut for exit.
-    * Detects letters entered as jam numbers
-    * Fixed bug in CRG Export introduced in 1.1.1
+    * Detects letters entered as jam numbers.
+    * Fixed bug in CRG Export introduced in 1.1.1.
 * 1.1.5 - June 25, 2018
-    * Fixed bug with reading injuries in lineups
-    * Added tooltips to error list
+    * Fixed bug with reading injuries in lineups.
+    * Added tooltips to error list.
     * Added check for ᚾ in lineups.
-    * Added check for fouled out skater still in box
+    * Added check for fouled out skater still in box.
 * 1.1.6 - October 27, 2018
-    * Added checks for skaters not on IGRF.  (Duplicates conditional formatting from StatsBook.)
-    * Updated dependencies
+    * Added checks for skaters not on IGRF. (Duplicates conditional formatting from StatsBook.)
+    * Updated dependencies.
     * Doesn't crash when checking one period games.
 * 2.0.0 - December 15, 2018
-    * Updated for 2019 Statsbook revision
+    * Updated for 2019 Statsbook revision.
+* 2.0.1 - January 29, 2019
+    * Fixed spelling error in report.
+    * Will warn for blank lineup cells not accompanied by a comment.

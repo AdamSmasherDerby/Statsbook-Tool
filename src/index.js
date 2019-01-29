@@ -1071,10 +1071,21 @@ let readLineups = (workbook) => {
 
                     skaterAddress.c = cells.firstJammer.c + (s * (boxCodes+1))
                     let skaterText = sheet[XLSX.utils.encode_cell(skaterAddress)]
-                    if (skaterText == undefined ||
-                        skaterText == '?' ||
-                        skaterText == 'n/a' ||
-                        skaterText == 'N/A'){continue}
+                    
+                    if (skaterText==undefined || 
+                        (skaterText.v == undefined ||
+                            skaterText.v == '?' || 
+                            skaterText.v== 'n/a' || 
+                            skaterText.v == 'N/A')
+                    ){
+                        if (skaterText == undefined || (skaterText.v == undefined && skaterText.c == undefined)){
+                        // WARNING: Empty box on Lineups without comment
+                            sbErrors.warnings.emptyLineupNoComment.events.push(
+                                `Period: ${period}, Team: ${ucFirst(team)}, Jam: ${jam}, Column: ${s+1}`
+                            )
+                        }
+                        continue
+                    }
 
                     let skater = team + ':' + skaterText.v
 
