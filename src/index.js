@@ -364,6 +364,7 @@ let readScores = (workbook) => {
     let tab = 'score'
     let npRe = /(\d)\+NP/
     let ippRe = /(\d)\+(\d)/
+    let jamNoRe = /^(\d+|SP|SP\*)$/i
 
     for(let period = 1; period < 3; period ++){
     // For each period, import data
@@ -412,6 +413,11 @@ let readScores = (workbook) => {
 
                 // if we're out of jams, stop
                 if (jamNumber == undefined || jamNumber.v == undefined){break}
+
+                // Test for invalid jam number, throw error and stop
+                if (!jamNoRe.test(jamNumber.v)){
+                    throw new Error(`Invalid Jam Number: ${jamNumber.v}`)
+                }
 
                 // handle star passes
                 if (anSP.test(jamNumber.v)) {
@@ -1408,7 +1414,7 @@ let readLineups = (workbook) => {
                                     // in the prior or current jam.
                                     if(thisJamPenalties.find(x => x.skater == skater) == undefined
                                         && priorJamPenalties.find(x => x.skater == skater) == undefined){
-                                        sbErrors.lineups.sNoPenalty.events.push(
+                                        sbErrors.lineups.sSlashNoPenalty.events.push(
                                             `Period: ${pstring}, Jam: ${jam}, Team: ${ucFirst(team)}, Skater: ${skaterText.v}`
                                         )
                                         warningData.badStarts.push({
