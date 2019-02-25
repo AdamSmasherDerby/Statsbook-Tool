@@ -17,7 +17,7 @@
         {
             "description": "No points (including a zero) on first trip, NI box not checked.",
             "events": [],
-            "long": "If the jammer completes their initial pass, they should have points recorded for the first scoring trip, even if that number is zero."
+            "long": "If the jammer completes their initial pass, they should have points recorded for the first scoring trip, even if that number is zero. (Exception: if they pass the star during their first scoring trip.)"
         },
         "tooManyLead":
         {
@@ -162,7 +162,7 @@
         {
             "description": "- marked for player with no corresponding penalty",
             "events": [],
-            "long": "A player was marked as entering the box without a penalty in the same or prior jam on the penalty sheet."
+            "long": "A player was marked as entering the box without a penalty in the same or prior jam on the penalty sheet. (Exception: player in queue for an entire jam.)"
         },
         "sNoPenalty":
         {
