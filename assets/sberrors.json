@@ -166,7 +166,7 @@
         },
         "sNoPenalty":
         {
-            "description": "S marked for player with no penalty in current or prior jam.",
+            "description": "S marked for player with no penalty in current or prior jam. (Possible Substitute)",
             "events": [],
             "long": "A player was marked as starting in the box without a penalty in the current or prior jam.  Could potentially indicate a substitute. (See warnings)"
         },
