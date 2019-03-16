@@ -10,6 +10,7 @@ let holder = document.getElementById('drag-file')
 let fileSelect = document.getElementById('file-select')
 let fileInfoBox = document.getElementById('file-info-box')
 let outBox = document.getElementById('output-box')
+let newVersionWarningBox = document.getElementById('newVersionWarning')
 let refreshButton = {}
 
 // Template Files
@@ -31,6 +32,21 @@ let sbData = {},  // derbyJSON formatted statsbook data
 const teamList = ['home','away']
 let anSP = /^sp\*?$/i
 let mySP = /^sp$/i
+
+// Check for new version
+ipc.on('do-version-check', (event, version) => {
+    let tagURL = 'https://api.github.com/repos/AdamSmasherDerby/Statsbook-Tool/tags'
+    $.getJSON(tagURL, {_: new Date().getTime()})
+        .done(function (json) {
+            let latestVersion = json[0].name
+            version = 'v' + version
+            if (latestVersion != version) {
+                newVersionWarningBox.innerHTML = `New version available: ${latestVersion} (Current Version: ${version})</BR>` +
+                    '<A HREF="https://github.com/AdamSmasherDerby/Statsbook-Tool/releases/" target="_system">Download Here</a>'
+            }
+        })
+        .fail(function () {console.log('Update check not performed: no connection')})
+})
 
 fileSelect.onchange = (e) => {
     // Fires if a file is selected by clicking "select file."

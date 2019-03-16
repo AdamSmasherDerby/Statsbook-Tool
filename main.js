@@ -95,6 +95,16 @@ let createWindow = () => {
         }
     ])
     Menu.setApplicationMenu(menu)
+
+    // Do version check
+    win.webContents.on('did-finish-load', () => {
+        win.webContents.send('do-version-check', app.getVersion())
+    })
+    
+    win.webContents.on('new-window', function(e, url) {
+        e.preventDefault()
+        require('electron').shell.openExternal(url)
+    })
 }
 
 let openAbout = () => {

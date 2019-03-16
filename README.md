@@ -114,9 +114,11 @@ Flamingo icon from http://www.iconsmind.com
 * 2.0.1 - January 29, 2019
     * Fixed spelling error in report.
     * Will warn for blank lineup cells not accompanied by a comment.
-* 2.02 - February 25, 2019
+* 2.0.2 - February 25, 2019
     * Fixed "S without penalty" error when it should have been "$ without penalty."
     * Explicitly checks for valid jam numbers on the score sheet.
     * Updated error message to more explicitly account for substitutes.
     * Updated error message to account for SP during initial scoring trip.
     * Updated error message to account for a skater in queue for an entire jam.
+* 2.1.0 - March 16, 2019
+    * Added check for latest version
