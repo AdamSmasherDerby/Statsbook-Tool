@@ -122,3 +122,5 @@ Flamingo icon from http://www.iconsmind.com
     * Updated error message to account for a skater in queue for an entire jam.
 * 2.1.0 - March 16, 2019
     * Added check for latest version
+* 2.1.1 - March 20, 2019
+    * More robust ignoring of comments

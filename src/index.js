@@ -4,6 +4,7 @@ const XLSX = require('xlsx')
 const moment = require('moment')
 const builder = require('xmlbuilder')
 const uuid = require('uuid/v4')
+const _ = require('lodash')
 
 // Page Elements
 let holder = document.getElementById('drag-file')
@@ -291,11 +292,8 @@ let readTeam = (workbook,team) => {
         skaterNumber = sheet[XLSX.utils.encode_cell(num_address)]
         if (skaterNumber == undefined || skaterNumber.v == undefined) {continue}
 
-        skaterName = ''
         skaterNameObject = sheet[XLSX.utils.encode_cell(name_address)]
-        if (skaterNameObject != undefined && skaterNameObject.v != undefined) {
-            skaterName = skaterNameObject.v
-        }
+        skaterName = (_.get(skaterNameObject,'v') == undefined ? '' : skaterNameObject.v)
         skaterData = {name: skaterName, number: skaterNumber.v}
         sbData.teams[team].persons.push(skaterData)
         penalties[team + ':' + skaterNumber.v] = []
@@ -428,7 +426,7 @@ let readScores = (workbook) => {
                 jamNumber = sheet[XLSX.utils.encode_cell(jamAddress)]
 
                 // if we're out of jams, stop
-                if (jamNumber == undefined || jamNumber.v == undefined){break}
+                if (_.get(jamNumber,'v') == undefined) {break}
 
                 // Test for invalid jam number, throw error and stop
                 if (!jamNoRe.test(jamNumber.v)){
@@ -481,7 +479,7 @@ let readScores = (workbook) => {
 
                 // Check for no initial pass box checked
                 let np = sheet[XLSX.utils.encode_cell(npAddress)]
-                let initialCompleted = (np != undefined && np.v != undefined ? 'no' : 'yes')
+                let initialCompleted = (_.get(np,'v') != undefined ? 'no' : 'yes')
 
                 if(sheet[XLSX.utils.encode_cell(jammerAddress)] != undefined){
                     skaterNum = sheet[XLSX.utils.encode_cell(jammerAddress)].v
@@ -551,7 +549,7 @@ let readScores = (workbook) => {
                         if (initialCompleted == 'yes' && t == 2 && !starPass){
                             let nextJamNumber = sheet[XLSX.utils.encode_cell({
                                 r: jamAddress.r + 1, c: jamAddress.c})]
-                            if(nextJamNumber != undefined && nextJamNumber.v=='SP'){
+                            if(_.get(nextJamNumber,'v') == 'SP'){
                                 sbErrors.warnings.SPNoPointsNoNI.events.push(
                                     `Team: ${ucFirst(team)}, Period: ${period}, Jam: ${jam}, Jammer: ${skaterNum}`
                                 )
@@ -633,7 +631,7 @@ let readScores = (workbook) => {
                 }
                 // Lost Lead
                 let lost = sheet[XLSX.utils.encode_cell(lostAddress)]
-                if (lost != undefined && lost.v != undefined){
+                if (_.get(lost,'v') != undefined){
                     sbData.periods[period].jams[jam-1].events.push(
                         {
                             event: 'lost',
@@ -651,7 +649,7 @@ let readScores = (workbook) => {
                 }
                 // Lead
                 let lead = sheet[XLSX.utils.encode_cell(leadAddress)]
-                if (lead != undefined && lead.v != undefined){
+                if (_.get(lead,'v') != undefined){
                     sbData.periods[period].jams[jam-1].events.push(
                         {
                             event: 'lead',
@@ -661,7 +659,7 @@ let readScores = (workbook) => {
                 }
                 // Call
                 let call = sheet[XLSX.utils.encode_cell(callAddress)]
-                if (call != undefined && call.v != undefined){
+                if (_.get(call,'v') != undefined){
                     sbData.periods[period].jams[jam-1].events.push(
                         {
                             event: 'call',
@@ -671,7 +669,7 @@ let readScores = (workbook) => {
                 }
                 // Injury
                 let inj = sheet[XLSX.utils.encode_cell(injAddress)]
-                if (inj != undefined && inj.v != undefined){
+                if (_.get(inj,'v') != undefined){
 
                     warningData.jamsCalledInjury.push(
                         {
@@ -838,10 +836,13 @@ let readPenalties = (workbook) => {
                     let codeText = sheet[XLSX.utils.encode_cell(penaltyAddress)]
                     let jamText = sheet[XLSX.utils.encode_cell(jamAddress)]
 
-                    if(codeText == undefined || jamText == undefined){
+                    let code = _.get(codeText,'v')
+                    let jam = _.get(jamText,'v')
+
+                    if(code == undefined || jam == undefined){
                         // Error Check - penalty code without jam # or vice versa
 
-                        if(codeText == undefined && jamText == undefined){
+                        if(code == undefined && jam == undefined){
                             continue
                         } else {
                             sbErrors.penalties.codeNoJam.events.push(
@@ -850,9 +851,6 @@ let readPenalties = (workbook) => {
                             continue
                         }
                     }
-
-                    let code = codeText.v,
-                        jam = jamText.v
 
                     if(jam > sbData.periods[period].jams.length || jam - 1 < 0 || typeof(jam) != 'number'){
                         // Error Check - jam number out of range
@@ -1054,7 +1052,7 @@ let readLineups = (workbook) => {
                         continue
                     }
 
-                    if (noPivot == undefined || noPivot.v == undefined){
+                    if (_.get(noPivot,'v') == undefined){
                         // Error check: Star Pass line without "No Pivot" box checked.
     
                         sbErrors.lineups.starPassNoPivot.events.push(
