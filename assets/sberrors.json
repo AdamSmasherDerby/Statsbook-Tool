@@ -124,6 +124,12 @@
             "description": "Penalty code without jam number, or jam number without penalty.",
             "events": [],
             "long": "On the penalty sheet, either a penalty code was entered without a jam number, or a jam number was entered without a penalty code."
+        },
+        "foBadJam":
+        {
+            "description": "Foulout or expulsion entered for bad jam number. (Out of range, or just not a number)",
+            "events": [],
+            "long": "A foulout or expulsion was entered with a jam number higher than the maximum jam on the score sheet, or with an invalid number."
         }
     },
     "lineups":

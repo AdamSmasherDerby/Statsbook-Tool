@@ -875,6 +875,8 @@ let readPenalties = (workbook) => {
                 // Check for FO or EXP, add events
                 let foCode = sheet[XLSX.utils.encode_cell(foAddress)]
                 let foJam = sheet[XLSX.utils.encode_cell(foJamAddress)]
+                let code = _.get(foCode,'v')
+                let jam = _.get(foJam,'v')
 
                 if(foCode==undefined || foJam==undefined){
 
@@ -898,17 +900,26 @@ let readPenalties = (workbook) => {
                     continue
                 }
 
-                // If there is a FO or expulsion, add an event
+                if(typeof(jam) != 'number' ||
+                    jam > sbData.periods[period].jams.length || 
+                    jam - 1 < 0){
+                    sbErrors.penalties.foBadJam.events.push(
+                        `Team: ${ucFirst(team)}, Skater: ${skaterNum.v}, Period: ${period}, Recorded Jam: ${jam}`
+                    )
+                    continue
+                }
+
+                // If there is expulsion, add an event.
                 // Note that derbyJSON doesn't actually record foul-outs,
                 // so only expulsions are recorded.
-                if (foCode.v != 'FO'){
-                    sbData.periods[period].jams[foJam.v -1].events.push(
+                if (code != 'FO'){
+                    sbData.periods[period].jams[jam - 1].events.push(
                         {
                             event: 'expulsion',
                             skater: skater,
                             notes: [
-                                {note: 'Penalty: ' + foCode.v},
-                                {note: 'Jam: ' + foJam.v}
+                                {note: 'Penalty: ' + code},
+                                {note: 'Jam: ' + jam}
                             ]
                         }
                     )
@@ -916,7 +927,7 @@ let readPenalties = (workbook) => {
                         {skater: skater,
                             team: team,
                             period: period,
-                            jam: foJam.v}
+                            jam: jam}
                     )
 
                     // ERROR CHECK: Expulsion code for a jam with no penalty
@@ -930,6 +941,7 @@ let readPenalties = (workbook) => {
 
                 }
 
+                // If there is a foul-out, add an event.
                 if (foCode.v == 'FO'){
                     foulouts.push(skater)
                     warningData.foulouts.push(
