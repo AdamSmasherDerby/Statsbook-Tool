@@ -1812,6 +1812,7 @@ let sbErrorsToTable = () => {
 
         table.appendChild(secHead)
         let noErrors = true
+        // TODO - Add Tip Icon
 
         for(let e in sbErrors[errorTypes[t]]){
             // For each error in the type
@@ -1823,10 +1824,13 @@ let sbErrorsToTable = () => {
             let descRow = document.createElement('tr')
             let descCell = document.createElement('th')
             descCell.appendChild(document.createTextNode(
-                sbErrors[section][e].description
+                `${sbErrors[section][e].description} `
             ))
             descCell.setAttribute('data-toggle','tooltip')
             descCell.setAttribute('title',sbErrors[section][e].long)
+            let icon = document.createElement('i')
+            icon.setAttribute('class','fa fa-info-circle')
+            descCell.appendChild(icon)
             descRow.appendChild(descCell)
             descRow.setAttribute('class','thead-light')
 

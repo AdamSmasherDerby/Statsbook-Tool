@@ -111,11 +111,11 @@
         {
             "description": "Penalty on penalty sheet without box entry on Lineups Tab",
             "events": [],
-            "long": "A skater was listed as having a penalty without a corresponding box entry code on the Lineups tab.  Can occasionally indicate a substitution. (See warnings)"
+            "long": "A skater was listed as having a penalty without a corresponding box entry code on the Lineups tab.  Can occasionally indicate a substitution or long service. (See warnings)"
         },
         "penaltyBadJam":
         {
-            "description": "Penalty entered for bad jam number. (Out of range, or just not a number)",
+            "description": "Penalty entered for bad jam number. (Out of range, or not a number)",
             "events": [],
             "long": "A penalty was entered with a jam number higher than the maximum jam on the score sheet."
         },
@@ -127,7 +127,7 @@
         },
         "foBadJam":
         {
-            "description": "Foulout or expulsion entered for bad jam number. (Out of range, or just not a number)",
+            "description": "Foulout or expulsion entered for bad jam number. (Out of range, or not a number)",
             "events": [],
             "long": "A foulout or expulsion was entered with a jam number higher than the maximum jam on the score sheet, or with an invalid number."
         }
