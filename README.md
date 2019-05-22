@@ -124,6 +124,7 @@ Flamingo icon from http://www.iconsmind.com
     * Added check for latest version
 * 2.1.1 - March 20, 2019
     * More robust ignoring of comments
-* 2.1.2 - 
+* 2.1.2 - May 22, 2019
     * Checks for valid jam numbers for foulouts or expulsions.
     * Added icon to draw attention to explanatory tooltips.
+    * Adds the ability to copy text from the error report.
