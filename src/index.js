@@ -5,6 +5,8 @@ const moment = require('moment')
 const builder = require('xmlbuilder')
 const uuid = require('uuid/v4')
 const _ = require('lodash')
+const { remote } = require('electron')
+const { Menu, MenuItem } = remote
 
 // Page Elements
 let holder = document.getElementById('drag-file')
@@ -13,6 +15,15 @@ let fileInfoBox = document.getElementById('file-info-box')
 let outBox = document.getElementById('output-box')
 let newVersionWarningBox = document.getElementById('newVersionWarning')
 let refreshButton = {}
+
+const menu = new Menu()
+menu.append( new MenuItem( { role: 'copy'} ))
+menu.append( new MenuItem( { role: 'selectAll'} ))
+
+window.addEventListener('contextmenu', (e) => {
+    e.preventDefault()
+    menu.popup( { window: remote.getCurrentWindow() })
+}, false)
 
 // Template Files
 let template2018 = require('../assets/2018statsbook.json')
