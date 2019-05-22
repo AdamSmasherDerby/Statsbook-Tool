@@ -183,7 +183,6 @@ let getVersion = (workbook) => {
     let defaultVersion = '2018'
     let sheet = workbook.Sheets['Read Me']
     let versionText = (sheet ? sheet['A3'].v : defaultVersion)
-    //let versionText = cellValue(workbook, [0, 'A3'])
     let versionRe = /(\d){4}/
     sbVersion = versionRe.exec(versionText)[0]
 

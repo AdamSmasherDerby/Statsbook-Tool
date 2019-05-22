@@ -77,6 +77,26 @@ let createWindow = () => {
             ]
         },
         {
+            label: 'Edit',
+            submenu: [
+                {
+                    label: 'Copy',
+                    accelerator: 'CmdOrCtrl+C',
+                    selector: 'Copy'
+                },
+                {
+                    label: 'Paste',
+                    accelerator: 'CmdOrCtrl+V',
+                    selector: 'paste'
+                },
+                {
+                    label: 'Select All',
+                    accelerator: 'CmdOrCtrl+A',
+                    selector: 'selectAll'
+                }
+            ]
+        },
+        {
             label: 'Help',
             submenu: [
                 {
