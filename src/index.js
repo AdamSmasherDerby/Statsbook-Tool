@@ -439,7 +439,7 @@ let readScores = (workbook) => {
                 if (_.get(jamNumber,'v') == undefined) {break}
 
                 // Test for invalid jam number, throw error and stop
-                if (!jamNoRe.test(jamNumber.v)){
+                if (!jamNoRe.test(_.trim(jamNumber.v))){
                     throw new Error(`Invalid Jam Number: ${jamNumber.v}`)
                 }
 

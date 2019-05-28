@@ -128,3 +128,5 @@ Flamingo icon from http://www.iconsmind.com
     * Checks for valid jam numbers for foulouts or expulsions.
     * Added icon to draw attention to explanatory tooltips.
     * Adds the ability to copy text from the error report.
+* 2.1.3 - 
+    * Doesn't crash on spaces after star pass entries.
