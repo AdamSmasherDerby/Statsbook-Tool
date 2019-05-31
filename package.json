@@ -58,11 +58,13 @@
       ]
     },
     "win": {
-      "target": "NSIS",
-      "arch": [
-        "x64",
-        "ia32"
-      ],
+      "target": {
+        "target": "NSIS",
+        "arch": [
+          "x64",
+          "ia32"
+        ]
+      },
       "icon": "build/flamingo-white.ico"
     },
     "nsis": {
