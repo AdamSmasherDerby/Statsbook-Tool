@@ -129,4 +129,5 @@ Flamingo icon from http://www.iconsmind.com
     * Added icon to draw attention to explanatory tooltips.
     * Adds the ability to copy text from the error report.
 * 2.1.3 - 
-    * Doesn't crash on spaces after star pass entries.
+    * Doesn't crash on spaces after "SP" or "SP*" entries.
+    * Fixed appearance of "refresh" button.

@@ -180,7 +180,7 @@ let updateFileInfo = () => {
 
 let createRefreshButton = () => {
 
-    fileInfoBox.innerHTML += '<button id="refresh" type="button" class="btn btn-sm">Refresh</button>'
+    fileInfoBox.innerHTML += '<button id="refresh" type="button" class="btn btn-secondary btn-sm">Refresh</button>'
     refreshButton = document.getElementById('refresh')
 
     refreshButton.onclick = () => {
