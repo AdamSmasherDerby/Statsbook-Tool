@@ -421,6 +421,8 @@ let readScores = (workbook) => {
             // For each line in the scoresheet, import data.
 
                 let blankTrip = false
+                let isLost = false
+                let isLead = false
 
                 // increment addresses
                 jamAddress.r = cells.firstJamNumber.r + l
@@ -642,6 +644,7 @@ let readScores = (workbook) => {
                 // Lost Lead
                 let lost = sheet[XLSX.utils.encode_cell(lostAddress)]
                 if (_.get(lost,'v') != undefined){
+                    isLost = true
                     sbData.periods[period].jams[jam-1].events.push(
                         {
                             event: 'lost',
@@ -660,6 +663,7 @@ let readScores = (workbook) => {
                 // Lead
                 let lead = sheet[XLSX.utils.encode_cell(leadAddress)]
                 if (_.get(lead,'v') != undefined){
+                    isLead = true
                     sbData.periods[period].jams[jam-1].events.push(
                         {
                             event: 'lead',
@@ -687,6 +691,13 @@ let readScores = (workbook) => {
                             period: period,
                             jam: jam
                         }
+                    )
+                }
+
+                // Error check - SP and lead without lost
+                if (mySP.test(jamNumber.v) && isLead && !isLost) {
+                    sbErrors.scores.spLeadNoLost.events.push(
+                        `Period: ${period}, Team: ${ucFirst(team)}, Jam: ${jam}`
                     )
                 }
             }

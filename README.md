@@ -131,3 +131,4 @@ Flamingo icon from http://www.iconsmind.com
 * 2.1.3 - 
     * Doesn't crash on spaces after "SP" or "SP*" entries.
     * Fixed appearance of "refresh" button.
+    * Added check for "SP" and "Lead" without "Lost".

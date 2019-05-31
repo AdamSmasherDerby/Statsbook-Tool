@@ -72,6 +72,12 @@
             "description": "Points scored with no lead jammer and without lost for scoring team",
             "events": [],
             "long": "For a jammer to reach a scoring trip, it must always be the case that they are lead, their opponent is lead, or they have lost lead."
+        },
+        "spLeadNoLost":
+        {
+            "description": "SP marked for a lead jammer without lost indicated.",
+            "events": [],
+            "long": "A lead jammer who passes the star always loses lead, so SP and 'lead' together must be accompanied by 'lost'."
         }
 
     },
