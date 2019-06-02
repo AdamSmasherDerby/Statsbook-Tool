@@ -71,7 +71,7 @@
         {
             "description": "Points scored with no lead jammer and without lost for scoring team",
             "events": [],
-            "long": "For a jammer to reach a scoring trip, it must always be the case that they are lead, their opponent is lead, or they have lost lead."
+            "long": "For a jammer to reach a scoring trip, it must always be the case that they were awarded lead, their opponent was awarded lead, or they have lost lead."
         },
         "spLeadNoLost":
         {
