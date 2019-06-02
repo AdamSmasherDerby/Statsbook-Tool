@@ -7,6 +7,7 @@ const uuid = require('uuid/v4')
 const _ = require('lodash')
 const { remote } = require('electron')
 const { Menu, MenuItem } = remote
+const mousetrap = require('mousetrap')
 
 // Page Elements
 let holder = document.getElementById('drag-file')
@@ -180,12 +181,16 @@ let updateFileInfo = () => {
 
 let createRefreshButton = () => {
 
-    fileInfoBox.innerHTML += '<button id="refresh" type="button" class="btn btn-secondary btn-sm">Refresh</button>'
+    fileInfoBox.innerHTML += '<button id="refresh" type="button" class="btn btn-secondary btn-sm">Refresh (f5)</button>'
     refreshButton = document.getElementById('refresh')
 
     refreshButton.onclick = () => {
         makeReader(sbFile)
     }
+
+    mousetrap.bind('f5', () => {
+        makeReader(sbFile)
+    })
 }
 
 let getVersion = (workbook) => {
