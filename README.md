@@ -20,8 +20,8 @@ https://github.com/AdamSmasherDerby/Statsbook-Tool/releases
 
 ### Scores:
 
-1. NP checked with points.
-2. No points (including a zero) entered, but NP *not* checked.
+1. NI checked with points.
+2. No points (including a zero) entered, but NI *not* checked.
 3. "Lead" checked for both jammers.
 4. "Call" checked for both jammers.
 5. "Injury" checked on one team but not the other.
@@ -32,6 +32,7 @@ https://github.com/AdamSmasherDerby/Statsbook-Tool/releases
 10. SP* with jammer number entered.
 11. Points scored with no lead jammer and 'lost' not recorded for the scoring team.
 12. Jammer not on IGRF.
+13. SP and "lead" without "lost."
 
 ### Penalties:
 
@@ -40,6 +41,7 @@ https://github.com/AdamSmasherDerby/Statsbook-Tool/releases
 3. Expulsion code entered for jam with no penalty.
 4. Penalty code without jam number, or jam number without penalty.
 5. Skater not on IGRF.
+6. Invalid jam number on penalty sheet.
 
 ### Lineups:
 
@@ -52,6 +54,7 @@ https://github.com/AdamSmasherDerby/Statsbook-Tool/releases
 7. Skaters entered on lines beginning with "SP*".
 8. "ᚾ" entered instead of "X". (2018 and earlier)
 9. "I" or "|" in lineups without the player being in the box already. (2018 and earlier)
+10. Star pass recorded for a lineup with no pivot.
 
 ### Lineups + Penalties:
 
@@ -74,6 +77,7 @@ https://github.com/AdamSmasherDerby/Statsbook-Tool/releases
 5. Missing data from IGRF
 6. Jam called for injury checked without a corresponding "3" on the lineups tab.
 7. Jammers with lead and a penalty, but not marked "lost."
+8. Empty box on the lineup sheet without an accompanying comment.
 
 Flamingo icon from http://www.iconsmind.com
 

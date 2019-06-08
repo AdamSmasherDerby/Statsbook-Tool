@@ -3,7 +3,7 @@
     {
         "scoresNotOnIGRF":
         {
-            "description": "Skater on score sheet is not on IGRF.",
+            "description": "Jammer on score sheet is not on IGRF.",
             "events": [],
             "long": "A jammer on the score sheet was not listed on the IGRF page.  Should also be higlighted red in the StatsBook."
         },
