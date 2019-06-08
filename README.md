@@ -78,6 +78,7 @@ https://github.com/AdamSmasherDerby/Statsbook-Tool/releases
 6. Jam called for injury checked without a corresponding "3" on the lineups tab.
 7. Jammers with lead and a penalty, but not marked "lost."
 8. Empty box on the lineup sheet without an accompanying comment.
+9. Check for out of date statsbook file version.
 
 Flamingo icon from http://www.iconsmind.com
 
@@ -132,7 +133,8 @@ Flamingo icon from http://www.iconsmind.com
     * Checks for valid jam numbers for foulouts or expulsions.
     * Added icon to draw attention to explanatory tooltips.
     * Adds the ability to copy text from the error report.
-* 2.1.3 - 
+* 2.1.3 - June 7, 2019
     * Doesn't crash on spaces after "SP" or "SP*" entries.
     * Fixed appearance of "refresh" button.
     * Added check for "SP" and "Lead" without "Lost".
+    * Added warning for out of date statsbook file version.

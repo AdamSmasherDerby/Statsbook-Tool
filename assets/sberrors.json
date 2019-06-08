@@ -293,6 +293,12 @@
             "description": "Empty box on lineup sheet without an accompanying comment.",
             "events": [],
             "long": "An empty box on the lineup sheet could indicate that fewer than a full lineup took the track that jam, that the information is missing, or it could be a data entry error.  Excel comments are a good way to indicate why a box is empty, but are not mandatory."
+        },
+        "oldStatsbookVersion":
+        {
+            "description": "Out of date statsbook file version.",
+            "events": [],
+            "long": "The version of the .xlsx file used to enter this statsbook is not the most current. If you are using codes from a different year than the file, the checker may throw odd errors."
         }
     }
 }

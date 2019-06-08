@@ -196,6 +196,7 @@ let createRefreshButton = () => {
 let getVersion = (workbook) => {
     // Determine version of Statsbook file.
 
+    let currentVersion = '2019'
     let defaultVersion = '2018'
     let sheet = workbook.Sheets['Read Me']
     let versionText = (sheet ? sheet['A3'].v : defaultVersion)
@@ -214,6 +215,12 @@ let getVersion = (workbook) => {
         sbTemplate = {}
     }
 
+    // Warning check: outdated statsbook version
+    if (sbVersion != currentVersion){
+        sbErrors.warnings.oldStatsbookVersion.events.push(
+            `This File: ${sbVersion}  Current Version: ${currentVersion} `
+        )
+    }
 }
 
 let readIGRF = (workbook) => {
