@@ -450,7 +450,10 @@ let readScores = (workbook) => {
                 jamNumber = sheet[XLSX.utils.encode_cell(jamAddress)]
 
                 // if we're out of jams, stop
-                if (_.get(jamNumber,'v') == undefined) {break}
+                if (
+                    _.get(jamNumber,'v') == undefined ||
+                    /^\s+$/.test(jamNumber.v)
+                ) { break }
 
                 // Test for invalid jam number, throw error and stop
                 if (!jamNoRe.test(_.trim(jamNumber.v))){
@@ -1067,7 +1070,9 @@ let readLineups = (workbook) => {
                 let jamText = sheet[XLSX.utils.encode_cell(jamNumberAddress)]
                 let noPivot = sheet[XLSX.utils.encode_cell(noPivotAddress)]
 
-                if (jamText == undefined || jamText.v == '') {continue}
+                if (jamText == undefined || 
+                    jamText.v == '' ||
+                    /^\s+$/.test(jamText.v)) {continue}
                 // If there is no jam number, go on to the next line.
                 // TODO - maybe change this to not give up if the jam # is blank?
 
