@@ -1989,9 +1989,7 @@ holder.ondragend = () => {
 ipc.on('save-derby-json', () => {
     // Saves statsbook data to a JSON file
 
-    let data = encode( JSON.stringify(sbData, null, ' '))
-
-    let blob = new Blob( [ data ], { type: 'application/json' });
+    let blob = new Blob( [ JSON.stringify(sbData, null, ' ') ], { type: 'application/json' });
 
     download(blob, sbFilename.split('.')[0] + '.json');
 })
@@ -2012,8 +2010,7 @@ ipc.on('export-crg-roster-json', () => {
     const teams = extractTeamsFromSBData(sbData, teamList);
     const json = exportJsonRoster(teams);
 
-    const data = encode(JSON.stringify(json, null, ' '));
-    const blob = new Blob( [data], { type: 'application/json' });
+    const blob = new Blob( [JSON.stringify(json, null, ' ')], { type: 'application/json' });
     download(blob, sbFilename.split('.')[0] + '.xml');
 });
 
@@ -2024,6 +2021,7 @@ let encode = (s) => {
     }
     return new Uint16Array( out )
 }
+
 
 window.onerror = (msg, url, lineNo, columnNo) => {
     ipc.send('error-thrown', msg, url, lineNo, columnNo)
