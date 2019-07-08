@@ -10,7 +10,14 @@ function generateSkaterId(teamId, skaterName) {
 
 function extractTeamsFromSBData(sbData, teamList) {
     return teamList.map(function(t) {
-        const teamName = `${sbData.teams[t].league || ''} ${sbData.teams[t].name}`;
+        let teamName;
+        
+        if(sbData.teams[t].league) {
+            teamName = `${sbData.teams[t].league} ${sbData.teams[t].name}`;
+        } else {
+            teamName = sbData.teams[t].name;
+        }
+
         const team = {
             id: teamName,
             name: teamName,
