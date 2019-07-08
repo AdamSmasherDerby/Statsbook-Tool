@@ -8,8 +8,11 @@ const { remote } = require('electron')
 const { Menu, MenuItem } = remote
 const mousetrap = require('mousetrap')
 
+const download = require('./tools/download');
+
 const { extractTeamsFromSBData } = require('./crg/crgtools');
 const exportXml = require('./crg/exportXml');
+const exportJsonRoster = require('./crg/exportJson');
 
 // Page Elements
 let holder = document.getElementById('drag-file')
@@ -1988,18 +1991,9 @@ ipc.on('save-derby-json', () => {
 
     let data = encode( JSON.stringify(sbData, null, ' '))
 
-    let blob = new Blob( [ data ], {
-        type: 'application/octet-stream'
-    })
+    let blob = new Blob( [ data ], { type: 'application/json' });
 
-    let url = URL.createObjectURL( blob )
-    let link = document.createElement( 'a' )
-    link.setAttribute( 'href', url )
-    link.setAttribute( 'download', sbFilename.split('.')[0] + '.json')
-
-    let e = document.createEvent( 'MouseEvents' )
-    e.initMouseEvent( 'click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null)
-    link.dispatchEvent( e )
+    download(blob, sbFilename.split('.')[0] + '.json');
 })
 
 ipc.on('export-crg-roster', () => {
@@ -2008,21 +2002,20 @@ ipc.on('export-crg-roster', () => {
     const teams = extractTeamsFromSBData(sbData, teamList);
     const xml = exportXml(teams);
 
-    let data = encode(xml.end({pretty: true}))
-
-    let blob = new Blob( [data], { type: 'text/xml'})
-
-    let url = URL.createObjectURL( blob )
-    let link = document.createElement( 'a' )
-    link.setAttribute( 'href', url )
-    link.setAttribute( 'download', sbFilename.split('.')[0] + '.xml')
-
-    let e = document.createEvent( 'MouseEvents' )
-    e.initMouseEvent( 'click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null)
-    link.dispatchEvent( e )
-
-
+    const data = encode(xml.end({pretty: true}))
+    const blob = new Blob( [data], { type: 'text/xml'})
+    download(blob, sbFilename.split('.')[0] + '.xml');
 })
+
+ipc.on('export-crg-roster-json', () => {
+    // Exports statsbook rosters in CRG Scoreboard's Beta JSON Format
+    const teams = extractTeamsFromSBData(sbData, teamList);
+    const json = exportJsonRoster(teams);
+
+    const data = encode(JSON.stringify(json, null, ' '));
+    const blob = new Blob( [data], { type: 'application/json' });
+    download(blob, sbFilename.split('.')[0] + '.xml');
+});
 
 let encode = (s) => {
     var out = []
