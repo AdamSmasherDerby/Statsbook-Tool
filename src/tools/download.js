@@ -11,4 +11,4 @@ function download(data, filename) {
     link.dispatchEvent( e )
 }
 
-module.exports = download;
+module.exports = download

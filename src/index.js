@@ -2,17 +2,16 @@ const electron = require('electron')
 const ipc = electron.ipcRenderer
 const XLSX = require('xlsx')
 const moment = require('moment')
-const builder = require('xmlbuilder')
 const _ = require('lodash')
 const { remote } = require('electron')
 const { Menu, MenuItem } = remote
 const mousetrap = require('mousetrap')
 
-const download = require('./tools/download');
+const download = require('./tools/download')
 
-const { extractTeamsFromSBData } = require('./crg/crgtools');
-const exportXml = require('./crg/exportXml');
-const exportJsonRoster = require('./crg/exportJson');
+const { extractTeamsFromSBData } = require('./crg/crgtools')
+const exportXml = require('./crg/exportXml')
+const exportJsonRoster = require('./crg/exportJson')
 
 // Page Elements
 let holder = document.getElementById('drag-file')
@@ -1989,30 +1988,30 @@ holder.ondragend = () => {
 ipc.on('save-derby-json', () => {
     // Saves statsbook data to a JSON file
 
-    let blob = new Blob( [ JSON.stringify(sbData, null, ' ') ], { type: 'application/json' });
+    let blob = new Blob( [ JSON.stringify(sbData, null, ' ') ], { type: 'application/json' })
 
-    download(blob, sbFilename.split('.')[0] + '.json');
+    download(blob, sbFilename.split('.')[0] + '.json')
 })
 
 ipc.on('export-crg-roster', () => {
     // Exports statsbook rosters in CRG Scoreboard XML Format
 
-    const teams = extractTeamsFromSBData(sbData, teamList);
-    const xml = exportXml(teams);
+    const teams = extractTeamsFromSBData(sbData, teamList)
+    const xml = exportXml(teams)
 
     const data = encode(xml.end({pretty: true}))
     const blob = new Blob( [data], { type: 'text/xml'})
-    download(blob, sbFilename.split('.')[0] + '.xml');
+    download(blob, sbFilename.split('.')[0] + '.xml')
 })
 
 ipc.on('export-crg-roster-json', () => {
     // Exports statsbook rosters in CRG Scoreboard's Beta JSON Format
-    const teams = extractTeamsFromSBData(sbData, teamList);
-    const json = exportJsonRoster(teams);
+    const teams = extractTeamsFromSBData(sbData, teamList)
+    const json = exportJsonRoster(teams)
 
-    const blob = new Blob( [JSON.stringify(json, null, ' ')], { type: 'application/json' });
-    download(blob, sbFilename.split('.')[0] + '.json');
-});
+    const blob = new Blob( [JSON.stringify(json, null, ' ')], { type: 'application/json' })
+    download(blob, sbFilename.split('.')[0] + '.json')
+})
 
 let encode = (s) => {
     var out = []
