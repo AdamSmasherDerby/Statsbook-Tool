@@ -2011,7 +2011,7 @@ ipc.on('export-crg-roster-json', () => {
     const json = exportJsonRoster(teams);
 
     const blob = new Blob( [JSON.stringify(json, null, ' ')], { type: 'application/json' });
-    download(blob, sbFilename.split('.')[0] + '.xml');
+    download(blob, sbFilename.split('.')[0] + '.json');
 });
 
 let encode = (s) => {
