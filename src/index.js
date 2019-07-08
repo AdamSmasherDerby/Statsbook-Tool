@@ -3,11 +3,13 @@ const ipc = electron.ipcRenderer
 const XLSX = require('xlsx')
 const moment = require('moment')
 const builder = require('xmlbuilder')
-const uuid = require('uuid/v4')
 const _ = require('lodash')
 const { remote } = require('electron')
 const { Menu, MenuItem } = remote
 const mousetrap = require('mousetrap')
+
+const { extractTeamsFromSBData } = require('./crg/crgtools');
+const exportXml = require('./crg/exportXml');
 
 // Page Elements
 let holder = document.getElementById('drag-file')
@@ -2003,44 +2005,10 @@ ipc.on('save-derby-json', () => {
 ipc.on('export-crg-roster', () => {
     // Exports statsbook rosters in CRG Scoreboard XML Format
 
-    let root = builder.create('document', {encoding: 'UTF-16'})
+    const teams = extractTeamsFromSBData(sbData, teamList);
+    const xml = exportXml(teams);
 
-    let teams = root.ele('Teams')
-
-    // Cargo cult boilerpplate - I don't know what this part is for,
-    // but it's in the original, so I'm leaving it in.
-    teams.ele('Reset ')
-    let transfer = teams.ele('Transfer')
-    let to = transfer.ele('To')
-    to.ele('Team1 ')
-    to.ele('Team2 ')
-    let from = transfer.ele('From')
-    from.ele('Team1 ')
-    from.ele('Team2')
-    let merge = teams.ele('Merge')
-    to = merge.ele('To')
-    to.ele('Team1 ')
-    to.ele('Team2 ')
-    from = merge.ele('From')
-    from.ele('Team1 ')
-    from.ele('Team2 ')
-
-    for (let t in teamList){
-        let teamElement = teams.ele('Team', 
-            {'Id': `${sbData.teams[teamList[t]].league} ${sbData.teams[teamList[t]].name}`})
-        teamElement.ele('Name').dat(`${sbData.teams[teamList[t]].league} ${sbData.teams[teamList[t]].name}`)
-        teamElement.ele('Logo ')
-        for (let s in sbData.teams[teamList[t]].persons){
-            let skater = teamElement.ele('Skater',
-                {'Id': uuid()})
-            skater.ele('Name').dat(sbData.teams[teamList[t]].persons[s].name)
-            skater.ele('Number').dat(sbData.teams[teamList[t]].persons[s].number)
-            skater.ele('Flags', {'empty': 'true'}).dat('')
-        }
-    }
-
-
-    let data = encode(root.end({pretty: true}))
+    let data = encode(xml.end({pretty: true}))
 
     let blob = new Blob( [data], { type: 'text/xml'})
 
