@@ -178,8 +178,8 @@ let updateFileInfo = () => {
     fileInfoBox.innerHTML = `<strong>Filename:</strong>  ${sbFilename}<br>`
     fileInfoBox.innerHTML += `<strong>SB Version:</strong> ${sbVersion}<br>`
     fileInfoBox.innerHTML += `<strong>Game Date:</strong> ${moment(sbData.date).format('MMMM DD, YYYY')}<br>`
-    fileInfoBox.innerHTML += `<strong>Team 1:</strong> ${sbData.teams['home'].league} ${sbData.teams['home'].name}<br>`
-    fileInfoBox.innerHTML += `<strong>Team 2:</strong> ${sbData.teams['away'].league} ${sbData.teams['away'].name}<br>`
+    fileInfoBox.innerHTML += `<strong>Team 1:</strong> ${sbData.teams['home'].league || ''} ${sbData.teams['home'].name}<br>`
+    fileInfoBox.innerHTML += `<strong>Team 2:</strong> ${sbData.teams['away'].league || ''} ${sbData.teams['away'].name}<br>`
     fileInfoBox.innerHTML += `<strong>File Read:</strong> ${moment().format('HH:mm:ss MMM DD, YYYY')} `
 }
 
