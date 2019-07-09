@@ -776,7 +776,7 @@ let readScores = (workbook) => {
                         x => x.event == 'lost' && x.skater.substr(0,4) == teamList[t]
                     )
                     let scoreTrip = sbData.periods[period].jams[j].events.find(
-                        x => x.event == 'pass' & x.team == teamList[t] & x.number > 1
+                        x => x.event == 'pass' && x.team == teamList[t] && x.number > 1
                     )
                     if (scoreTrip != undefined && isLost == undefined){
                         sbErrors.scores.pointsNoLeadNoLost.events.push(
@@ -1344,7 +1344,7 @@ let readLineups = (workbook) => {
                                 // no derbyJSON event, but use this branch for error checking
                                 if (!box[team].includes(skater)){
                                     let priorFoulout = warningData.foulouts.filter(x => 
-                                        (x.period == period && x.jam < jam & x.skater == skater) || 
+                                        (x.period == period && x.jam < jam && x.skater == skater) || 
                                         (x.period < period && x.skater == skater))
                                     if (priorFoulout.length > 0){
                                         sbErrors.lineups.foInBox.events.push(
@@ -1431,7 +1431,7 @@ let readLineups = (workbook) => {
 
                                 // ERROR CHECK: skater who has fouled out starting in box
                                 let priorFoulout = warningData.foulouts.filter(x => 
-                                    (x.period == period && x.jam < jam & x.skater == skater) || 
+                                    (x.period == period && x.jam < jam && x.skater == skater) || 
                                     (x.period < period && x.skater == skater))
                                 if (priorFoulout.length > 0){
                                     sbErrors.lineups.foInBox.events.push(
@@ -1467,7 +1467,7 @@ let readLineups = (workbook) => {
                             case '$': {
                                 // ERROR CHECK: skater who has fouled out starting in box
                                 let priorFoulout = warningData.foulouts.filter(x => 
-                                    (x.period == period && x.jam < jam & x.skater == skater) || 
+                                    (x.period == period && x.jam < jam && x.skater == skater) || 
                                     (x.period < period && x.skater == skater))
                                 if (priorFoulout.length > 0){
                                     sbErrors.lineups.foInBox.events.push(
@@ -1553,7 +1553,7 @@ let readLineups = (workbook) => {
                 // Done reading line
 
                 // Remove fouled out or expelled skaters from the box
-                let fouledOutSkaters = warningData.foulouts.filter(x => x.period == period && x.jam == jam & x.team == team)
+                let fouledOutSkaters = warningData.foulouts.filter(x => x.period == period && x.jam == jam && x.team == team)
                 if(fouledOutSkaters != undefined) {
                     for(let s in fouledOutSkaters) {
                         let skater = fouledOutSkaters[s].skater
@@ -1562,7 +1562,7 @@ let readLineups = (workbook) => {
                         }
                     }
                 }
-                let expelledSkaters = warningData.expulsions.filter(x => x.period == period && x.jam == jam & x.team == team)
+                let expelledSkaters = warningData.expulsions.filter(x => x.period == period && x.jam == jam && x.team == team)
                 if(expelledSkaters != undefined) {
                     for(let s in expelledSkaters) {
                         let skater = expelledSkaters[s].skater
