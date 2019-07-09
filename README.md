@@ -138,5 +138,8 @@ Flamingo icon from http://www.iconsmind.com
     * Fixed appearance of "refresh" button.
     * Added check for "SP" and "Lead" without "Lost".
     * Added warning for out of date statsbook file version.
-* 2.1.4 - 
+* 2.1.4 - July 8, 2019
     * Fixed crash if the jam AFTER the last one is a whitespace.
+    * Added ability to export to new CRG 4.0 JSON format
+    * Reduced liklihood of UUID collisions.
+    * Changed derbyJSON export from UTF-8 to UTF-16
