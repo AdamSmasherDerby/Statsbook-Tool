@@ -1375,6 +1375,11 @@ let readLineups = (workbook) => {
                                     period: period,
                                     jam: jam
                                 })
+
+                                // remove the injured skater from the box if they were there
+                                if (box[team].includes(skater)){
+                                    remove(box[team],skater)
+                                }
                                 break
                             default:
                             // Handle invalid lineup codes
@@ -1515,6 +1520,11 @@ let readLineups = (workbook) => {
                                     period: period,
                                     jam: jam
                                 })
+
+                                // remove the injured skater from the box if they were there
+                                if (box[team].includes(skater)){
+                                    remove(box[team],skater)
+                                }
                                 break
                             default:
                                 // Handle invalid lineup codes

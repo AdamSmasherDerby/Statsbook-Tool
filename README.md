@@ -143,5 +143,6 @@ Flamingo icon from http://www.iconsmind.com
     * Added ability to export to new CRG 4.0 JSON format
     * Reduced liklihood of UUID collisions.
     * Changed derbyJSON export from UTF-8 to UTF-16
-* 2.1.5 - 
+* 2.1.5 - August 5, 2019
     * Fixed display if team name not entered.
+    * Handle skaters substituted out of the box correctly.
