@@ -256,8 +256,23 @@ let readIGRF = (workbook) => {
     sbData.venue.name = cellVal(sheet,sbTemplate.venue.name)
     sbData.venue.city = cellVal(sheet,sbTemplate.venue.city)
     sbData.venue.state = cellVal(sheet,sbTemplate.venue.state)
-    sbData.date = getJsDateFromExcel(cellVal(sheet,sbTemplate.date))
-    sbData.time = getJsTimeFromExcel(cellVal(sheet,sbTemplate.time))
+
+    // Deal with the fact that Date and Time could be strings or 
+    // Excel date/time values.
+
+    let date = _.get(sheet, sbTemplate.date)
+    if (date.t == 'n') {
+        sbData.date = getJsDateFromExcel(date.v)
+    } else if (date.t == 's') {
+        sbData.date = new Date (date.v.slice(0,4),date.v.slice(5,7),date.v.slice(8,10))
+    }
+    
+    let time = _.get(sheet, sbTemplate.time)
+    if (time.t == 'n') {
+        sbData.time = getJsTimeFromExcel(time.v)
+    } else if (time.t == 's') {
+        sbData.time = time.v
+    }
 
     let props = ['sbData.venue.name',
         'sbData.venue.city',
@@ -509,8 +524,8 @@ let readScores = (workbook) => {
                 let skaterNum = ' '
 
                 // Check for no initial pass box checked
-                let np = sheet[XLSX.utils.encode_cell(npAddress)]
-                let initialCompleted = (_.get(np,'v') != undefined ? 'no' : 'yes')
+                let np = _.get(sheet[XLSX.utils.encode_cell(npAddress)],'v')
+                let initialCompleted = ((np == undefined || np == '') ? 'yes' : 'no')
 
                 if(sheet[XLSX.utils.encode_cell(jammerAddress)] != undefined){
                     skaterNum = sheet[XLSX.utils.encode_cell(jammerAddress)].v
@@ -661,8 +676,8 @@ let readScores = (workbook) => {
 
                 }
                 // Lost Lead
-                let lost = sheet[XLSX.utils.encode_cell(lostAddress)]
-                if (_.get(lost,'v') != undefined){
+                let lost = _.get(sheet[XLSX.utils.encode_cell(lostAddress)],'v')
+                if (lost != undefined && lost != '') {
                     isLost = true
                     sbData.periods[period].jams[jam-1].events.push(
                         {
@@ -680,8 +695,8 @@ let readScores = (workbook) => {
                     )
                 }
                 // Lead
-                let lead = sheet[XLSX.utils.encode_cell(leadAddress)]
-                if (_.get(lead,'v') != undefined){
+                let lead = _.get(sheet[XLSX.utils.encode_cell(leadAddress)], 'v')
+                if (lead != undefined && lead != '') {
                     isLead = true
                     sbData.periods[period].jams[jam-1].events.push(
                         {
@@ -691,8 +706,8 @@ let readScores = (workbook) => {
                     )
                 }
                 // Call
-                let call = sheet[XLSX.utils.encode_cell(callAddress)]
-                if (_.get(call,'v') != undefined){
+                let call = _.get(sheet[XLSX.utils.encode_cell(callAddress)], 'v')
+                if (call != undefined && call != '') {
                     sbData.periods[period].jams[jam-1].events.push(
                         {
                             event: 'call',
@@ -701,9 +716,8 @@ let readScores = (workbook) => {
                     )
                 }
                 // Injury
-                let inj = sheet[XLSX.utils.encode_cell(injAddress)]
-                if (_.get(inj,'v') != undefined){
-
+                let inj = _.get(sheet[XLSX.utils.encode_cell(injAddress)], 'v')
+                if (inj != undefined && inj != '') {
                     warningData.jamsCalledInjury.push(
                         {
                             team: team,
@@ -1209,7 +1223,7 @@ let readLineups = (workbook) => {
                         skaterAddress.c = cells.firstJammer.c + (s * (boxCodes+1)) + c
                         let codeText = sheet[XLSX.utils.encode_cell(skaterAddress)]
 
-                        if (codeText == undefined) {continue}
+                        if (codeText == undefined || /^\s*$/.exec(codeText.v)) {continue}
 
                         allCodes += codeText.v
 

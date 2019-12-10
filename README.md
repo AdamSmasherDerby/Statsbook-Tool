@@ -146,3 +146,5 @@ Flamingo icon from http://www.iconsmind.com
 * 2.1.5 - August 5, 2019
     * Fixed display if team name not entered.
     * Handle skaters substituted out of the box correctly.
+* 2.2.0 - December 9, 2019
+    * With CRG 4.0 making more data, we're going to find some more cracks in this tool. First round of bug fixes.
