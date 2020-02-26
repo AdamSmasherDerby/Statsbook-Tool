@@ -993,6 +993,13 @@ let readPenalties = (workbook) => {
                         )
                     }
 
+                    // WARNING CHECK: Expulsion code for a skater with exactly six penalties
+                    if (penalties[skater].length == 6) {
+                        sbErrors.warnings.sixPenaltiesPlusExpulsion.events.push(
+                            `Team: ${ucFirst(team)}, Skater: ${skaterNum.v}`
+                        )
+                    }
+
                 }
 
                 // If there is a foul-out, add an event.

@@ -79,6 +79,7 @@ https://github.com/AdamSmasherDerby/Statsbook-Tool/releases
 7. Jammers with lead and a penalty, but not marked "lost."
 8. Empty box on the lineup sheet without an accompanying comment.
 9. Check for out of date statsbook file version.
+10. Check for six penalties plus an expulsion. (Possible incorrectly entered seventh penalty)
 
 Flamingo icon from http://www.iconsmind.com
 

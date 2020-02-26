@@ -299,6 +299,12 @@
             "description": "Out of date statsbook file version.",
             "events": [],
             "long": "The version of the .xlsx file used to enter this statsbook is not the most current. If you are using codes from a different year than the file, the checker may throw odd errors."
+        },
+        "sixPenaltiesPlusExpulsion":
+        {
+            "description": "Exactly six penalties plus expulsion. Seventh penalty in wrong colum?",
+            "events": [],
+            "long": "When there are exactly six penalties entered plus a penalty code in the FO/EXP column, that often means a seventh regular penalty was incorrectly entered as an expulsion.  If the skater was actually expelled for their seventh penalty, ignore this warning."
         }
     }
 }
