@@ -7,6 +7,8 @@ At present it supports the 2017, 2018, and 2019 statsbook formats.  Feed it an o
 Installable binaries are located at:
 https://github.com/AdamSmasherDerby/Statsbook-Tool/releases
 
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/J3J11GKIZ)
+
 ## Installation instructions:
 
 *Windows:* Download and run <code>Stastbook.Tool.Setup.x.x.x-Windows.exe</code>
@@ -149,3 +151,5 @@ Flamingo icon from http://www.iconsmind.com
     * Handle skaters substituted out of the box correctly.
 * 2.2.0 - December 9, 2019
     * With CRG 4.0 making more data, we're going to find some more cracks in this tool. First round of bug fixes.
+* 2.2.1 - ?
+    * Add warning to check for six penalties and an expulsion.
