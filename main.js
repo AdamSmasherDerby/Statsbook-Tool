@@ -14,7 +14,11 @@ let createWindow = () => {
         title: 'Statsbook Tool',
         icon: __dirname + '/build/flamingo-white.png',
         width: 800, 
-        height: 600
+        height: 600,
+        webPreferences: {
+            nodeIntegration: true,
+            enableRemoteModule: true
+        }
     })
 
     win.loadURL(url.format({
@@ -25,7 +29,6 @@ let createWindow = () => {
 
     if (isDev){
         win.webContents.openDevTools()
-        require('devtron').install()
     }
 
     // Prevent files dropped outside of the drop zone from doing anything.
@@ -193,7 +196,9 @@ let openHelp = () => {
     
 }
 
-app.on('ready', createWindow)
+//app.on('ready', createWindow)
+
+app.whenReady().then(() => createWindow())
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
