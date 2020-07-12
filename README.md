@@ -151,5 +151,6 @@ Flamingo icon from http://www.iconsmind.com
     * Handle skaters substituted out of the box correctly.
 * 2.2.0 - December 9, 2019
     * With CRG 4.0 making more data, we're going to find some more cracks in this tool. First round of bug fixes.
-* 2.2.1 - ?
+* 2.2.1 - July 12, 2020
     * Add warning to check for six penalties and an expulsion.
+    * Internal upgrade to Electron 9 for security reasons.
