@@ -145,7 +145,10 @@ let openAbout = () => {
         width: 300,
         height: 300,
         x: win.getPosition()[0] + 250,
-        y: win.getPosition()[1] + 150
+        y: win.getPosition()[1] + 150,
+        webPreferences: {
+            nodeIntegration: true
+        }
     })
 
     aboutWin.setMenu(null)
@@ -179,8 +182,15 @@ let openHelp = () => {
         width: 800,
         height: 600,
         x: win.getPosition()[0] + 20,
-        y: win.getPosition()[1] + 20
+        y: win.getPosition()[1] + 20,
+        webPreferences: {
+            nodeIntegration: true
+        }
     })
+
+    if (isDev){
+        helpWin.webContents.openDevTools()
+    }
 
     helpWin.loadURL(url.format({
         pathname: path.join(__dirname, 'src/help.html'),
