@@ -1,6 +1,6 @@
 {
   "name": "statsbooktool",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "A tool for error checking WFTDA Statsbooks",
   "main": "main.js",
   "author": "Adam Smasher (Daniel Alt) <dan@fnerk.com>",
