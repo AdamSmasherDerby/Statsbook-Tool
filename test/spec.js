@@ -3,27 +3,31 @@ const assert = require('assert')
 const electronPath = require('electron')
 const path = require('path')
 
-describe('Application Launch', function () {
+const app = new Application({
+    path: electronPath,
+    args: [path.join(__dirname, '..'), '--test'],
+})
+
+describe('Statsbook Tool', function () {
     this.timeout(10000)
 
-    beforeEach(function () {
-        this.app = new Application({
-            path: electronPath,
-            args: [path.join(__dirname, '..')]
-        })
-        return this.app.start()
+    beforeEach( () => {
+        return app.start()
     })
 
-    afterEach(function() {
-        if (this.app && this.app.isRunning()) {
-            return this.app.stop()
+    afterEach( () => {
+        if (app && app.isRunning()) {
+            return app.stop()
         }
     })
 
-    it('shows an initial window', function () {
-        return this.app.client.getWindowCount().then(function (count) {
-            // Note that this is 2 because of the dev tools.
-            assert.equal(count, 2)
-        })
+    it('shows an initial window', async() => {
+        const count = await app.client.getWindowCount()
+        return assert.equal(count, 1)
+    })
+
+    it('Shows correct window title', async () => {
+        const title = await app.client.getTitle()
+        return assert.equal(title, 'StatsBook Tool')
     })
 })

@@ -9,6 +9,12 @@ let menu,
     helpWin,
     aboutWin
 
+let showConsole = false
+
+if (isDev && !app.commandLine.hasSwitch('test')) {
+    showConsole = true
+} 
+
 let createWindow = () => {
     win = new BrowserWindow({
         title: 'Statsbook Tool',
@@ -27,7 +33,7 @@ let createWindow = () => {
         slashes: true
     }))
 
-    if (isDev){
+    if (showConsole){
         win.webContents.openDevTools()
     }
 
@@ -188,7 +194,7 @@ let openHelp = () => {
         }
     })
 
-    if (isDev){
+    if (showConsole){
         helpWin.webContents.openDevTools()
     }
 
