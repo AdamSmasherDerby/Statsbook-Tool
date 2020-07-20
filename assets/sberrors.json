@@ -156,25 +156,25 @@
         {
             "description": "X marked for player with no corresponding penalty",
             "events": [],
-            "long": "A player was notated as entering (or continuing in) the box without a penalty marked for the same or prior jam on the penalty sheet."
+            "long": "A player was notated as entering (or continuing in) the box without a penalty marked for the same or prior jam on the penalty sheet. (2017)"
         },
         "plusNoPenalty":
         {
             "description": "+ marked for player with no corresponding penalty",
             "events": [],
-            "long": "A player was notated as entering the box without a penalty marked for the same or prior jam on the penalty sheet."
+            "long": "A player was notated as entering the box without a penalty marked for the same or prior jam on the penalty sheet. (2019)"
         },
         "slashNoPenalty":
         {
             "description": "/ marked for player with no corresponding penalty",
             "events": [],
-            "long": "A player was marked as entering the box without a penalty in the same or prior jam on the penalty sheet."
+            "long": "A player was marked as entering the box without a penalty in the same or prior jam on the penalty sheet. (2017)"
         },
         "dashNoPenalty":
         {
             "description": "- marked for player with no corresponding penalty",
             "events": [],
-            "long": "A player was marked as entering the box without a penalty in the same or prior jam on the penalty sheet. (Exception: player in queue for an entire jam.)"
+            "long": "A player was marked as entering the box without a penalty in the same or prior jam on the penalty sheet. (Exception: player in queue for an entire jam.) (2019)"
         },
         "sNoPenalty":
         {
@@ -192,7 +192,7 @@
         {
             "description": "I or | marked for player with no box entry.",
             "events": [],
-            "long": "A player was marked as continuing in the box without a corresponding box entry in a prior jam."
+            "long": "A player was marked as continuing in the box without a corresponding box entry in a prior jam. (2017)"
         },
         "seatedNoCode":
         {
@@ -204,7 +204,7 @@
         {
             "description": "S or $ entered for skater already in the box.",
             "events": [],
-            "long": "Skaters who have already been seated in the box should be indicated with I or X.  S and $ are reserved for skaters who report to the box between jams."
+            "long": "Skaters who have already been seated in the box should be indicated with I or X.  S and $ are reserved for skaters who report to the box between jams. (2017)"
         },
         "seatedNotLinedUp":
         {
@@ -228,7 +228,7 @@
         {
             "description": "ᚾ used in statsbook file instead of X.",
             "events": [],
-            "long": "While the ᚾ character is used during paper entry, the statsbook manual specifies that an 'X' should be entered in the actual Excel file."
+            "long": "While the ᚾ character is used during paper entry, the statsbook manual specifies that an 'X' should be entered in the actual Excel file. (2017)"
         },
         "foInBox":
         {
