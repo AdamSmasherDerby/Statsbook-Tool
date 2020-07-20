@@ -175,7 +175,7 @@ let readSbData = (data) => {
 let updateFileInfo = () => {
     // Update the "File Information Box"
     // Update File Information Box
-    fileInfoBox.innerHTML = `<strong>Filename:</strong>  ${sbFilename}<br>`
+    fileInfoBox.innerHTML = `<strong>Filename:</strong>  <span id="loadedFile">${sbFilename}</span><br>`
     fileInfoBox.innerHTML += `<strong>SB Version:</strong> ${sbVersion}<br>`
     fileInfoBox.innerHTML += `<strong>Game Date:</strong> ${moment(sbData.date).format('MMMM DD, YYYY')}<br>`
     fileInfoBox.innerHTML += `<strong>Team 1:</strong> ${sbData.teams['home'].league || ''} ${sbData.teams['home'].name}<br>`
