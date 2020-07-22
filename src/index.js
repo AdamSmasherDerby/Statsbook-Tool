@@ -6,6 +6,7 @@ const _ = require('lodash')
 const { remote } = require('electron')
 const { Menu, MenuItem } = remote
 const mousetrap = require('mousetrap')
+const fs = require('fs')
 
 const download = require('./tools/download')
 
@@ -43,7 +44,6 @@ let sbData = {},  // derbyJSON formatted statsbook data
     starPasses = [],
     sbFilename = '',
     sbVersion = '',
-    rABS = true, // read XLSX files as binary strings vs. array buffers
     warningData = {},
     sbFile = new File([''],'')
 const teamList = ['home','away']
@@ -102,27 +102,16 @@ holder.ondrop = (e) => {
 }
 
 let makeReader = (sbFile) => {
-    // Create reader object and load statsbook file
-    let reader = new FileReader()
     sbFilename = sbFile.name
-
-    reader.onload = (e) => {
-        readSbData(e.target.result)
-    }
-
-    // Actually load the file
-    if (rABS) {
-        reader.readAsBinaryString(sbFile)
-    }
-    else {
-        reader.readAsArrayBuffer(sbFile)
-    }
+    let data = fs.readFileSync(sbFile.path)
+    data = new Uint8Array(data)
+    readSbData(data)
 }
 
 let readSbData = (data) => {
-    // Read in the statsbook data for an event e
-    if (!rABS) data = new Uint8Array(data)
-    var workbook = XLSX.read(data, {type: rABS ? 'binary' :'array'})
+    // Take raw data from Excel File and process the file.
+
+    var workbook = XLSX.read(data, {type: 'array'})
 
     // Reinitialize globals
     sbData = {}

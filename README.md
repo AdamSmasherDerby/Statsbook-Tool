@@ -156,3 +156,5 @@ Flamingo icon from http://www.iconsmind.com
     * Internal upgrade to Electron 9 for security reasons.
 * 2.2.2 - July 19, 2020
     * Fix bug introduced in 2.2.1 where sub-windows wouldn't run properly.
+* 2.2.3 - July 21, 2020
+    * Repair broken "refresh" button.
