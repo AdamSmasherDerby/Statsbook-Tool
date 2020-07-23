@@ -96,7 +96,6 @@ holder.ondrop = (e) => {
     }
 
     sbFile = e.dataTransfer.files[0]
-
     makeReader(sbFile)
     return false
 }
@@ -1890,6 +1889,7 @@ let sbErrorsToTable = () => {
             ))
             descCell.setAttribute('data-toggle','tooltip')
             descCell.setAttribute('title',sbErrors[section][e].long)
+            descCell.id = `${e}-header`
             let icon = document.createElement('i')
             icon.setAttribute('class','fa fa-info-circle')
             descCell.appendChild(icon)
@@ -1901,6 +1901,7 @@ let sbErrorsToTable = () => {
             for(let v in sbErrors[errorTypes[t]][e].events){
                 let evRow = document.createElement('tr')
                 let evCell = document.createElement('td')
+                evCell.id = `${e}-${v}`
                 evCell.appendChild(document.createTextNode(
                     sbErrors[section][e].events[v]
                 ))
