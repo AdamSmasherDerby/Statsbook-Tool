@@ -51,10 +51,8 @@ describe('Basic Program Functions Without File Load', function () {
             return
         })
     
-    
         it('Loads the clean test file and verifies no positives', async () => {
             let val = await (await app.client.$('#output-box > table > tr > th')).getText()
-            //return assert.equal(val, 'No Errors Found!')*/
             return val.should.equal('No Errors Found!')
         })
 
@@ -63,6 +61,7 @@ describe('Basic Program Functions Without File Load', function () {
     describe('Tests on a Statsbook with errors', function () {
         this.timeout(1000)
 
+        // Before running tests, load statsBook with errors.
         before( async () => {
             const remoteFilePath = await app.client.uploadFile(testFile)
             let inputBox = await app.client.$('#file-select')
@@ -72,24 +71,36 @@ describe('Basic Program Functions Without File Load', function () {
         
         // Check all of the scores errors exist
         for (let error in errorList.scores) {
-            if(_.get(errorList, `penalties.${error}.deprecated`, false)) continue
+            if(_.get(errorList, `penalties.${error}.noTest`, false)) continue
             it(`finds score error ${error}`, async () => {
                 return app.client.$(`#${error}-header`).should.exist
             })   
         }
+
         // Check all of the penalties errors exist
         for (let error in errorList.penalties) {
-            if (_.get(errorList, `penalties.${error}.deprecated`,false)) continue
+            if (_.get(errorList, `penalties.${error}.noTest`, false)) continue
             it(`finds penalty error ${error}`, async () => {
                 return app.client.$(`#${error}-header`).should.exist
             })
         }  
+
+        // Check all lineups errors exist
         for (let error in errorList.lineups) {
-            if (_.get(errorList, `lineups.${error}.deprecated`,false)) continue
+            if (_.get(errorList, `lineups.${error}.noTest`, false)) continue
             it(`finds lineup error ${error}`, async () => {
                 return app.client.$(`#${error}-header`).should.exist
             })
         }
+
+        // Check all warnings exist
+        for (let warning in errorList.warnings) {
+            if (_.get(errorList, `warnings.${warning}.noTest`, false)) continue
+            it(`finds warning ${warning}`, async () => {
+                return app.client.$(`#${warning}-header`).should.exist
+            })
+        }
+
     })
 })
 
