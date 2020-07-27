@@ -1,4 +1,6 @@
-const Application = require('spectron').Application
+//const Application = require('spectron').Application
+const spectronMenuAddon = require('spectron-menu-addon')
+const menuAddon = new spectronMenuAddon.SpectronMenuAddon()
 const electronPath = require('electron')
 const path = require('path')
 const chai = require('chai')
@@ -7,7 +9,12 @@ chai.should()
 chai.use(chaiAsPromised)
 const _ = require('lodash')
 
-const app = new Application({
+/*const app = new Application({
+    path: electronPath,
+    args: [path.join(__dirname, '..'), '--test'],
+})*/
+
+const app = menuAddon.createApplication({
     path: electronPath,
     args: [path.join(__dirname, '..'), '--test'],
 })
@@ -39,6 +46,54 @@ describe('Basic Program Functions Without File Load', function () {
 
     it('Shows correct window title', async () => {
         return app.client.getTitle().should.eventually.equal('StatsBook Tool')
+    })
+
+    describe('Tests on about window', function () {
+        this.timeout(1000)
+
+        before( async () => {
+            await menuAddon.clickMenu('Help', 'About')
+            await app.client.switchWindow('aboutst.html')
+        })
+
+        after( async () => {
+            await app.client.windowByIndex(0)
+        })
+
+        it('tests about menu has opened', async () => {
+            let URL = await app.webContents.getURL()
+            return URL.should.include('aboutst.html')
+        })
+
+        it('tests version number exists in about menu', async () => {
+            let version = await (await app.client.$('#version')).getText()
+            return version.should.not.equal('')
+        })
+
+    })
+
+    describe('Tests on error list window', function () {
+        this.timeout(1000)
+
+        before( async () => {
+            await menuAddon.clickMenu('Help', 'Error Descriptions')
+            await app.client.switchWindow('help.html')
+        })
+
+        after( async () => {
+            await app.client.windowByIndex(0)
+        })
+
+        it('tests about menu has opened', async () => {
+            let URL = await app.webContents.getURL()
+            return URL.should.include('help.html')
+        })
+
+        it('tests table is not zero length', async () => {
+            let val = await (await app.client.$$('#error-table > tr')).length
+            return val.should.not.equal(0)
+        })
+
     })
 
     describe('Tests on a clean Statsbook file', function () {

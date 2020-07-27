@@ -8,6 +8,7 @@ let sbErrorsToTable = () => {
     let typeHeaders = ['Scores', 'Lineups', 'Penalties','Warnings']
     let table = document.createElement('table')
     table.setAttribute('class','table')
+    table.id = ('error-table')
 
     for(let t in errorTypes){
         // For each of the three types of errors
