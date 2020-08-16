@@ -18,7 +18,6 @@ if (isDev && !app.commandLine.hasSwitch('test')) {
 let createWindow = () => {
     win = new BrowserWindow({
         title: 'Statsbook Tool',
-        icon: __dirname + '/build/flamingo-white.png',
         width: 800, 
         height: 600,
         webPreferences: {
