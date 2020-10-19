@@ -49,7 +49,7 @@ describe('Basic Program Functions Without File Load', function () {
     })
 
     describe('Tests on about window', function () {
-        this.timeout(1000)
+        this.timeout(5000)
 
         before( async () => {
             await menuAddon.clickMenu('Help', 'About')
@@ -61,7 +61,7 @@ describe('Basic Program Functions Without File Load', function () {
         })
 
         it('tests about menu has opened', async () => {
-            let URL = await app.webContents.getURL()
+            let URL = await app.client.getUrl()
             return URL.should.include('aboutst.html')
         })
 
@@ -73,7 +73,7 @@ describe('Basic Program Functions Without File Load', function () {
     })
 
     describe('Tests on error list window', function () {
-        this.timeout(1000)
+        this.timeout(5000)
 
         before( async () => {
             await menuAddon.clickMenu('Help', 'Error Descriptions')
@@ -85,7 +85,7 @@ describe('Basic Program Functions Without File Load', function () {
         })
 
         it('tests about menu has opened', async () => {
-            let URL = await app.webContents.getURL()
+            let URL = await app.client.getUrl()
             return URL.should.include('help.html')
         })
 
