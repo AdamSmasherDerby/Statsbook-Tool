@@ -165,7 +165,7 @@ let updateFileInfo = () => {
     // Update File Information Box
     fileInfoBox.innerHTML = `<strong>Filename:</strong>  <span id="loadedFile">${sbFilename}</span><br>`
     fileInfoBox.innerHTML += `<strong>SB Version:</strong> ${sbVersion}<br>`
-    fileInfoBox.innerHTML += `<strong>Game Date:</strong> ${moment(sbData.date).format('MMMM DD, YYYY')}<br>`
+    fileInfoBox.innerHTML += `<strong>Game Date:</strong> ${moment.utc(sbData.date).format('MMMM DD, YYYY')}<br>`
     fileInfoBox.innerHTML += `<strong>Team 1:</strong> ${sbData.teams['home'].league || ''} ${sbData.teams['home'].name}<br>`
     fileInfoBox.innerHTML += `<strong>Team 2:</strong> ${sbData.teams['away'].league || ''} ${sbData.teams['away'].name}<br>`
     fileInfoBox.innerHTML += `<strong>File Read:</strong> ${moment().format('HH:mm:ss MMM DD, YYYY')} `
@@ -222,7 +222,7 @@ let readIGRF = (workbook) => {
         // Helper function to convert Excel date to JS format
         if(!excelDate){return undefined}
 
-        return new Date((excelDate - (25567 + 1))*86400*1000)
+        return new Date((excelDate - (25567 +2))*86400*1000)
     }
 
     let getJsTimeFromExcel = (excelTime) => {
@@ -256,10 +256,14 @@ let readIGRF = (workbook) => {
     }
     
     let time = _.get(sheet, sbTemplate.time)
-    if (time.t == 'n') {
-        sbData.time = getJsTimeFromExcel(time.v)
-    } else if (time.t == 's') {
-        sbData.time = time.v
+    if (!time || !time.hasOwnProperty('t')){
+        sbData.time = '' // Fail gracefully if time is undefined
+    } else {
+        if (time.t == 'n') {
+            sbData.time = getJsTimeFromExcel(time.v)
+        } else if (time.t == 's') {
+            sbData.time = time.v
+        }
     }
 
     let props = ['sbData.venue.name',

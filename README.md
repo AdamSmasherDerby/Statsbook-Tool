@@ -158,3 +158,8 @@ Flamingo icon from http://www.iconsmind.com
     * Fix bug introduced in 2.2.1 where sub-windows wouldn't run properly.
 * 2.2.3 - July 21, 2020
     * Repair broken "refresh" button.
+* 2.2.4 - October 18, 2020
+    * Update to Electron 10 - no changes for users
+* 2.2.5 - June 7, 2022
+    * Fix weird bug where, with no changes to the software or the statsbook, it nonetheless stopped failing gracefully when no time was present.  I blame Bill Gates.  
+    * May or may not also fix a bug where European users saw the date off by one day on the display.
