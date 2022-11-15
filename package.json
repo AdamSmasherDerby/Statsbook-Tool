@@ -1,6 +1,6 @@
 {
   "name": "statsbooktool",
-  "version": "2.2.5",
+  "version": "2.2.6",
   "description": "A tool for error checking WFTDA Statsbooks",
   "main": "main.js",
   "author": "Adam Smasher (Daniel Alt) <dan@fnerk.com>",
@@ -34,7 +34,7 @@
     "popper.js": "^1.14.3",
     "typeface-raleway": "^0.0.54",
     "uuid": "^3.2.1",
-    "xlsx": "^0.11.19",
+    "xlsx": "^0.18.5",
     "xmlbuilder": "^10.0.0"
   },
   "build": {

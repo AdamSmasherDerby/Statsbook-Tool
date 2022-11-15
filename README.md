@@ -163,3 +163,5 @@ Flamingo icon from http://www.iconsmind.com
 * 2.2.5 - June 7, 2022
     * Fix weird bug where, with no changes to the software or the statsbook, it nonetheless stopped failing gracefully when no time was present.  I blame Bill Gates.  
     * May or may not also fix a bug where European users saw the date off by one day on the display.
+* 2.2.6 - November 15, 2022
+    * Upgrade to new version of xlsx importer to fix issue with extlst tag not being parsed correctly.
