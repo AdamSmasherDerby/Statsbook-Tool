@@ -50,6 +50,8 @@ let sbData = {},  // derbyJSON formatted statsbook data
 const teamList = ['home','away']
 let anSP = /^sp\*?$/i
 let mySP = /^sp$/i
+let anINJ = /^inj\*?$/i
+//let myINJ = /^inj$/i Save this in case we need it later.
 
 // Check for new version
 ipc.on('do-version-check', (event, version) => {
@@ -420,7 +422,7 @@ let readScores = (workbook) => {
     let tab = 'score'
     let npRe = /(\d)\+NP/
     let ippRe = /(\d)\+(\d)/
-    let jamNoRe = /^(\d+|SP|SP\*)$/i
+    let jamNoRe = /^(\d+|SP|SP\*|INJ|INJ\*)$/i
 
     for(let period = 1; period < 3; period ++){
     // For each period, import data
@@ -480,7 +482,7 @@ let readScores = (workbook) => {
                     throw new Error(`Invalid Jam Number: ${jamNumber.v}`)
                 }
 
-                // handle star passes
+                // handle star passes and injuries
                 if (anSP.test(jamNumber.v)) {
                     starPass = true
                     if (mySP.test(jamNumber.v)) {
@@ -492,8 +494,11 @@ let readScores = (workbook) => {
                         )
                     }
                     starPasses.push({period: period, jam: jam})
+                } else if (anINJ.test(jamNumber.v)) {
+                    // Will we need more code here?  Stay tuned.
+                    continue
                 } else {
-                    // Not a star pass
+                    // Not a star pass or injury
 
                     // Error check - is this jam number out of sequence?
                     if (parseInt(jamNumber.v) != (jam+1)){
@@ -513,7 +518,7 @@ let readScores = (workbook) => {
                     starPass = false
                 }
 
-                // If there isn't currently an numbered object for this jam, create it
+                // If there isn't currently a numbered object for this jam, create it
                 // Note that while the "number" field is one indexed, the jams array itself is zero indexed
                 if (!sbData.periods[pstring].jams.find(o => o.number === jam)){
                     sbData.periods[pstring].jams[jam-1] = {number: jam, events: []}
@@ -1135,9 +1140,13 @@ let readLineups = (workbook) => {
                             `Team: ${ucFirst(team)}, Period: ${period}, Jam: ${jam}`
                         )
                     }
-
+                } else if(anINJ.test(jamText.v)){
+                // If this is an injury line (INJ or INJ*)
+                    // TODO: add an error check to see if skaters
+                    // other than the jammer were subbed.
+                    continue
                 } else {
-                    // Not a starpass line, update the jam number
+                    // Not a starpass or an injury line, update the jam number
                     jam = jamText.v
                     starPass = false
                     skaterList = []
@@ -1412,6 +1421,7 @@ let readLineups = (workbook) => {
                             }
                             break
                         case '2019':
+                        case '2023jrda':
                             // Possible codes - -, +, S, $, 3
 
                             // - - Enter box
