@@ -34,6 +34,7 @@ window.addEventListener('contextmenu', (e) => {
 // Template Files
 let template2018 = require('../assets/2018statsbook.json')
 let template2017 = require('../assets/2017statsbook.json')
+let template2023jrda = require('../assets/2023jrda.json')
 let sbErrorTemplate = require('../assets/sberrors.json')
 
 // Globals
@@ -189,13 +190,21 @@ let getVersion = (workbook) => {
     // Determine version of Statsbook file.
 
     let currentVersion = '2019'
+    let currentJRDAVersion = '2023jrda'
     let defaultVersion = '2018'
     let sheet = workbook.Sheets['Read Me']
     let versionText = (sheet ? sheet['A3'].v : defaultVersion)
     let versionRe = /(\d){4}/
     sbVersion = versionRe.exec(versionText)[0]
+    if (versionText.toLowerCase().includes('jrda')) {
+        sbVersion = sbVersion.concat('jrda')
+    }
 
     switch (sbVersion){
+    case '2023jrda':
+        sbTemplate = template2023jrda
+        currentVersion = currentJRDAVersion
+        break
     case '2019':
     case '2018':
         sbTemplate = template2018

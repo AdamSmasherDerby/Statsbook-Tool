@@ -1,0 +1,167 @@
+{
+    "version": "2023jrda",
+    "mainSheet": "IGRF",
+    "venue": {
+        "name": "B3",
+        "city": "I3",
+        "state": "K3"
+    },
+    "date": "B7",
+    "time": "F7",
+    "tournament": "B5",
+    "host-league": "I5",
+    "teams": {
+        "home": {
+            "sheetName": "IGRF",
+            "league": "B10",
+            "name": "B11",
+            "color": "B12",
+            "firstName": "C14",
+            "firstNumber": "B14",
+            "maxNum": 20
+        },
+        "away": {
+            "sheetName": "IGRF",
+            "league": "I10",
+            "name": "I11",
+            "color": "I12",
+            "firstName": "J14",
+            "firstNumber": "I14",
+            "maxNum": 20
+        },
+        "officials":{
+            "sheetName": "IGRF",
+            "firstName": "C62",
+            "firstRole": "A62",
+            "firstLeague": "H62",
+            "firstCert": "K62",
+            "maxNum": 21
+                }
+    },
+    "score": {
+        "sheetName": "Score",
+        "maxJams": 38,
+        "1": {
+            "home": {
+                "firstJamNumber":  "A4",
+                "firstJammerNumber":  "B4",
+                "firstLost":  "C4",
+                "firstLead":  "D4",
+                "firstCall":  "E4",
+                "firstInj":  "F4",
+                "firstNp": "G4",
+                "firstTrip":  "H4",
+                "lastTrip":  "P4"
+            },
+            "away": {
+                "firstJamNumber":  "T4",
+                "firstJammerNumber":  "U4",
+                "firstLost":  "V4",
+                "firstLead":  "W4",
+                "firstCall":  "X4",
+                "firstInj":  "Y4",
+                "firstNp": "Z4",
+                "firstTrip":  "AA4",
+                "lastTrip":  "AI4"                
+            }
+        },
+        "2": {
+            "home": {
+                "firstJamNumber":  "A46",
+                "firstJammerNumber":  "B46",
+                "firstLost":  "C46",
+                "firstLead":  "D46",
+                "firstCall":  "E46",
+                "firstInj":  "F46",
+                "firstNp": "G46",
+                "firstTrip":  "H46",
+                "lastTrip":  "P46"
+            },
+            "away": {
+                "firstJamNumber":  "T46",
+                "firstJammerNumber":  "U46",
+                "firstLost":  "V46",
+                "firstLead":  "W46",
+                "firstCall":  "X46",
+                "firstInj":  "Y46",
+                "firstNp":  "Z46",
+                "firstTrip":  "AA46",
+                "lastTrip":  "AI46"                
+            }
+        }
+    },
+    "penalties": {
+        "sheetName": "Penalties",
+        "maxPenalties": 9,
+        "1": {
+            "home": {
+                "firstNumber":  "A4",
+                "firstPenalty":  "C4",
+                "firstJam":  "C5",
+                "firstFO":  "L4",
+                "firstFOJam": "L5",
+                "benchExpCode": "D44",
+                "benchExpJam": "D45"
+                
+            },
+            "away": {
+                "firstNumber":  "Q4",
+                "firstPenalty":  "S4",
+                "firstJam":  "S5",
+                "firstFO":  "AB4",
+                "firstFOJam": "AB5", 
+                "benchExpCode": "T44",
+                "benchExpJam": "T45"            
+            }
+        },
+        "2": {
+            "home": {
+                "firstNumber":  "AE4",
+                "firstPenalty":  "AG4",
+                "firstJam":  "AG5",
+                "firstFO":  "AP4",
+                "firstFOJam": "AP5",
+                "benchExpCode": "AH44",
+                "benchExpJam": "AH45"
+            },
+            "away": {
+                "firstNumber":  "AU4",
+                "firstPenalty":  "AW4",
+                "firstJam":  "AW5",
+                "firstFO":  "BF4",
+                "firstFOJam": "BF5",
+                "benchExpCode": "AX44",
+                "benchExpJam": "AX45"
+            }           
+        }
+    },
+    "lineups": {
+        "sheetName": "Lineups",
+        "maxJams": 38,
+        "boxCodes": 3,
+        "1": {
+            "home": {
+                "firstJamNumber": "A4",
+                "firstNoPivot": "B4",
+                "firstJammer": "C4"
+            },
+            "away": {
+                "firstJamNumber": "AB4",
+                "firstNoPivot": "AC4",
+                "firstJammer": "AD4"                
+            }
+        },
+        "2": {
+            "home": {
+                "firstJamNumber": "A46",
+                "firstNoPivot": "B46",
+                "firstJammer": "C46"
+            },
+            "away": {
+                "firstJamNumber": "AB46",
+                "firstNoPivot": "AC46",
+                "firstJammer": "AD46"                
+            }            
+        }
+    }
+}
