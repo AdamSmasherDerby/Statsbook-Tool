@@ -165,5 +165,8 @@ Flamingo icon from http://www.iconsmind.com
     * May or may not also fix a bug where European users saw the date off by one day on the display.
 * 2.2.6 - November 15, 2022
     * Upgrade to new version of xlsx importer to fix issue with extlst tag not being parsed correctly.
-* 3.0.0 - February 5, 2022
+* 3.0.0 - February 5, 2023
     * Added support for JRDA statsbook.  Seems a good a reason as any for a new major version number.
+* 3.1.0 - January 19, 2024
+    * Added ability to load statsbook from Google Sheets link.
+    * Corrected year of prior update in this README file. 

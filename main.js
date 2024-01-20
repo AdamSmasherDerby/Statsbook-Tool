@@ -7,7 +7,8 @@ const isDev = require('electron-is-dev')
 let menu,
     win,
     helpWin,
-    aboutWin
+    aboutWin,
+    urlWin
 
 let showConsole = false
 
@@ -211,6 +212,46 @@ let openHelp = () => {
     
 }
 
+let openURLwin = () => {
+    urlWin = new BrowserWindow ({
+        parent: win,
+        title: 'Google Sheets URL Entry',
+        icon: __dirname + '/build/flamingo-white.png',
+        width: 800,
+        height: 300,
+        x: win.getPosition()[0] + 20,
+        y: win.getPosition()[1] + 20,
+        webPreferences: {
+            nodeIntegration: true
+        }
+    })
+
+    if (showConsole){
+        urlWin.webContents.openDevTools()
+    }
+
+    urlWin.setMenu(null)
+
+    urlWin.loadURL(url.format({
+        pathname: path.join(__dirname, 'src/openurl.html'),
+        protocol: 'file',
+        slashes: true
+    }))
+
+    urlWin.webContents.on('new-window', function(e, url) {
+        e.preventDefault()
+        require('electron').shell.openExternal(url)
+    })
+
+    urlWin.on('closed', () => {
+        aboutWin = null
+    })
+
+    urlWin.webContents.on('did-finish-load', () => {
+        urlWin.webContents.send('set-version', app.getVersion())
+    })
+}
+
 //app.on('ready', createWindow)
 
 app.whenReady().then(() => createWindow())
@@ -232,6 +273,15 @@ ipc.on('enable-menu-items', () => {
     menu.items.find(x => x.label == 'File').submenu.items.find(x => x.label == 'Save DerbyJSON').enabled = true
     menu.items.find(x => x.label == 'File').submenu.items.find(x => x.label == 'Export Roster to CRG XML').enabled = true
     menu.items.find(x => x.label == 'File').submenu.items.find(x => x.label == 'Export Roster to CRG JSON (beta)').enabled = true
+})
+
+ipc.on('open-get-url-window', () => {
+    openURLwin()
+})
+
+ipc.on('url-submitted', (event, statsbookURL) => {
+    urlWin.close()
+    win.webContents.send('load-google-sheet',statsbookURL)
 })
 
 ipc.on('error-thrown', (event, msg, url, lineNo, columnNo) => {

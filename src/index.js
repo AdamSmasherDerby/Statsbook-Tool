@@ -7,6 +7,8 @@ const { remote } = require('electron')
 const { Menu, MenuItem } = remote
 const mousetrap = require('mousetrap')
 const fs = require('fs')
+const request = require('request')
+var validURL = require('valid-url')
 
 const download = require('./tools/download')
 
@@ -21,6 +23,11 @@ let fileInfoBox = document.getElementById('file-info-box')
 let outBox = document.getElementById('output-box')
 let newVersionWarningBox = document.getElementById('newVersionWarning')
 let refreshButton = {}
+let geturlbutton = document.getElementById('geturlbutton')
+
+geturlbutton.onclick = () => {
+    ipc.send('open-get-url-window')
+}
 
 const menu = new Menu()
 menu.append( new MenuItem( { role: 'copy'} ))
@@ -36,6 +43,7 @@ let template2018 = require('../assets/2018statsbook.json')
 let template2017 = require('../assets/2017statsbook.json')
 let template2023jrda = require('../assets/2023jrda.json')
 let sbErrorTemplate = require('../assets/sberrors.json')
+//const { load } = require('npm')
 
 // Globals
 let sbData = {},  // derbyJSON formatted statsbook data
@@ -46,7 +54,8 @@ let sbData = {},  // derbyJSON formatted statsbook data
     sbFilename = '',
     sbVersion = '',
     warningData = {},
-    sbFile = new File([''],'')
+    sbFile = new File([''],''),
+    googleSheet = ''
 const teamList = ['home','away']
 let anSP = /^sp\*?$/i
 let mySP = /^sp$/i
@@ -82,6 +91,7 @@ fileSelect.onchange = (e) => {
     }
 
     sbFile = e.target.files[0]
+    googleSheet = ''
 
     makeReader(sbFile)
     return false
@@ -99,22 +109,49 @@ holder.ondrop = (e) => {
     }
 
     sbFile = e.dataTransfer.files[0]
+    googleSheet = ''
+
     makeReader(sbFile)
     return false
 }
+
+ipc.on('load-google-sheet', (event, statsbookURL) => {
+    
+    statsbookURL = statsbookURL.replace(/(\/d\/[a-zA-Z0-9-_]*\/)(.*)/gm,'$1export?format=xlsx')
+
+    if (!validURL.isUri(statsbookURL)){
+        //error not valid url 
+        fileInfoBox.innerHTML = `Error: ${statsbookURL} is not a valid URL`
+        return
+    } 
+    googleSheet = statsbookURL
+
+    loadGoogleSheet(googleSheet)
+}) 
+
+let loadGoogleSheet = (statsbookURL) => {
+    request.get(statsbookURL, { encoding: null }, function (err, res, data) {
+        if (err || res.statusCode != 200) {
+            fileInfoBox.innerHTML = `Unable to load file. Error: ${err}`
+            return
+        }
+        const buf = Buffer.from(data)
+        const workbook = XLSX.read(buf)
+      
+        readSbData(workbook)
+    })
+}
+
 
 let makeReader = (sbFile) => {
     sbFilename = sbFile.name
     let data = fs.readFileSync(sbFile.path)
     data = new Uint8Array(data)
-    readSbData(data)
+    var workbook = XLSX.read(data, {type: 'array'})
+    readSbData(workbook)
 }
 
-let readSbData = (data) => {
-    // Take raw data from Excel File and process the file.
-
-    var workbook = XLSX.read(data, {type: 'array'})
-
+let readSbData = (workbook) => {
     // Reinitialize globals
     sbData = {}
     sbErrors = JSON.parse(JSON.stringify(sbErrorTemplate))
@@ -179,13 +216,18 @@ let createRefreshButton = () => {
     fileInfoBox.innerHTML += '<button id="refresh" type="button" class="btn btn-secondary btn-sm">Refresh (f5)</button>'
     refreshButton = document.getElementById('refresh')
 
-    refreshButton.onclick = () => {
-        makeReader(sbFile)
-    }
+    if (googleSheet == '' ){
+        // If a local file has been loaded
+        refreshButton.onclick = () => {
+            makeReader(sbFile)
+        }
 
-    mousetrap.bind('f5', () => {
-        makeReader(sbFile)
-    })
+        mousetrap.bind('f5', () => {
+            makeReader(sbFile)
+        })
+    } else {
+        loadGoogleSheet(googleSheet)
+    }
 }
 
 let getVersion = (workbook) => {
