@@ -170,3 +170,6 @@ Flamingo icon from http://www.iconsmind.com
 * 3.1.0 - January 19, 2024
     * Added ability to load statsbook from Google Sheets link.
     * Corrected year of prior update in this README file. 
+* 3.1.1 - March 9, 2024
+    * Added support for JRDA 2024 statsbook.
+    * Theoretically will now default to the most recent current version if it encounters a NEWER version.

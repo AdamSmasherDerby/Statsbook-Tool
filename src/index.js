@@ -234,7 +234,7 @@ let getVersion = (workbook) => {
     // Determine version of Statsbook file.
 
     let currentVersion = '2019'
-    let currentJRDAVersion = '2023jrda'
+    let currentJRDAVersion = '2024jrda'
     let defaultVersion = '2018'
     let sheet = workbook.Sheets['Read Me']
     let versionText = (sheet ? sheet['A3'].v : defaultVersion)
@@ -245,6 +245,7 @@ let getVersion = (workbook) => {
     }
 
     switch (sbVersion){
+    case '2024jrda':
     case '2023jrda':
         sbTemplate = template2023jrda
         currentVersion = currentJRDAVersion
@@ -261,10 +262,16 @@ let getVersion = (workbook) => {
     }
 
     // Warning check: outdated statsbook version
+    // Note that this will ALSO fire if the statsbook version is NEWER.
     if (sbVersion != currentVersion){
         sbErrors.warnings.oldStatsbookVersion.events.push(
-            `This File: ${sbVersion}  Current Version: ${currentVersion} `
+            `This File: ${sbVersion}  Current Supported Version: ${currentVersion} `
         )
+    }
+
+    // Check for NEWER statsbook version
+    if (sbVersion > currentVersion){
+        sbVersion.includes('jrda') ? sbVersion = currentJRDAVersion : sbVersion = currentVersion
     }
 }
 
@@ -1464,6 +1471,7 @@ let readLineups = (workbook) => {
                             break
                         case '2019':
                         case '2023jrda':
+                        case '2024jrda':
                             // Possible codes - -, +, S, $, 3
 
                             // - - Enter box
