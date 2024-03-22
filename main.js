@@ -98,17 +98,17 @@ let createWindow = () => {
                 {
                     label: 'Copy',
                     accelerator: 'CmdOrCtrl+C',
-                    selector: 'Copy'
+                    role: 'Copy'
                 },
                 {
                     label: 'Paste',
                     accelerator: 'CmdOrCtrl+V',
-                    selector: 'paste'
+                    role: 'paste'
                 },
                 {
                     label: 'Select All',
                     accelerator: 'CmdOrCtrl+A',
-                    selector: 'selectAll'
+                    role: 'selectAll'
                 }
             ]
         },
