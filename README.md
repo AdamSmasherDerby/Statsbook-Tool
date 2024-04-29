@@ -173,3 +173,8 @@ Flamingo icon from http://www.iconsmind.com
 * 3.1.1 - March 9, 2024
     * Added support for JRDA 2024 statsbook.
     * Theoretically will now default to the most recent current version if it encounters a NEWER version.
+* 3.2.0 - April 29, 2024
+    * Added support for WFTDA 2024 statsbook. (This time, for real.)
+    * Improve support for NEWER versions.
+    * Add check for uncalculated spreadsheet.
+    * Include warning about Google Sheet permissions.
