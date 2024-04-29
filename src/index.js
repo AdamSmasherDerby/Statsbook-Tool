@@ -248,7 +248,7 @@ let getVersion = (workbook) => {
     // Note that this will ALSO fire if the statsbook version is NEWER.
     if (sbVersion < currentVersion){
         sbErrors.warnings.oldStatsbookVersion.events.push(
-            `This File: ${sbVersion}  Current Supported Version: ${currentVersion} `
+            `This File: ${sbVersion}  Current Preferred Version: ${currentVersion} `
         )
     }
 
@@ -924,7 +924,15 @@ let readPenalties = (workbook) => {
 
                 let skaterNum = sheet[XLSX.utils.encode_cell(numberAddress)]
 
-                if (skaterNum == undefined || skaterNum.v == ''){continue}
+                if (skaterNum == undefined || skaterNum.v == ''){
+                    if (period == 1 && s == 0 && i == 0) { // run this check once only
+                        fileInfoBox.innerHTML = '<B>WARNING:</B> The values in this file do not appear to have been calculated,'
+                        + ' probably due to direct export from the scoreboard.  '
+                        + 'Please open the file in Excel and save it before using this tool.<br>'
+                        + fileInfoBox.innerHTML
+                    }
+                    continue
+                }
 
                 // ERROR CHECK: skater on penalty sheet not on the IGRF
                 if (sbData.teams[team].persons.findIndex(x => x.number == skaterNum.v) == -1){
