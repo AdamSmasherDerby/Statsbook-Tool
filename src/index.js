@@ -233,7 +233,7 @@ let createRefreshButton = () => {
 let getVersion = (workbook) => {
     // Determine version of Statsbook file.
 
-    let currentVersion = '2019'
+    let currentVersion = '2024'
     let currentJRDAVersion = '2024jrda'
     let defaultVersion = '2018'
     let sheet = workbook.Sheets['Read Me']
@@ -244,12 +244,26 @@ let getVersion = (workbook) => {
         sbVersion = sbVersion.concat('jrda')
     }
 
+    // Warning check: outdated statsbook version
+    // Note that this will ALSO fire if the statsbook version is NEWER.
+    if (sbVersion < currentVersion){
+        sbErrors.warnings.oldStatsbookVersion.events.push(
+            `This File: ${sbVersion}  Current Supported Version: ${currentVersion} `
+        )
+    }
+
+    // Check for NEWER statsbook version
+    if (sbVersion > currentVersion){
+        sbVersion.includes('jrda') ? sbVersion = currentJRDAVersion : sbVersion = currentVersion
+    }
+
     switch (sbVersion){
     case '2024jrda':
     case '2023jrda':
         sbTemplate = template2023jrda
         currentVersion = currentJRDAVersion
         break
+    case '2024':
     case '2019':
     case '2018':
         sbTemplate = template2018
@@ -261,18 +275,6 @@ let getVersion = (workbook) => {
         sbTemplate = {}
     }
 
-    // Warning check: outdated statsbook version
-    // Note that this will ALSO fire if the statsbook version is NEWER.
-    if (sbVersion != currentVersion){
-        sbErrors.warnings.oldStatsbookVersion.events.push(
-            `This File: ${sbVersion}  Current Supported Version: ${currentVersion} `
-        )
-    }
-
-    // Check for NEWER statsbook version
-    if (sbVersion > currentVersion){
-        sbVersion.includes('jrda') ? sbVersion = currentJRDAVersion : sbVersion = currentVersion
-    }
 }
 
 let readIGRF = (workbook) => {
@@ -1470,6 +1472,7 @@ let readLineups = (workbook) => {
                             }
                             break
                         case '2019':
+                        case '2024':
                         case '2023jrda':
                         case '2024jrda':
                             // Possible codes - -, +, S, $, 3
